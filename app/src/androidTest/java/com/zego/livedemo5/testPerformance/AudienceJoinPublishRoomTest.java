@@ -48,7 +48,7 @@ public class AudienceJoinPublishRoomTest {
     public void setup(){
         printLog("AudienceJoinPublishRoomTest->setup()");
         mActivity=mMainActivity.getActivity();
-        sleep(10000);
+        sleep(30000);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class AudienceJoinPublishRoomTest {
         onView(ViewMatchers.withText(anchorCameraInstrumentedTest.roomName)).perform(click());
         sleep(2000);
         onView(withId(R.id.tv_speaker)).perform(click());
-        sleep(60*1000*10);
+        sleep(60*1000*(PerformanceTest.RUNTIME));
         endPublish();
     }
 

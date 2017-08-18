@@ -36,14 +36,16 @@ public class ZegoApiManager {
     /**
      * 外部采集开关.
      */
-    private boolean mUseVideoCapture = true;
+    private boolean mUseVideoCapture = false;
 
-    private VideoCaptureFactoryDemo factoryDemo;
+    private VideoCaptureFactoryDemo mVideoCaptureFactoryDemo = null;
 
     /**
      * 外部滤镜开关.
      */
     private boolean mUseVideoFilter = false;
+
+    private VideoFilterFactoryDemo mVideoFilterFactoryDemo = null;
 
     private boolean mUseHardwareEncode = false;
 
@@ -88,16 +90,17 @@ public class ZegoApiManager {
         // 外部采集
         if (mUseVideoCapture) {
             // 外部采集
-            factoryDemo = new VideoCaptureFactoryDemo();
-            factoryDemo.setContext(ZegoApplication.sApplicationContext);
-            ZegoLiveRoom.setVideoCaptureFactory(factoryDemo);
+            mVideoCaptureFactoryDemo = new VideoCaptureFactoryDemo();
+            mVideoCaptureFactoryDemo.setContext(ZegoApplication.sApplicationContext);
+            ZegoLiveRoom.setVideoCaptureFactory(mVideoCaptureFactoryDemo);
         }
 
         // 外部滤镜
         if (mUseVideoFilter) {
             // 外部滤镜
-            VideoFilterFactoryDemo videoFilterFactoryDemo = new VideoFilterFactoryDemo();
-            ZegoLiveRoom.setVideoFilterFactory(videoFilterFactoryDemo);
+            mVideoFilterFactoryDemo = new VideoFilterFactoryDemo();
+            mVideoFilterFactoryDemo.setContext(ZegoApplication.sApplicationContext);
+            ZegoLiveRoom.setVideoFilterFactory(mVideoFilterFactoryDemo);
         }
     }
 
@@ -273,6 +276,11 @@ public class ZegoApiManager {
     }
 
     public FaceunityController getFaceunityController() {
-        return factoryDemo.getDevice();
+        if (mVideoCaptureFactoryDemo != null) {
+            return mVideoCaptureFactoryDemo.getFaceunityController();
+        } else if (mVideoFilterFactoryDemo != null) {
+            return mVideoFilterFactoryDemo.getFaceunityController();
+        }
+        return null;
     }
 }

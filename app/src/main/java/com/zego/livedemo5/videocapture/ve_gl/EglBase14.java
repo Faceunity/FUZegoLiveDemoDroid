@@ -45,16 +45,16 @@ public final class EglBase14 extends EglBase {
     }
 
     public static class Context extends EglBase.Context {
-        private final EGLContext egl14Context;
+        private final android.opengl.EGLContext egl14Context;
 
-        public Context(EGLContext eglContext) {
+        public Context(android.opengl.EGLContext eglContext) {
             this.egl14Context = eglContext;
         }
     }
 
     // Create a new context with the specified config type, sharing data with sharedContext.
     // |sharedContext| may be null.
-    public EglBase14(Context sharedContext, int[] configAttributes) {
+    public EglBase14(EglBase14.Context sharedContext, int[] configAttributes) {
         eglDisplay = getEglDisplay();
         eglConfig = getEglConfig(eglDisplay, configAttributes);
         eglContext = createEglContext(sharedContext, eglDisplay, eglConfig);
@@ -112,7 +112,7 @@ public final class EglBase14 extends EglBase {
 
     @Override
     public Context getEglBaseContext() {
-        return new Context(eglContext);
+        return new EglBase14.Context(eglContext);
     }
 
     @Override
@@ -248,7 +248,7 @@ public final class EglBase14 extends EglBase {
 
     // Return an EGLConfig, or die trying.
     private static EGLContext createEglContext(
-            Context sharedContext, EGLDisplay eglDisplay, EGLConfig eglConfig) {
+            EglBase14.Context sharedContext, EGLDisplay eglDisplay, EGLConfig eglConfig) {
         if (sharedContext != null && sharedContext.egl14Context == EGL14.EGL_NO_CONTEXT) {
             throw new RuntimeException("Invalid sharedContext");
         }

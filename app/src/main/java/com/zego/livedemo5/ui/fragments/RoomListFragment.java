@@ -140,7 +140,7 @@ public class RoomListFragment extends AbsBaseFragment implements MainActivity.On
     }
 
     @Override
-    protected void initViews(View rootView) {
+    protected void initViews() {
         mLinearLayoutManager = new LinearLayoutManager(mParentActivity);
         rlvRoomList.setLayoutManager(mLinearLayoutManager);
         rlvRoomList.addItemDecoration(new SpaceItemDecoration(mResources.getDimensionPixelSize(R.dimen.dimen_5)));

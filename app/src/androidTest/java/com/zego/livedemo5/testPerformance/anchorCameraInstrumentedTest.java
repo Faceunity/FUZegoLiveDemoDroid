@@ -43,13 +43,14 @@ public class anchorCameraInstrumentedTest {
     public void setup(){
         mActivity=mActivityRule.getActivity();
         onView(withText(mActivity.getResources().getStringArray(R.array.navigation_bar_titles)[1])).perform(click());
-        clickToGetPermission(5);
+        sleep(90000);
+//        clickToGetPermission(5);
 //        allowPermissionIfNeed();
     }
 
     @Test
     public void startTest(){
-        test3(10);
+        test3(PerformanceTest.RUNTIME+2);
     }
 
     /**
@@ -58,6 +59,7 @@ public class anchorCameraInstrumentedTest {
      */
     public void test3(int minute){
         printLog("onlyOpenCameraTest");
+        sleep(1000);
         startPublish(roomName,R.id.tv_select_single_anchor);
         sleep(2000);
         onView(withId(R.id.tv_speaker)).perform(click());
@@ -70,7 +72,8 @@ public class anchorCameraInstrumentedTest {
      * 麦克风默认是打开的
      */
     public void openOrCloseMicrophone(){
-        waitForPublishSuccess(5000, mActivity);//点击设置之前要等待推流成功
+//        waitForPublishSuccess(5000, mActivity);//点击设置之前要等待推流成功
+        sleep(30000);//暂停30s等待推流结束
         onView(withId(R.id.tv_publish_settings)).perform(click());
         sleep(1000);//点击设置面板上的控件之前需要等待settingPanel动画的完成
         onView(withId(R.id.tb_mic)).perform(click());
@@ -79,7 +82,8 @@ public class anchorCameraInstrumentedTest {
 
     public void startPublish(String publishName,int publishType){
         //设置房间名
-        onView(withId(R.id.et_publish_title)).perform(clearText(),replaceText(publishName), closeSoftKeyboard());
+        onView(withId(R.id.et_publish_title)).perform(clearText(),replaceText(publishName));
+        sleep(500);
         //点击开始按钮
         onView(withId(R.id.btn_start_publish)).perform(click());
         sleep(500);

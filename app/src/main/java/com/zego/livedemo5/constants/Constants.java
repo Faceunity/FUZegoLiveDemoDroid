@@ -13,5 +13,5 @@ public class Constants {
     public static final String FIRST_ANCHOR = "first";
 
     public static final String KEY_MIX_STREAM_ID = "mixStreamID";
-    
+
 }

@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -179,7 +177,7 @@ public class ViewLive extends RelativeLayout {
             mTvShare.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mActivityHost != null && mShareToQQCallback != null){
+                    if (mActivityHost != null && mShareToQQCallback != null) {
                         ShareUtils.getInstance().shareToQQ(mActivityHost, mListShareUrls, mShareToQQCallback.getRoomID(), mStreamID);
                     }
                 }
@@ -310,7 +308,7 @@ public class ViewLive extends RelativeLayout {
         mNeedToSwitchFullScreen = needToSwitchFullScreen;
         mZegoVideoViewMode = mode;
 
-        if(mTvSwitchToFullScreen != null){
+        if (mTvSwitchToFullScreen != null) {
             if (mNeedToSwitchFullScreen) {
                 mTvSwitchToFullScreen.setVisibility(View.VISIBLE);
 
@@ -370,11 +368,11 @@ public class ViewLive extends RelativeLayout {
         mStreamID = streamID;
     }
 
-    public String getStreamID(){
+    public String getStreamID() {
         return mStreamID;
     }
 
-    public boolean isPublishView(){
+    public boolean isPublishView() {
         return mIsPublishView;
     }
 
@@ -390,7 +388,7 @@ public class ViewLive extends RelativeLayout {
         mIsPlayView = playView;
     }
 
-    public interface IShareToQQCallback{
+    public interface IShareToQQCallback {
         String getRoomID();
     }
 }

@@ -3,12 +3,10 @@ package com.zego.livedemo5.ui.activities.wolvesgame;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.view.Surface;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -28,10 +26,10 @@ import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.constants.ZegoIM;
 import com.zego.zegoliveroom.constants.ZegoVideoViewMode;
 import com.zego.zegoliveroom.entity.AuxData;
-import com.zego.zegoliveroom.entity.ZegoStreamQuality;
 import com.zego.zegoliveroom.entity.ZegoConversationMessage;
 import com.zego.zegoliveroom.entity.ZegoRoomMessage;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
+import com.zego.zegoliveroom.entity.ZegoStreamQuality;
 import com.zego.zegoliveroom.entity.ZegoUser;
 import com.zego.zegoliveroom.entity.ZegoUserState;
 
@@ -60,7 +58,6 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
      * 当前参与游戏的人员列表
      */
     private LinkedList<WolfInfo> inGamingMembers;
-
 
 
     public static void actionStart(Activity activity, String publishTitle, int appOrientation) {
@@ -153,10 +150,9 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
     }
 
     /**
-     * @see WolvesGameBaseActivity#handleUIMessage(Message)
-     *
      * @param msg
      * @return
+     * @see WolvesGameBaseActivity#handleUIMessage(Message)
      */
     @Override
     protected boolean handleUIMessage(Message msg) {
@@ -256,7 +252,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         if (TextUtils.isEmpty(streamId)) return;
 
 //        if (currentPublishMode != PublishMode.Super_Low_Delay) {
-            zegoLiveRoom.stopPlayingStream(streamId);
+        zegoLiveRoom.stopPlayingStream(streamId);
 //        }
     }
 
@@ -390,7 +386,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
     }
 
     private void showSelectPublishWayDialog() {
-        String[] publishWays = new String[] {
+        String[] publishWays = new String[]{
                 getString(R.string.publish_way_low_delay), getString(R.string.publish_way_low_cost)
         };
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -541,7 +537,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
                             IZegoCustomCommandCallback callback = callbackRef.get();
                             if (callback == null) {
                                 Toast.makeText(WolvesGameHostActivity.this, "发送指令时出错)", Toast.LENGTH_LONG).show();
-                            } else{
+                            } else {
                                 sendAllowSpeakingCommand(wolf.getUserId(), callbackRef.get());
                             }
                         }
@@ -569,7 +565,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
     private void handleAnswerRoomInfoCommand(String userId, String userName) {
         removeOlderUser(userId, true);
 
-        currentIndex ++;
+        currentIndex++;
 
         ZegoUser zegoUser = new ZegoUser();
         zegoUser.userID = userId;
@@ -617,7 +613,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         } catch (JSONException e) {
         }
 
-        zegoLiveRoom.sendCustomCommand(new ZegoUser[] { toUser }, cmdJson.toString(), callback);
+        zegoLiveRoom.sendCustomCommand(new ZegoUser[]{toUser}, cmdJson.toString(), callback);
     }
 
     private void sendNewUserJoinRoomCommand(WolfInfo newWolf, IZegoCustomCommandCallback callback) {
@@ -698,9 +694,9 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 推流状态更新.
          *
-         * @param stateCode     状态码, 0:成功, 其它:失败
-         * @param streamId      流ID
-         * @param streamInfo    推流信息
+         * @param stateCode  状态码, 0:成功, 其它:失败
+         * @param streamId   流ID
+         * @param streamInfo 推流信息
          */
         @Override
         public void onPublishStateUpdate(int stateCode, String streamId, HashMap<String, Object> streamInfo) {
@@ -753,10 +749,10 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 收到连麦请求.
          *
-         * @param seq            请求seq
-         * @param fromUserId     来源用户ID
-         * @param fromUserName   来源用户名
-         * @param roomId         房间ID
+         * @param seq          请求seq
+         * @param fromUserId   来源用户ID
+         * @param fromUserName 来源用户名
+         * @param roomId       房间ID
          */
         @Override
         public void onJoinLiveRequest(int seq, String fromUserId, String fromUserName, String roomId) {
@@ -771,7 +767,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 音乐伴奏回调, 每次取20毫秒的数据.
          *
-         * @param dataLen  20毫秒的数据长度
+         * @param dataLen 20毫秒的数据长度
          * @return 背景音乐数据
          */
         @Override
@@ -782,8 +778,8 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 采集视频的宽度和高度变化通知.
          *
-         * @param width     视频宽度
-         * @param height    视频高度
+         * @param width  视频宽度
+         * @param height 视频高度
          */
         @Override
         public void onCaptureVideoSizeChangedTo(int width, int height) {
@@ -793,9 +789,9 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 混流配置更新。
          *
-         * @param stateCode     状态码, 0:成功, 其它:失败
-         * @param mixStreamId   混流ID
-         * @param streamInfo    混流信息
+         * @param stateCode   状态码, 0:成功, 其它:失败
+         * @param mixStreamId 混流ID
+         * @param streamInfo  混流信息
          */
         @Override
         public void onMixStreamConfigUpdate(int stateCode, String mixStreamId, HashMap<String, Object> streamInfo) {
@@ -807,8 +803,8 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 拉流状态更新.
          *
-         * @param stateCode     状态码, 0:成功, 其它:失败
-         * @param streamId      流ID
+         * @param stateCode 状态码, 0:成功, 其它:失败
+         * @param streamId  流ID
          */
         @Override
         public void onPlayStateUpdate(int stateCode, String streamId) {
@@ -823,10 +819,10 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 收到连麦邀请.
          *
-         * @param seq           请求 seq
-         * @param fromUserId    来源用户ID
-         * @param fromUserName  来源用户名
-         * @param roomId        房间ID
+         * @param seq          请求 seq
+         * @param fromUserId   来源用户ID
+         * @param fromUserName 来源用户名
+         * @param roomId       房间ID
          */
         @Override
         public void onInviteJoinLiveRequest(int seq, String fromUserId, String fromUserName, String roomId) {
@@ -841,9 +837,9 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 视频宽高变化通知,startPlay后，如果视频宽度或者高度发生变化(首次的值也会)，则收到该通知.
          *
-         * @param streamId  流ID
-         * @param width     视频宽度
-         * @param height    视频高度
+         * @param streamId 流ID
+         * @param width    视频宽度
+         * @param height   视频高度
          */
         @Override
         public void onVideoSizeChangedTo(String streamId, int width, int height) {
@@ -855,8 +851,8 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 房间成员更新回调.
          *
-         * @param listUser     成员更新列表
-         * @param updateType   @see com.zego.zegoliveroom.constants.ZegoIM#UserUpdateType
+         * @param listUser   成员更新列表
+         * @param updateType @see com.zego.zegoliveroom.constants.ZegoIM#UserUpdateType
          */
         @Override
         public void onUserUpdate(ZegoUserState[] listUser, int updateType) {
@@ -877,8 +873,8 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 收到房间的广播消息.
          *
-         * @param roomId        房间ID
-         * @param listMsg       消息列表, 包括消息内容，消息分类，消息类型，发送者等信息
+         * @param roomId  房间ID
+         * @param listMsg 消息列表, 包括消息内容，消息分类，消息类型，发送者等信息
          */
         @Override
         public void onRecvRoomMessage(String roomId, ZegoRoomMessage[] listMsg) {
@@ -888,9 +884,9 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 收到会话消息.
          *
-         * @param roomId            房间ID
-         * @param conversationId    会话ID
-         * @param message           会话消息, 包括消息内容，消息类型，发送者，发送时间等信息
+         * @param roomId         房间ID
+         * @param conversationId 会话ID
+         * @param message        会话消息, 包括消息内容，消息类型，发送者，发送时间等信息
          */
         @Override
         public void onRecvConversationMessage(String roomId, String conversationId, ZegoConversationMessage message) {
@@ -902,8 +898,8 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 因为登陆抢占原因等被挤出房间.
          *
-         * @param reason    原因
-         * @param roomId    房间ID
+         * @param reason 原因
+         * @param roomId 房间ID
          */
         @Override
         public void onKickOut(int reason, String roomId) {
@@ -913,8 +909,8 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 与 server 断开.
          *
-         * @param errorCode  错误码
-         * @param roomId     房间ID
+         * @param errorCode 错误码
+         * @param roomId    房间ID
          */
         @Override
         public void onDisconnect(int errorCode, String roomId) {
@@ -922,11 +918,11 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         }
 
         /**
-         *  房间流列表更新.
+         * 房间流列表更新.
          *
-         * @param type          2001:增加, 2002:删除
-         * @param listStream    流列表
-         * @param roomId        房间ID
+         * @param type       2001:增加, 2002:删除
+         * @param listStream 流列表
+         * @param roomId     房间ID
          */
         @Override
         public void onStreamUpdated(int type, ZegoStreamInfo[] listStream, String roomId) {
@@ -950,6 +946,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
 
         /**
          * 更新流的额外信息.
+         *
          * @param listStream
          * @param roomId
          */
@@ -961,21 +958,21 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         /**
          * 收到自定义消息.
          *
-         * @param fromUserId     消息来源UserID
-         * @param fromUserName   消息来源UserName
-         * @param content    消息内容
-         * @param roomId     房间ID
+         * @param fromUserId   消息来源UserID
+         * @param fromUserName 消息来源UserName
+         * @param content      消息内容
+         * @param roomId       房间ID
          */
         @Override
         public void onRecvCustomCommand(String fromUserId, String fromUserName, String content, String roomId) {
             recordLog("收到自定义消息, fromUserId: %s; fromUserName: %s; roomId: %s; content: %s", fromUserId, fromUserName, roomId, content);
-            JSONObject json = (JSONObject)JsonUtil.safeDecodeFromString(content);
+            JSONObject json = (JSONObject) JsonUtil.safeDecodeFromString(content);
             int command = json.optInt(kSpeakingCommandKey, 0);
             switch (command) {
                 case SpeakingCmd.StopSpeaking: {
                     handleStopSpeakingCommand(json);
                 }
-                    break;
+                break;
 
                 case SpeakingCmd.StartSpeaking:
                     handleStartSpeakingCommand(json);
@@ -984,7 +981,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
                 case SpeakingCmd.AskRoomInfo: {
                     handleAnswerRoomInfoCommand(fromUserId, fromUserName);
                 }
-                    break;
+                break;
 
                 case SpeakingCmd.UserLeaveRoom: {
                     String userId = json.optString(kSpeakingUserIdKey);
@@ -992,7 +989,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
 
                     removeOlderUser(userId, false);
                 }
-                    break;
+                break;
 
                 default:
                     recordLog("主播忽略消息, fromUserName: %s; Command: %d", fromUserName, command);

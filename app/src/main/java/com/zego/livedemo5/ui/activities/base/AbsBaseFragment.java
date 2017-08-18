@@ -57,7 +57,7 @@ public abstract class AbsBaseFragment extends Fragment {
     /**
      * 初始化子类中的控件.
      */
-    protected abstract void initViews(View rootView);
+    protected abstract void initViews();
 
     /**
      * 加载数据.
@@ -82,7 +82,7 @@ public abstract class AbsBaseFragment extends Fragment {
             // 初始化View注入
             ButterKnife.bind(this, mRootView);
 
-            initViews(mRootView);
+            initViews();
             loadData();
         } else {
             ViewGroup viewGroup = (ViewGroup) mRootView.getParent();

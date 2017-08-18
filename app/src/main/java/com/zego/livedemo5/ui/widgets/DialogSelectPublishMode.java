@@ -21,7 +21,7 @@ public class DialogSelectPublishMode extends DialogFragment implements View.OnCl
 
     private OnSelectPublishModeListener mOnSelectPublishModeListener;
 
-    public void setOnSelectPublishModeListener(OnSelectPublishModeListener listener){
+    public void setOnSelectPublishModeListener(OnSelectPublishModeListener listener) {
         mOnSelectPublishModeListener = listener;
     }
 
@@ -56,37 +56,41 @@ public class DialogSelectPublishMode extends DialogFragment implements View.OnCl
 
     @Override
     public void onClick(View v) {
-            if(mOnSelectPublishModeListener != null){
-                switch (v.getId()) {
-                    case R.id.tv_select_single_anchor:
-                        mOnSelectPublishModeListener.onSingleAnchorSelect();
-                        break;
-                    case R.id.tv_select_more_anchors:
-                        mOnSelectPublishModeListener.onMoreAnchorsSelect();
-                        break;
-                    case R.id.tv_select_mix_stream:
-                        mOnSelectPublishModeListener.onMixStreamSelect();
-                        break;
-                    case R.id.tv_select_game_living:
-                        mOnSelectPublishModeListener.onGameLivingSelect();
-                        break;
-                    case R.id.tv_select_wolves_game:
-                        mOnSelectPublishModeListener.onWolvesGameSelect();
-                        break;
-                    case R.id.tv_cancel:
-                        break;
-                }
-
-                dismiss();
+        if (mOnSelectPublishModeListener != null) {
+            switch (v.getId()) {
+                case R.id.tv_select_single_anchor:
+                    mOnSelectPublishModeListener.onSingleAnchorSelect();
+                    break;
+                case R.id.tv_select_more_anchors:
+                    mOnSelectPublishModeListener.onMoreAnchorsSelect();
+                    break;
+                case R.id.tv_select_mix_stream:
+                    mOnSelectPublishModeListener.onMixStreamSelect();
+                    break;
+                case R.id.tv_select_game_living:
+                    mOnSelectPublishModeListener.onGameLivingSelect();
+                    break;
+                case R.id.tv_select_wolves_game:
+                    mOnSelectPublishModeListener.onWolvesGameSelect();
+                    break;
+                case R.id.tv_cancel:
+                    break;
             }
+
+            dismiss();
+        }
     }
 
 
-    public interface OnSelectPublishModeListener{
+    public interface OnSelectPublishModeListener {
         void onSingleAnchorSelect();
+
         void onMoreAnchorsSelect();
+
         void onMixStreamSelect();
+
         void onGameLivingSelect();
+
         void onWolvesGameSelect();
     }
 

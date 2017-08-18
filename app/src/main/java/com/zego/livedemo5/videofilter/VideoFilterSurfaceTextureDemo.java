@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
  */
 
 public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter {
-    private Client mClient = null;
+    private ZegoVideoFilter.Client mClient = null;
     private ZegoImageFilter mFilter = null;
     private int mWidth = 0;
     private int mHeight = 0;
@@ -89,5 +89,10 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter {
     @Override
     protected SurfaceTexture getSurfaceTexture() {
         return mFilter.getInputSurfaceTexture();
+    }
+
+    @Override
+    protected void onProcessCallback(int textureId, int width, int height, long timestamp_100n) {
+
     }
 }

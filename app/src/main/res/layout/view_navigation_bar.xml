@@ -61,5 +61,4 @@
             android:textSize="@dimen/text_size_3"
             tools:text="直播"/>
     </RelativeLayout>
-
 </LinearLayout>

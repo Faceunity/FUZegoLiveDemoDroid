@@ -64,7 +64,7 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
     private Handler mHandler = null;
 
     private Context mContext = null;
-    private Client mClient = null;
+    private ZegoVideoCaptureDevice.Client mClient = null;
     private boolean mIsEgl14 = false;
 
     private int mX = 0;
@@ -579,7 +579,7 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
 
     private void releasePreviewSurfaceSafe() {
 
-        if(mHandler != null){
+        if (mHandler != null) {
             final CountDownLatch barrier = new CountDownLatch(1);
             mHandler.post(new Runnable() {
                 @Override
@@ -593,7 +593,7 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }else {
+        } else {
             releasePreviewSurface();
         }
 

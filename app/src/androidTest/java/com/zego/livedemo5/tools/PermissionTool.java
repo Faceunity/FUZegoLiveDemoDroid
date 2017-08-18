@@ -67,7 +67,7 @@ public final class PermissionTool {
 
     private static void clickAllowButtonInPermissionDialog(String btnClassName, String btnResId) {
         printLog("get UiDevice instance");
-        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        android.support.test.uiautomator.UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         printLog("UiDevice instance: %s", device);
         UiObject allowPermission = device.findObject(new UiSelector().className(btnClassName).resourceId(btnResId));
         printLog("find allow permission dialog button: %s, exists: %s", allowPermission, allowPermission.exists());

@@ -191,11 +191,6 @@ public class MoreAnchorsPublishActivity extends BasePublishActivity {
         });
     }
 
-    @Override
-    protected boolean isShowFaceunityUi() {
-        return true;
-    }
-
 
     @Override
     protected void initPublishControlText() {
@@ -236,5 +231,10 @@ public class MoreAnchorsPublishActivity extends BasePublishActivity {
         } else {
             startPublish();
         }
+    }
+
+    @Override
+    protected boolean isShowFaceunityUi() {
+        return true;
     }
 }

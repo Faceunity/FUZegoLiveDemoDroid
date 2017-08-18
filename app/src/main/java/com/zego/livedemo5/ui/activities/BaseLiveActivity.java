@@ -76,6 +76,7 @@ import static com.tencent.open.utils.Global.getContext;
  * des: 主页面
  */
 public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements View.OnClickListener {
+
     public static final String TAG = "BaseLiveActivity";
 
     protected InputStream mIsBackgroundMusic = null;
@@ -115,6 +116,8 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
     protected boolean mEnableTorch = false;
 
     protected boolean mEnableBackgroundMusic = false;
+
+    protected boolean mEnableLoopback = false;
 
     protected int mSelectedBeauty = 0;
 
@@ -198,6 +201,17 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
 
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        startPublish();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopPublish();
+    }
+    @Override
     protected int getContentViewLayout() {
         return R.layout.activity_live;
     }
@@ -222,7 +236,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
     private void initSettingPannel() {
 
         mSettingsPannel = (PublishSettingsPannel) findViewById(R.id.publishSettingsPannel);
-        mSettingsPannel.initPublishSettings(mEnableCamera, mEnableFrontCam, mEnableMic, mEnableTorch, mEnableBackgroundMusic, mSelectedBeauty, mSelectedFilter);
+        mSettingsPannel.initPublishSettings(mEnableCamera, mEnableFrontCam, mEnableMic, mEnableTorch, mEnableBackgroundMusic, mEnableLoopback, mSelectedBeauty, mSelectedFilter);
         mSettingsPannel.setPublishSettingsCallback(new PublishSettingsPannel.PublishSettingsCallback() {
             @Override
             public void onEnableCamera(boolean isEnable) {
@@ -263,6 +277,12 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
                         mIsBackgroundMusic = null;
                     }
                 }
+            }
+
+            @Override
+            public void onEnableLoopback(boolean isEnable) {
+                mEnableLoopback = isEnable;
+                mZegoLiveRoom.enableLoopback(isEnable);
             }
 
             @Override
@@ -348,7 +368,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
 
         mRlytControlHeader.bringToFront();
 
-        if (!ZegoApiManager.getInstance().isUseVideoCapture() || !isShowFaceunityUi()) {
+        if (!(ZegoApiManager.getInstance().isUseVideoCapture() || ZegoApiManager.getInstance().isUseVideoFilter()) || !isShowFaceunityUi()) {
             mMainBottom.setVisibility(View.GONE);
             return;
         }
@@ -545,18 +565,6 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
 
     @Override
     protected void doBusiness(Bundle savedInstanceState) {
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        startPublish();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopPublish();
     }
 
     /**
@@ -844,6 +852,9 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
     }
 
     protected void logout() {
+
+        mEnableLoopback = false;
+        mZegoLiveRoom.enableLoopback(false);
 
         if (mIsPublishing) {
             AlertDialog dialog = new AlertDialog.Builder(this).setMessage(getString(R.string.do_you_really_want_to_leave)).setTitle(getString(R.string.hint)).setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
@@ -1276,6 +1287,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
         }
         return listUrls;
     }
+
 
     @Override
     public void onClick(View v) {

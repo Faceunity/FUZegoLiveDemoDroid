@@ -15,7 +15,7 @@ android {
 
         ndk {
             //设置支持的SO库架构
-            abiFilters 'armeabi' , 'armeabi-v7a', 'arm64-v8a'
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a'
         }
     }
 
@@ -56,16 +56,17 @@ android {
     }
 }
 
-def getDemoVersionName(){
+def getDemoVersionName() {
     String versionName = "1.0"
     File version_file = file("../demo_version.txt")
-    if(version_file.exists()){
+    if (version_file.exists()) {
         versionName = version_file.readLines()[0]
     }
     return versionName
 }
 
 dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'faceunity')
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile fileTree(include: ['*.jar'], dir: 'bizlibs')
     compile fileTree(include: ['*.jar'], dir: '3rdlibs')
@@ -91,7 +92,7 @@ dependencies {
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
 
     androidTestCompile 'com.android.support.test.espresso:espresso-core:' + rootProject.espressoVersion
-    androidTestCompile ('com.android.support.test.espresso:espresso-contrib:' + rootProject.espressoVersion) {
+    androidTestCompile('com.android.support.test.espresso:espresso-contrib:' + rootProject.espressoVersion) {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.android.support', module: 'appcompat-v7'
         exclude group: 'com.android.support', module: 'design'

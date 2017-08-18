@@ -99,7 +99,6 @@
     <dimen name="avatar_width">@dimen/dimen_60</dimen>
     <dimen name="avatar_height">@dimen/dimen_60</dimen>
 
-
     <dimen name="big_space">11dp</dimen>
     <dimen name="max_space">10dp</dimen>
     <dimen name="normal_space">8dp</dimen>

@@ -41,13 +41,14 @@ public class anchorMicInstrumentedTest {
     public void setup(){
         mActivity=mActivityRule.getActivity();
         onView(withText(mActivity.getResources().getStringArray(R.array.navigation_bar_titles)[1])).perform(click());
-        clickToGetPermission(5);
+        sleep(90000);
+//        clickToGetPermission(5);
 //        allowPermissionIfNeed();
     }
 
     @Test
     public void startTest(){
-        test2(10);
+        test2(PerformanceTest.RUNTIME+2);
     }
 
     /**
@@ -68,7 +69,8 @@ public class anchorMicInstrumentedTest {
      * 默认情况下是打开前置摄像头的
      */
     public void openOrCloseCamera(){
-        waitForPublishSuccess(5000, mActivity);
+//        waitForPublishSuccess(5000, mActivity);
+        sleep(30000);//暂停10s等待推流结束
         onView(withId(R.id.tv_publish_settings)).perform(click());
         sleep(1000);
         onView(withId(R.id.tb_camera)).perform(click());
@@ -78,7 +80,8 @@ public class anchorMicInstrumentedTest {
 
     public void startPublish(String publishName,int publishType){
         //设置房间名
-        onView(withId(R.id.et_publish_title)).perform(clearText(),replaceText(publishName), closeSoftKeyboard());
+        onView(withId(R.id.et_publish_title)).perform(clearText(),replaceText(publishName));
+        sleep(500);
         //点击开始按钮
         onView(withId(R.id.btn_start_publish)).perform(click());
         sleep(500);

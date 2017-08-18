@@ -48,6 +48,7 @@
     <string name="camera">Camera</string>
     <string name="speaker">Speaker</string>
     <string name="background_music">Backgroud Music</string>
+    <string name="loopback">Loopback</string>
     <string name="mic">Microphone</string>
     <string name="flashlight">Flashlight</string>
     <string name="beauty">Beauty</string>
@@ -89,9 +90,9 @@
     <string name="play_mixstream">Play MixStream</string>
     <string name="wolves_game_mode">Wolves Game</string>
 
-    <string name="external_capture">External Capture</string>
+    <string name="external_capture">FU External Capture</string>
     <string name="external_render">External Render</string>
-    <string name="external_filter">External Filter</string>
+    <string name="external_filter">FU External Filter</string>
     <string name="hardware_encode">Hardware Encode</string>
     <string name="hardware_decode">Hardware_Decode</string>
     <string name="rate_control">Rate Control</string>

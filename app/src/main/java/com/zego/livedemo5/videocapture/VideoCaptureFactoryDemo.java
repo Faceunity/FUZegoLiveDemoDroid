@@ -37,8 +37,8 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         mContext = context;
     }
 
-    public FaceunityController getDevice() {
-        if(mDevice instanceof  FaceunityController) {
+    public FaceunityController getFaceunityController() {
+        if (mDevice instanceof FaceunityController) {
             return (FaceunityController) mDevice;
         }
         return null;

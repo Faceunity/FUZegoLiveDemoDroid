@@ -12,7 +12,8 @@
         android:background="?attr/colorPrimary"
         app:navigationIcon="@mipmap/ic_setting_72"
         app:popupTheme="@style/AppTheme.PopupOverlay"
-        app:title="@string/app_name"/>
+        app:title="@string/app_name"
+        />
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawerlayout"

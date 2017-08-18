@@ -21,6 +21,7 @@ import com.zego.livedemo5.ZegoApiManager;
 import com.zego.livedemo5.ZegoAppHelper;
 import com.zego.livedemo5.ui.activities.AboutZegoActivity;
 import com.zego.livedemo5.ui.activities.base.AbsBaseFragment;
+import com.zego.livedemo5.utils.ByteSizeUnit;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.SystemUtil;
 import com.zego.zegoliveroom.ZegoLiveRoom;
@@ -137,7 +138,7 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
     }
 
     @Override
-    protected void initViews(View rootView) {
+    protected void initViews() {
 
         // 用户信息
         tvsdkVersion.setText(ZegoLiveRoom.version());
@@ -158,7 +159,7 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
                         tvFps.setText(getString(R.string.fps_prefix, progress + ""));
                         break;
                     case R.id.sb_bitrate:
-                        tvBitrate.setText(getString(R.string.bitrate_prefix, progress + ""));
+                        tvBitrate.setText(getString(R.string.bitrate_prefix, ByteSizeUnit.toHumanString(progress, ByteSizeUnit.RADIX_TYPE.K, 2)) + "ps");
                         break;
                 }
             }
@@ -189,10 +190,10 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
         tvFps.setText(getString(R.string.fps_prefix, "15"));
 
         // 初始化码率, 默认为 1200 * 1000
-        seekBarBitrate.setMax(ZegoAvConfig.VIDEO_BITRATES[ZegoAvConfig.VIDEO_BITRATES.length - 1]);
+        seekBarBitrate.setMax(ZegoAvConfig.VIDEO_BITRATES[ZegoAvConfig.VIDEO_BITRATES.length - 1] + 1000 * 1000);
         seekBarBitrate.setProgress(ZegoAvConfig.VIDEO_BITRATES[defaultLevel]);
         seekBarBitrate.setOnSeekBarChangeListener(seekBarChangeListener);
-        tvBitrate.setText(getString(R.string.bitrate_prefix, "" + ZegoAvConfig.VIDEO_BITRATES[defaultLevel]));
+        tvBitrate.setText(getString(R.string.bitrate_prefix, ByteSizeUnit.toHumanString(ZegoAvConfig.VIDEO_BITRATES[defaultLevel], ByteSizeUnit.RADIX_TYPE.K, 2)) + "ps");
 
         spinnerResolutions.setSelection(defaultLevel);
         spinnerResolutions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -223,13 +224,13 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
 
         long appId = ZegoApiManager.getInstance().getAppID();
         if (ZegoAppHelper.isUdpProduct(appId)) {
-            spAppFlavors.setSelection( 0 );
+            spAppFlavors.setSelection(0);
         } else if (ZegoAppHelper.isRtmpProduct(appId)) {
-            spAppFlavors.setSelection( 1 );
+            spAppFlavors.setSelection(1);
         } else if (ZegoAppHelper.isInternationalProduct(appId)) {
-            spAppFlavors.setSelection( 2 );
+            spAppFlavors.setSelection(2);
         } else {
-            spAppFlavors.setSelection( 3 );
+            spAppFlavors.setSelection(3);
         }
         spAppFlavors.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             private String convertSignKey2String(byte[] signKey) {
@@ -434,7 +435,7 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
     }
 
     @OnCheckedChanged({R.id.tb_modify_test_env, R.id.tb_hardware_encode, R.id.tb_hardware_decode, R.id.tb_rate_control
-    , R.id.tb_preview_mirror, R.id.tb_capture_mirror})
+            , R.id.tb_preview_mirror, R.id.tb_capture_mirror})
     public void onCheckedChanged1(CompoundButton compoundButton, boolean checked) {
         // "非点击按钮"时不触发回调
         if (!compoundButton.isPressed()) return;
@@ -483,7 +484,7 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
 
         switch (compoundButton.getId()) {
             case R.id.tb_video_capture:
-                if(checked){
+                if (checked) {
                     // 开启外部采集时, 关闭外部滤镜
                     tbVideoFilter.setChecked(false);
                     ZegoApiManager.getInstance().setUseVideoFilter(false);
@@ -492,7 +493,7 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
                 ZegoApiManager.getInstance().setUseVideoCapture(checked);
                 break;
             case R.id.tb_video_filter:
-                if(checked){
+                if (checked) {
                     // 开启外部滤镜时, 关闭外部采集
                     tbVideoCapture.setChecked(false);
                     ZegoApiManager.getInstance().setUseVideoCapture(false);

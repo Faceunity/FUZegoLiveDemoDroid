@@ -683,12 +683,10 @@ public class VideoCaptureFromFaceunity extends ZegoVideoCaptureDevice
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        releasePreviewSurfaceSafe();
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        releasePreviewSurfaceSafe();
         return false;
     }
 
@@ -702,12 +700,10 @@ public class VideoCaptureFromFaceunity extends ZegoVideoCaptureDevice
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        releasePreviewSurfaceSafe();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        releasePreviewSurfaceSafe();
     }
 
     private void releasePreviewSurfaceSafe() {

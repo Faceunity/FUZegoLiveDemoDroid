@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
-
 import com.zego.zegoliveroom.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;
@@ -21,7 +20,7 @@ import java.util.concurrent.CountDownLatch;
 public class VideoFilterMemDemo extends ZegoVideoFilter {
     private static final String TAG = "VideoFilterMemDemo";
 
-    private Client mClient = null;
+    private ZegoVideoFilter.Client mClient = null;
     private HandlerThread mThread = null;
     private volatile Handler mHandler = null;
 
@@ -32,6 +31,7 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
         public long timestamp_100n;
         public ByteBuffer buffer;
     }
+
     private ArrayList<PixelBuffer> mProduceQueue = new ArrayList<PixelBuffer>();
     private int mWriteIndex = 0;
     private int mWriteRemain = 0;
@@ -121,7 +121,7 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
     @Override
     protected synchronized void queueInputBuffer(int bufferIndex, final int width, int height, int stride, long timestamp_100n) {
         if (bufferIndex == -1) {
-            return ;
+            return;
         }
 
         PixelBuffer pixelBuffer = mProduceQueue.get(bufferIndex);
@@ -139,7 +139,7 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
             public void run() {
                 if (!mIsRunning) {
                     Log.e(TAG, "already stopped");
-                    return ;
+                    return;
                 }
 
                 PixelBuffer pixelBuffer = getConsumerPixelBuffer();
@@ -162,6 +162,11 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
     @Override
     protected SurfaceTexture getSurfaceTexture() {
         return null;
+    }
+
+    @Override
+    protected void onProcessCallback(int textureId, int width, int height, long timestamp_100n) {
+
     }
 
     private void createPixelBufferPool(int count) {

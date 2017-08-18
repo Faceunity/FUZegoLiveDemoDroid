@@ -11,4 +11,5 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({PerformanceInstrumentedTest.class})
 public class PerformanceTest {
+    public final static int RUNTIME=20;
 }

@@ -185,7 +185,7 @@ public final class TimeUtil {
             throw new NullPointerException("resources不能为空");
         }
         //long curMillis = getCurMillis();
-        long curMillis = System.currentTimeMillis() /  1000;
+        long curMillis = System.currentTimeMillis() / 1000;
         long offset = (curMillis - millis) * 1000;
         if (offset < Times.ONE_MINUTE_IN_MILLIS) {
             return resources.getString(R.string.recent); // 刚刚

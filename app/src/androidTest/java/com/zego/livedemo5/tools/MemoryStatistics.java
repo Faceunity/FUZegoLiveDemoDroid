@@ -48,7 +48,7 @@ public final class MemoryStatistics extends AbstractRecorder {
 
     private MemoryInfo getCurrentMemoryInfo() {
         Debug.MemoryInfo memoryInfo = new Debug.MemoryInfo();
-        Debug.getMemoryInfo(memoryInfo);
+        android.os.Debug.getMemoryInfo(memoryInfo);
         int ussMemory = memoryInfo.getTotalPrivateDirty();
         return null;
     }

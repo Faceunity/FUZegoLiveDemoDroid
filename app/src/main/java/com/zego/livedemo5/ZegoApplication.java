@@ -31,6 +31,7 @@ public class ZegoApplication extends Application implements Thread.UncaughtExcep
         // 初始化sdk
         ZegoApiManager.getInstance().initSDK();
 
+
         // bugly初始化用户id
         CrashReport.initCrashReport(getApplicationContext(), "2da9d0c1ef", false);
         CrashReport.setUserId(PreferenceUtil.getInstance().getUserID());

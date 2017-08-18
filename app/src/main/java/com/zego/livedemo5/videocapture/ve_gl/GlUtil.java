@@ -1,7 +1,6 @@
 package com.zego.livedemo5.videocapture.ve_gl;
 
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
@@ -12,17 +11,6 @@ import java.nio.FloatBuffer;
  * Some OpenGL static utility functions.
  */
 public class GlUtil {
-
-    /**
-     * Identity matrix for general use.  Don't modify or life will get weird.
-     */
-    public static final float[] IDENTITY_MATRIX;
-
-    static {
-        IDENTITY_MATRIX = new float[16];
-        Matrix.setIdentityM(IDENTITY_MATRIX, 0);
-    }
-
     private GlUtil() {
     }
 
@@ -75,6 +63,7 @@ public class GlUtil {
         checkNoGLES2Error("generateFrameBuffer");
         return frameBufferId;
     }
+
 
     /**
      * Checks to see if a GLES error has been raised.

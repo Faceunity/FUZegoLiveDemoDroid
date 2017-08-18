@@ -71,9 +71,9 @@ public class BizLivePresenter {
                 String url = String.format("https://liveroom%d-api.%s/demo/roomlist?appid=%s", appID, domain, appID);
 
                 //  测试环境, 使用不同的url获取房间列表
-                if(ZegoApiManager.getInstance().isUseTestEvn()){
+                if (ZegoApiManager.getInstance().isUseTestEvn()) {
                     String testBase = "https://test2-liveroom-api.zego.im";
-                    if(ZegoAppHelper.isInternationalProduct(appID)){
+                    if (ZegoAppHelper.isInternationalProduct(appID)) {
                         testBase = "https://test2-liveroom-api.zegocloud.com";
                     }
                     url = String.format("%s/demo/roomlist?appid=%s", testBase, appID);
@@ -85,8 +85,8 @@ public class BizLivePresenter {
                                 Gson gson = new Gson();
                                 RoomInfoEx roomInfoEx = gson.fromJson(response, RoomInfoEx.class);
 
-                                if(roomInfoEx != null && roomInfoEx.data != null){
-                                    if(mUpdateRoomListListener != null){
+                                if (roomInfoEx != null && roomInfoEx.data != null) {
+                                    if (mUpdateRoomListListener != null) {
                                         mUpdateRoomListListener.onUpdateRoomList(roomInfoEx.data.room_list);
                                     }
                                 }

@@ -46,13 +46,14 @@ public class anchorCemeraMicInstrumentedTest {
     public void setup(){
         mActivity=mActivityRule.getActivity();
         onView(withText(mActivity.getResources().getStringArray(R.array.navigation_bar_titles)[1])).perform(click());
-        clickToGetPermission(5);
+        sleep(90000);
+//        clickToGetPermission(5);
 //        allowPermissionIfNeed();
     }
 
     @Test
     public void startTest(){
-        test1(10);
+        test1(PerformanceTest.RUNTIME+2);
     }
 
     /**
@@ -61,6 +62,7 @@ public class anchorCemeraMicInstrumentedTest {
      */
     public void test1(int minute){
         printLog("onlyOpenCamaraAndMicTest");
+        sleep(1000);
         startPublish(anchorCameraInstrumentedTest.roomName,R.id.tv_select_single_anchor);
         sleep(2000);
         onView(withId(R.id.tv_speaker)).perform(click());
@@ -70,7 +72,8 @@ public class anchorCemeraMicInstrumentedTest {
 
     public void startPublish(String publishName,int publishType){
         //设置房间名
-        onView(withId(R.id.et_publish_title)).perform(clearText(),replaceText(publishName), closeSoftKeyboard());
+        onView(withId(R.id.et_publish_title)).perform(clearText(),replaceText(publishName));
+        sleep(500);
         //点击开始按钮
         onView(withId(R.id.btn_start_publish)).perform(click());
         sleep(500);

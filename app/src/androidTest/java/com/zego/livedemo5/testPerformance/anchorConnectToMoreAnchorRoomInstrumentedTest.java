@@ -57,23 +57,24 @@ public class anchorConnectToMoreAnchorRoomInstrumentedTest {
 
     @Test
     public void testStart(){
-        joinToMoreAnchor(10);
+        joinToMoreAnchor(PerformanceTest.RUNTIME);
     }
 
     public void joinToMoreAnchor(int minute){
-        sleep(10000);
-        onView(withText(anchorStartMoreAnchorInstrumentedTest.moreAnchorRoomName)).perform(click());
+        sleep(30000);
+        onView(withText(anchorStartMoreAnchorInstrumentedTest.moreAnchorRoomName)).perform(click());//点击房间进入
         sleep(2000);
         onView(withId(R.id.tv_speaker)).perform(click());
         sleep(10000);
         onView(withId(R.id.tv_publish_control)).perform(click());
-        GetPermission(20);
+//        GetPermission(20);
         sleep(60*1000*minute);
         endPublish();
     }
 
     public void endPublish(){
         onView(withId(R.id.tv_close)).perform(click());
+        sleep(500);
         onView(withText(R.string.Yes)).perform(click());
     }
 

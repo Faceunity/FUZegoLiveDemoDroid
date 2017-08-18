@@ -78,7 +78,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="@dimen/dimen_5"
                 android:enabled="true"
-                android:textSize="@dimen/text_size_2"/>
+                android:textSize="@dimen/text_size_2"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -304,7 +305,8 @@
                     android:layout_marginLeft="@dimen/dimen_5"
                     android:inputType="number"
                     android:textColor="@color/text_gray"
-                    android:textSize="@dimen/text_size_3"/>
+                    android:textSize="@dimen/text_size_3"
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -328,7 +330,8 @@
                     android:layout_marginLeft="@dimen/dimen_5"
                     android:inputType="text"
                     android:textColor="@color/text_gray"
-                    android:textSize="@dimen/text_size_3"/>
+                    android:textSize="@dimen/text_size_3"
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -340,7 +343,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/external_faceunity"
+                    android:text="@string/external_capture"
                     android:textColor="@color/text_black"
                     android:textSize="@dimen/text_size_4"/>
 
@@ -350,7 +353,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dimen_10"
-                    android:checked="true"/>
+                    android:checked="false"
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -372,7 +376,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dimen_10"
-                    android:checked="false"/>
+                    android:checked="false"
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -394,7 +399,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dimen_10"
-                    android:checked="false"/>
+                    android:checked="false"
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -416,7 +422,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dimen_10"
-                    android:checked="false"/>
+                    android:checked="false"
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -438,7 +445,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dimen_10"
-                    android:checked="false"/>
+                    android:checked="false"
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -460,7 +468,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dimen_10"
-                    android:checked="false"/>
+                    android:checked="false"
+                    />
             </LinearLayout>
         </LinearLayout>
 
@@ -483,7 +492,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dimen_10"
-                android:checked="true"/>
+                android:checked="true"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -505,7 +515,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dimen_10"
-                android:checked="false"/>
+                android:checked="false"
+                />
         </LinearLayout>
 
 

@@ -150,11 +150,6 @@ public class ExternalRenderPlayActivity extends BasePlayActivity {
     }
 
     @Override
-    protected boolean isShowFaceunityUi() {
-        return false;
-    }
-
-    @Override
     protected void initPublishControlText() {
         mTvPublisnControl.setText(R.string.request_to_join);
         mTvPublishSetting.setEnabled(false);
@@ -218,5 +213,10 @@ public class ExternalRenderPlayActivity extends BasePlayActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         handleConfigurationChanged(newConfig);
+    }
+
+    @Override
+    protected boolean isShowFaceunityUi() {
+        return false;
     }
 }

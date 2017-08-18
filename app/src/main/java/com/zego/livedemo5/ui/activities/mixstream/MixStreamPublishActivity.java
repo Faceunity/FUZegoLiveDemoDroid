@@ -213,11 +213,6 @@ public class MixStreamPublishActivity extends BasePublishActivity {
     }
 
     @Override
-    protected boolean isShowFaceunityUi() {
-        return true;
-    }
-
-    @Override
     protected void handlePublishSuccMix(String streamID, HashMap<String, Object> info) {
         super.handlePublishSucc(streamID);
 
@@ -389,5 +384,11 @@ public class MixStreamPublishActivity extends BasePublishActivity {
         } else {
             startPublish();
         }
+    }
+
+
+    @Override
+    protected boolean isShowFaceunityUi() {
+        return true;
     }
 }

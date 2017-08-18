@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
-
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
 import com.zego.zegoliveroom.videofilter.ZegoVideoFilter;
@@ -19,8 +18,9 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by robotding on 17/2/9.
  */
+
 public class VideoFilterHybridDemo extends ZegoVideoFilter {
-    private Client mClient = null;
+    private ZegoVideoFilter.Client mClient = null;
     private HandlerThread mThread = null;
     private volatile Handler mHandler = null;
 
@@ -31,6 +31,7 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
         public long timestamp_100n;
         public ByteBuffer buffer;
     }
+
     private ArrayList<PixelBuffer> mProduceQueue = new ArrayList<PixelBuffer>();
     private int mWriteIndex = 0;
     private int mWriteRemain = 0;
@@ -136,7 +137,6 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
         if (mProduceQueue.isEmpty()) {
             return null;
         }
-
         ByteBuffer buffer = mProduceQueue.get(index).buffer;
         buffer.position(0);
 
@@ -147,7 +147,7 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
     @Override
     protected synchronized void queueInputBuffer(int bufferIndex, final int width, final int height, int stride, long timestamp_100n) {
         if (bufferIndex == -1) {
-            return ;
+            return;
         }
 
         PixelBuffer pixelBuffer = mProduceQueue.get(bufferIndex);
@@ -175,6 +175,7 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
                 // 将原始数据加载到GPU缓冲区
                 GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
+
                 pixelBuffer.buffer.position(0);
                 GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, pixelBuffer.width, pixelBuffer.height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, pixelBuffer.buffer);
 
@@ -195,6 +196,11 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
     @Override
     protected SurfaceTexture getSurfaceTexture() {
         return null;
+    }
+
+    @Override
+    protected void onProcessCallback(int textureId, int width, int height, long timestamp_100n) {
+
     }
 
     private void createPixelBufferPool(int count) {
@@ -225,7 +231,7 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
         if (captureEglBase.hasSurface()) {
             captureEglBase.makeCurrent();
             if (mTextureId != 0) {
-                int[] textures = new int[] {mTextureId};
+                int[] textures = new int[]{mTextureId};
                 GLES20.glDeleteTextures(1, textures, 0);
                 mTextureId = 0;
             }

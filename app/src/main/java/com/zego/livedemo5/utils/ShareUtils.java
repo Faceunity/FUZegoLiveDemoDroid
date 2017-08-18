@@ -48,7 +48,7 @@ public class ShareUtils {
      * @param listShareUrls
      */
     public void shareToQQ(Activity activity, List<String> listShareUrls, String bizID, String streamID) {
-        if (listShareUrls != null && listShareUrls.size() >=2 && activity != null) {
+        if (listShareUrls != null && listShareUrls.size() >= 2 && activity != null) {
 
             String url = "http://www.zego.im/share/index2?video=" + listShareUrls.get(0) + "&rtmp=" + listShareUrls.get(1) +
                     "&id=" + bizID + "stream=" + streamID;
@@ -92,7 +92,7 @@ public class ShareUtils {
                 public void onCancel() {
                 }
             });
-        }else {
+        } else {
             Toast.makeText(activity, "分享失败!", Toast.LENGTH_SHORT).show();
         }
     }

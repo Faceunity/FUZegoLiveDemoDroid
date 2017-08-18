@@ -68,10 +68,12 @@ public final class EglBase10 extends EglBase {
             }
 
             @Override
-            public void addCallback(Callback callback) {}
+            public void addCallback(Callback callback) {
+            }
 
             @Override
-            public void removeCallback(Callback callback) {}
+            public void removeCallback(Callback callback) {
+            }
 
             @Override
             public boolean isCreating() {
@@ -80,19 +82,24 @@ public final class EglBase10 extends EglBase {
 
             @Deprecated
             @Override
-            public void setType(int i) {}
+            public void setType(int i) {
+            }
 
             @Override
-            public void setFixedSize(int i, int i2) {}
+            public void setFixedSize(int i, int i2) {
+            }
 
             @Override
-            public void setSizeFromLayout() {}
+            public void setSizeFromLayout() {
+            }
 
             @Override
-            public void setFormat(int i) {}
+            public void setFormat(int i) {
+            }
 
             @Override
-            public void setKeepScreenOn(boolean b) {}
+            public void setKeepScreenOn(boolean b) {
+            }
 
             @Override
             public Canvas lockCanvas() {
@@ -105,7 +112,8 @@ public final class EglBase10 extends EglBase {
             }
 
             @Override
-            public void unlockCanvasAndPost(Canvas canvas) {}
+            public void unlockCanvasAndPost(Canvas canvas) {
+            }
 
             @Override
             public Rect getSurfaceFrame() {
@@ -168,7 +176,7 @@ public final class EglBase10 extends EglBase {
 
     @Override
     public EglBase.Context getEglBaseContext() {
-        return new Context(eglContext);
+        return new EglBase10.Context(eglContext);
     }
 
     @Override

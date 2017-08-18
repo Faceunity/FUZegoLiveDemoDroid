@@ -12,11 +12,17 @@ public class WolfInfo extends ZegoUser {
     private SpeakingState state = SpeakingState.isIdle;
 
     public enum SpeakingState {
-        /** 清闲 */
+        /**
+         * 清闲
+         */
         isIdle(0),
-        /** 允许说话 */
+        /**
+         * 允许说话
+         */
         allowSpeaking(1),
-        /** 正在说话 */
+        /**
+         * 正在说话
+         */
         isSpeaking(2);
 
         private int value = 0;
@@ -101,6 +107,6 @@ public class WolfInfo extends ZegoUser {
     public boolean equals(Object obj) {
         if (!(obj instanceof WolfInfo)) return false;
 
-        return this.userID.equals(((WolfInfo)obj).userID);
+        return this.userID.equals(((WolfInfo) obj).userID);
     }
 }

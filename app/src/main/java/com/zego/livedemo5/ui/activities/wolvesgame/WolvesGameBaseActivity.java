@@ -43,33 +43,43 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
 
     static final protected String kSpeakingCommandKey = "command";
 
-    static final protected String kSpeakingUserIdKey  = "userId";
+    static final protected String kSpeakingUserIdKey = "userId";
 
     static final protected String kCurrentUserListKey = "currentUserList";
-    static final protected String kNewUserKey         = "newUser";
+    static final protected String kNewUserKey = "newUser";
 
-    static final protected String kUserIdKey          = "userId";
-    static final protected String kUserNameKey        = "userName";
+    static final protected String kUserIdKey = "userId";
+    static final protected String kUserNameKey = "userName";
 
-    static final protected String kSpeakingModeKey    = "roomMode";
-    static final protected String kUserIndexKey       = "userIndex";
+    static final protected String kSpeakingModeKey = "roomMode";
+    static final protected String kUserIndexKey = "userIndex";
 
-    /** @see WolfInfo.SpeakingState */
-    static final protected String kUserStateKey       = "speakingState";
+    /**
+     * @see com.zego.livedemo5.ui.activities.wolvesgame.WolfInfo.SpeakingState
+     */
+    static final protected String kUserStateKey = "speakingState";
 
     static final protected String kServerModeIndexKey = "urtralServer";     // true 使用自己的服务器推流，false 使用CDN（延时比较大）
-    static final protected String kSuperLowDelayMode  = "dontStopPublish";  // true 极速模式: 停止说话时，不终止推流，仅关闭 Mic & Camera
+    static final protected String kSuperLowDelayMode = "dontStopPublish";  // true 极速模式: 停止说话时，不终止推流，仅关闭 Mic & Camera
 
-    static final protected String kUserCharacterKey   = "character";
+    static final protected String kUserCharacterKey = "character";
 
-    /** 发信停止说话信令与停止推流之间的时间间隔，用于确保按停止说话按钮时，所有语音都能正常推送出去 */
-    static final protected int kPostSpeakingInterval  = 2;
-    /** 开始说话后，设置结束说话倒计时。即轮流模式下允许单次说话的最长时间 */
+    /**
+     * 发信停止说话信令与停止推流之间的时间间隔，用于确保按停止说话按钮时，所有语音都能正常推送出去
+     */
+    static final protected int kPostSpeakingInterval = 2;
+    /**
+     * 开始说话后，设置结束说话倒计时。即轮流模式下允许单次说话的最长时间
+     */
     static final protected int kSpeakingTimerInterval = 60;
-    /** 轮流说话模式下，组织者（Host）用于设定某位说话者的最长时间，避免说话者异常离开导致游戏无法继续的情况 */
-    static final protected int kAnchorTimerInterval   = 5 + kSpeakingTimerInterval;
+    /**
+     * 轮流说话模式下，组织者（Host）用于设定某位说话者的最长时间，避免说话者异常离开导致游戏无法继续的情况
+     */
+    static final protected int kAnchorTimerInterval = 5 + kSpeakingTimerInterval;
 
-    /** 轮流说话模式下，计时器相关的消息 */
+    /**
+     * 轮流说话模式下，计时器相关的消息
+     */
     protected class MsgIds {
         static final int UPDATE_COUNT_TIMER = 0x100;            // 计时器
         static final int STOP_SPEAKING_FOR_ME = 0x101;          // 计时结束，自己停止本轮说话
@@ -119,7 +129,9 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
 
     protected boolean dontPreviewWhenPublishSuccess = false;
 
-    /** 进入房间的所有成员列表 */
+    /**
+     * 进入房间的所有成员列表
+     */
     protected LinkedList<WolfInfo> allWolfMembers;
 
     private Handler.Callback mHandlerCallback = new Handler.Callback() {
@@ -147,7 +159,7 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
                 Intent intent = new Intent(this, LogListActivity.class);
                 startActivity(intent);
             }
-                return true;
+            return true;
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -229,7 +241,7 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
     /**
      * 根据推流推流方式取得推流 flag
      *
-     * @return {@link ZegoConstants.PublishFlag}
+     * @return {@link com.zego.zegoliveroom.constants.ZegoConstants.PublishFlag}
      */
     protected int getPublishFlag() {
         return (currentPublishMode == PublishMode.Low_Cost) ?
@@ -382,7 +394,7 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
                     unBindStreamFromSpeakingHeaderViewAndHide();
                 } else {
                     zegoLiveRoom.stopPlayingStream(stream.streamID);
-                    String bundleStreamId = (String)mCurrentSpeakingHead.getTag(R.id.bundle_stream_id);
+                    String bundleStreamId = (String) mCurrentSpeakingHead.getTag(R.id.bundle_stream_id);
                     if (TextUtils.equals(bundleStreamId, stream.streamID)) {
                         unBindStreamFromSpeakingHeaderViewAndHide();
                     }
@@ -548,7 +560,7 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
         public void updateItem(WolfInfo wolf) {
             int pos = -1;
             for (WolfInfo _wolf : mData) {
-                pos ++;
+                pos++;
                 if (_wolf.equals(wolf)) {
                     _wolf.update(wolf);
                     notifyItemChanged(pos);
@@ -567,7 +579,7 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
         public void deleteItem(WolfInfo wolf) {
             int pos = -1;
             for (WolfInfo _wolf : mData) {
-                pos ++;
+                pos++;
                 if (_wolf.equals(wolf)) {
                     mData.remove(_wolf);
                     notifyItemRemoved(pos);
@@ -587,9 +599,9 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
         public WolfHeadViewHolder(View itemView) {
             super(itemView);
 
-            headImg = (TextureView)itemView.findViewById(R.id.head_img);
-            serialNumber = (TextView)itemView.findViewById(R.id.txt_serial_number);
-            name = (TextView)itemView.findViewById(R.id.txt_name);
+            headImg = (TextureView) itemView.findViewById(R.id.head_img);
+            serialNumber = (TextView) itemView.findViewById(R.id.txt_serial_number);
+            name = (TextView) itemView.findViewById(R.id.txt_name);
         }
     }
 
@@ -603,9 +615,8 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
         private boolean includeEdge;
 
         /**
-         *
-         * @param spanCount 每行多少个元素
-         * @param spacing 元素间间距
+         * @param spanCount   每行多少个元素
+         * @param spacing     元素间间距
          * @param includeEdge 边缘地带是否需要间距。false 无间距
          */
         public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {

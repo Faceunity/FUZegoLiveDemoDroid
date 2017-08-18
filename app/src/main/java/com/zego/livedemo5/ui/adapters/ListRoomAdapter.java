@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.presenters.RoomInfo;
-import com.zego.livedemo5.utils.ZegoRoomUtil;
 import com.zego.livedemo5.ui.widgets.CirImageView;
 import com.zego.livedemo5.ui.widgets.MaterialProgressBarSupport;
 
@@ -20,7 +19,7 @@ import java.util.List;
 
 /**
  * Copyright © 2016 Zego. All rights reserved.
- *
+ * <p>
  * des:  直播列表适配器.
  */
 public class ListRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -71,7 +70,7 @@ public class ListRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else {
             RoomInfo room = mListRoom.get(position);
             String roomName = room.room_name;
-            if(TextUtils.isEmpty(roomName)){
+            if (TextUtils.isEmpty(roomName)) {
                 roomName = room.room_id;
             }
             ((LiveListHolder) holder).tvPulishTitle.setText(roomName);

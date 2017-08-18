@@ -36,7 +36,7 @@ public class VideoCaptureFromCamera extends ZegoVideoCaptureDevice implements Ca
     int mFrameRate = 15;
     int mRotation = 0;
 
-    Client mClient = null;
+    ZegoVideoCaptureDevice.Client mClient = null;
 
     private TextureView mView = null;
     private SurfaceTexture mTexture = null;
@@ -54,7 +54,7 @@ public class VideoCaptureFromCamera extends ZegoVideoCaptureDevice implements Ca
     private final Object pendingCameraRestartLock = new Object();
     private volatile boolean pendingCameraRestart = false;
 
-    protected void allocateAndStart(Client client) {
+    protected void allocateAndStart(ZegoVideoCaptureDevice.Client client) {
         mClient = client;
         mThread = new HandlerThread("camera-cap");
         mThread.start();

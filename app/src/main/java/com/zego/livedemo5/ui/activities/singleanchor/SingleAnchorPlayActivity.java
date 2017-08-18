@@ -146,11 +146,6 @@ public class SingleAnchorPlayActivity extends BasePlayActivity {
     }
 
     @Override
-    protected boolean isShowFaceunityUi() {
-        return false;
-    }
-
-    @Override
     protected void initPublishControlText() {
         mTvPublisnControl.setText(R.string.request_to_join);
         mTvPublishSetting.setEnabled(false);
@@ -197,5 +192,10 @@ public class SingleAnchorPlayActivity extends BasePlayActivity {
     @Override
     protected void afterPublish() {
 
+    }
+
+    @Override
+    protected boolean isShowFaceunityUi() {
+        return false;
     }
 }

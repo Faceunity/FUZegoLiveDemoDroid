@@ -79,15 +79,15 @@ public class GameLivingPlayActivity extends AppCompatActivity {
         mZegoLiveRoom.loginRoom(mRoomID, ZegoConstants.RoomRole.Audience, new IZegoLoginCompletionCallback() {
             @Override
             public void onLoginCompletion(int stateCode, ZegoStreamInfo[] zegoStreamInfos) {
-                if(stateCode == 0){
+                if (stateCode == 0) {
 
                     Log.i(TAG, "登陆房间成功");
 
-                    if(zegoStreamInfos != null && zegoStreamInfos.length > 0){
+                    if (zegoStreamInfos != null && zegoStreamInfos.length > 0) {
                         mPlayStreamID = zegoStreamInfos[0].streamID;
                         startPlay();
                     }
-                }else {
+                } else {
                     Log.i(TAG, "登陆房间失败");
                     Toast.makeText(GameLivingPlayActivity.this, "登陆房间失败", Toast.LENGTH_SHORT).show();
                 }
@@ -141,11 +141,11 @@ public class GameLivingPlayActivity extends AppCompatActivity {
 
             @Override
             public void onStreamUpdated(int type, ZegoStreamInfo[] zegoStreamInfos, String s) {
-                if(zegoStreamInfos != null && zegoStreamInfos.length > 0){
+                if (zegoStreamInfos != null && zegoStreamInfos.length > 0) {
                     mPlayStreamID = zegoStreamInfos[0].streamID;
-                    if(type == ZegoConstants.StreamUpdateType.Added){
+                    if (type == ZegoConstants.StreamUpdateType.Added) {
                         startPlay();
-                    }else if(type == ZegoConstants.StreamUpdateType.Deleted){
+                    } else if (type == ZegoConstants.StreamUpdateType.Deleted) {
                         stopPlay();
                     }
                 }

@@ -32,7 +32,6 @@ import butterknife.Bind;
  * des:
  */
 public class MainActivity extends AbsBaseActivity implements NavigationBar.NavigationBarListener {
-    private static final String TAG = "MainActivity";
 
     private List<AbsBaseFragment> mFragments;
 

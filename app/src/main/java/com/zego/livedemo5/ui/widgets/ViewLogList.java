@@ -52,20 +52,20 @@ public class ViewLogList extends LinearLayout {
         mTvBack.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mLogListCallback != null){
+                if (mLogListCallback != null) {
                     mLogListCallback.onCallback();
                 }
             }
         });
     }
 
-    public void initList(Context context, LinkedList<String> datas){
+    public void initList(Context context, LinkedList<String> datas) {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mLogListAdapter = new LogListAdapter(context, datas);
         mRecyclerView.setAdapter(mLogListAdapter);
     }
 
-    public void setDatas(LinkedList<String> datas){
+    public void setDatas(LinkedList<String> datas) {
         mLogListAdapter.setDatas(datas);
     }
 

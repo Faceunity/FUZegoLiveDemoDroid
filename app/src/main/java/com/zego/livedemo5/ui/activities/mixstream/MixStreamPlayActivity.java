@@ -224,11 +224,6 @@ public class MixStreamPlayActivity extends BasePlayActivity {
     }
 
     @Override
-    protected boolean isShowFaceunityUi() {
-        return false;
-    }
-
-    @Override
     protected void initPublishControlText() {
         if (mIsPublishing) {
             mTvPublisnControl.setText(R.string.stop_publishing);
@@ -286,8 +281,13 @@ public class MixStreamPlayActivity extends BasePlayActivity {
     @Override
     protected void afterPublish() {
         // 播放房间的流
-        for(ZegoStreamInfo streamInfo : mListStreamOfRoom){
+        for (ZegoStreamInfo streamInfo : mListStreamOfRoom) {
             startPlay(streamInfo.streamID);
         }
+    }
+
+    @Override
+    protected boolean isShowFaceunityUi() {
+        return false;
     }
 }

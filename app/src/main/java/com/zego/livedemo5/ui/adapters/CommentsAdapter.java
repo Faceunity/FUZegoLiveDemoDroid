@@ -46,13 +46,13 @@ public class CommentsAdapter extends BaseAdapter {
         return 0;
     }
 
-    public void addMsgList(List<ZegoRoomMessage> listMsg){
+    public void addMsgList(List<ZegoRoomMessage> listMsg) {
         mListMsg.addAll(listMsg);
         notifyDataSetChanged();
     }
 
-    public void addMsg(ZegoRoomMessage msg){
-        if(msg != null){
+    public void addMsg(ZegoRoomMessage msg) {
+        if (msg != null) {
             mListMsg.add(msg);
             notifyDataSetChanged();
         }
@@ -84,7 +84,7 @@ public class CommentsAdapter extends BaseAdapter {
         TextView msgContent;
     }
 
-    private SpannableStringBuilder getStringBuilder(String fromUserName, String content){
+    private SpannableStringBuilder getStringBuilder(String fromUserName, String content) {
 
         fromUserName = fromUserName.trim() + ":";
         SpannableStringBuilder builder = new SpannableStringBuilder(fromUserName + content.trim());

@@ -16,7 +16,6 @@ import com.zego.livedemo5.constants.IntentExtra;
 import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.ZegoRoomUtil;
-import com.zego.zegoliveroom.callback.IZegoEndJoinLiveCallback;
 import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
 
@@ -31,7 +30,9 @@ import java.util.Map;
 
 public abstract class BasePublishActivity extends BaseLiveActivity {
 
-    /** 已连麦用户 */
+    /**
+     * 已连麦用户
+     */
     protected ArrayList<String> hasJoinedUsers = new ArrayList<>();
 
     @Override
@@ -79,15 +80,16 @@ public abstract class BasePublishActivity extends BaseLiveActivity {
 
     @Override
     protected void logout() {
-        for (final String userId : hasJoinedUsers) {
-            mZegoLiveRoom.endJoinLive(userId, new IZegoEndJoinLiveCallback() {
-                @Override
-                public void onEndJoinLive(int result, String roomId) {
-                    recordLog("onEndJoinLive, userId: %s, result: %d", userId, result);
-                }
-            });
-        }
-        hasJoinedUsers.clear();
+        // 退出时不主动结束连麦，以后通过一单独入口来实现该功能
+//        for (final String userId : hasJoinedUsers) {
+//            mZegoLiveRoom.endJoinLive(userId, new IZegoEndJoinLiveCallback() {
+//                @Override
+//                public void onEndJoinLive(int result, String roomId) {
+//                    recordLog("onEndJoinLive, userId: %s, result: %d", userId, result);
+//                }
+//            });
+//        }
+//        hasJoinedUsers.clear();
         super.logout();
     }
 
