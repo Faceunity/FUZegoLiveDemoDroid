@@ -34,6 +34,7 @@
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -44,6 +45,7 @@
         <activity
             android:name=".ui.activities.singleanchor.SingleAnchorPlayActivity"
             android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden"/>
         <activity
             android:name=".ui.activities.singleanchor.SingleAnchorPublishActivity"
@@ -58,6 +60,7 @@
         <activity
             android:name=".ui.activities.moreanchors.MoreAnchorsPlayActivity"
             android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden"/>
         <activity
             android:name=".ui.activities.mixstream.MixStreamPublishActivity"
@@ -67,10 +70,12 @@
         <activity
             android:name=".ui.activities.mixstream.MixStreamPlayActivity"
             android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden"/>
         <activity
             android:name=".ui.activities.externalrender.ExternalRenderPlayActivity"
             android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden"/>
         <activity
             android:name=".ui.activities.AboutZegoActivity"
@@ -81,7 +86,8 @@
         <activity
             android:name="com.tencent.tauth.AuthActivity"
             android:launchMode="singleTask"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -94,6 +100,7 @@
         <activity
             android:name="com.tencent.connect.common.AssistActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <activity
             android:name=".ui.activities.gamelive.GameLiveActivity"
@@ -101,7 +108,8 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activities.gamelive.GameLivingPlayActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activities.wolvesgame.WolvesGameHostActivity"
             android:configChanges="orientation|screenSize"

@@ -92,6 +92,7 @@
                     android:layout_marginRight="@dimen/dimen_20"
                     android:layout_marginTop="@dimen/dimen_20"
                     android:orientation="horizontal"
+                    android:visibility="gone"
                     >
 
                     <Spinner
