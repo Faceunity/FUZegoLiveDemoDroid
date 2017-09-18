@@ -976,6 +976,9 @@ public class VideoCaptureFromFaceunity extends ZegoVideoCaptureDevice
     }
 
     private int restartCam() {
+        if (!mIsRunning) {
+            return 0;
+        }
         synchronized (pendingCameraRestartLock) {
             if (pendingCameraRestart) {
                 // Do not handle multiple camera switch request to avoid blocking

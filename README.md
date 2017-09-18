@@ -4,6 +4,11 @@
 
 FUZegoLiveDemoDroid 是集成了 Faceunity 面部跟踪和虚拟道具功能 和 Zego 直播功能的 Demo。
 
+## 更新SDK
+
+[**Nama SDK发布地址**](https://github.com/Faceunity/FULiveDemoDroid/releases),可查看Nama SDK的所有版本和发布说明。
+更新方法为下载Faceunity*.zip解压后替换faceunity模块中的相应库文件。
+
 ## SDK使用介绍
 
  - Faceunity SDK的使用方法请参看 [**Faceunity/FULiveDemoDroid**][1]

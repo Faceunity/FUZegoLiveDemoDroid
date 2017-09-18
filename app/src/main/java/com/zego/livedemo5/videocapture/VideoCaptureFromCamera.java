@@ -514,7 +514,8 @@ public class VideoCaptureFromCamera extends ZegoVideoCaptureDevice implements Ca
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         mTexture = surface;
-        restartCam();
+//        restartCam();
+        startCapture();
     }
 
     @Override
