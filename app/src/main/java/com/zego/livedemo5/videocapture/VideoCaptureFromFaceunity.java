@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.faceunity.wrapper.faceunity;
 import com.zego.livedemo5.faceunity.EffectAndFilterSelectAdapter;
 import com.zego.livedemo5.faceunity.FaceunityController;
+import com.zego.livedemo5.faceunity.MiscUtil;
 import com.zego.livedemo5.faceunity.authpack;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
@@ -117,6 +118,13 @@ public class VideoCaptureFromFaceunity extends ZegoVideoCaptureDevice
     private byte[] fuImgNV21Bytes;
 
     private int mFrameId = 0;
+
+    private long lastOneHundredFrameTimeStamp = 0;
+    private int currentFrameCnt = 0;
+    private long oneHundredFrameFUTime = 0;
+
+    private boolean isBenchmarkFPS = true;
+    private boolean isBenchmarkTime = true;
 
     VideoCaptureFromFaceunity(Context context) {
         mContext = context;
@@ -295,9 +303,14 @@ public class VideoCaptureFromFaceunity extends ZegoVideoCaptureDevice
             } else {
                 fuImgNV21Bytes = mCameraNV21Byte;
             }
-            flags |= 0;
+
+            long fuStartTime = System.nanoTime();
             int fuTex = faceunity.fuDualInputToTexture(fuImgNV21Bytes, mCameraTextureId, flags,
                     mCameraWidth, mCameraHeight, mFrameId++, itemsArray);
+            long fuEndTime = System.nanoTime();
+            oneHundredFrameFUTime += fuEndTime - fuStartTime;
+
+            GLES20.glFinish();
 
             float[] matrix = new float[16];
             Matrix.multiplyMM(matrix, 0, mtx, 0, transformationMatrix, 0);
@@ -329,6 +342,17 @@ public class VideoCaptureFromFaceunity extends ZegoVideoCaptureDevice
             }
 
             previewEglBase.detachCurrent();
+
+            if (++currentFrameCnt == 100) {
+                currentFrameCnt = 0;
+                long tmp = System.nanoTime();
+                if (isBenchmarkFPS)
+                    Log.e(TAG, "dualInput FPS : " + (1000.0f * MiscUtil.NANO_IN_ONE_MILLI_SECOND / ((tmp - lastOneHundredFrameTimeStamp) / 100.0f)));
+                lastOneHundredFrameTimeStamp = tmp;
+                if (isBenchmarkTime)
+                    Log.e(TAG, "dualInput cost time avg : " + oneHundredFrameFUTime / 100.f / MiscUtil.NANO_IN_ONE_MILLI_SECOND);
+                oneHundredFrameFUTime = 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1137,6 +1161,8 @@ public class VideoCaptureFromFaceunity extends ZegoVideoCaptureDevice
                             int tmp = itemsArray[1];
                             itemsArray[1] = mEffectItem = faceunity.fuCreateItemFromPackage(itemData);
                             faceunity.fuItemSetParam(mEffectItem, "isAndroid", 1.0);
+                            faceunity.fuItemSetParam(mEffectItem, "rotationAngle",
+                                    mCamInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT ? 90 : 270);
                             if (tmp != 0) {
                                 faceunity.fuDestroyItem(tmp);
                             }

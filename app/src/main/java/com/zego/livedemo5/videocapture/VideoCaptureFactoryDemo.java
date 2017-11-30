@@ -23,7 +23,7 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         } else if (mode == 2) {
             mDevice = new VideoCaptureFromImage2(mContext);
         } else if (mode == 3) {
-            mDevice = new VideoCaptureFromFaceunity(mContext);
+            mDevice = new VideoCaptureFromFaceunity2(mContext);
         }
 
         return mDevice;

@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.faceunity.wrapper.faceunity;
 import com.zego.livedemo5.faceunity.EffectAndFilterSelectAdapter;
 import com.zego.livedemo5.faceunity.FaceunityController;
+import com.zego.livedemo5.faceunity.MiscUtil;
 import com.zego.livedemo5.faceunity.authpack;
 import com.zego.zegoliveroom.videofilter.ZegoVideoFilter;
 
@@ -73,6 +74,13 @@ public class VideoFilterFaceUnityDemo extends ZegoVideoFilter implements Faceuni
     private String mEffectFileName = EffectAndFilterSelectAdapter.EFFECT_ITEM_FILE_NAME[1];
     private HandlerThread mEffectThread = null;
     private volatile Handler mEffectHandler = null;
+
+    private long lastOneHundredFrameTimeStamp = 0;
+    private int currentFrameCnt = 0;
+    private long oneHundredFrameFUTime = 0;
+
+    private boolean isBenchmarkFPS = true;
+    private boolean isBenchmarkTime = true;
 
     public VideoFilterFaceUnityDemo(Context context) {
         mContext = context;
@@ -218,7 +226,7 @@ public class VideoFilterFaceUnityDemo extends ZegoVideoFilter implements Faceuni
 
     @Override
     protected synchronized void queueInputBuffer(int bufferIndex, final int width, int height, int stride, long timestamp_100n) {
-        Log.e(TAG, "queueInputBuffer width = " + width + " height = " + height);
+//        Log.e(TAG, "queueInputBuffer width = " + width + " height = " + height);
         if (bufferIndex == -1) {
             return;
         }
@@ -279,8 +287,11 @@ public class VideoFilterFaceUnityDemo extends ZegoVideoFilter implements Faceuni
                     faceunity.fuItemSetParam(mFacebeautyItem, "face_shape_level", mFaceShapeLevel);
                     faceunity.fuItemSetParam(mFacebeautyItem, "red_level", mFacebeautyRedLevel);
 
+                    long fuStartTime = System.nanoTime();
                     int fuTex = faceunity.fuRenderToI420Image(pixelBuffer.buffer.array(),
                             pixelBuffer.width, pixelBuffer.height, mFrameId++, itemsArray);
+                    long fuEndTime = System.nanoTime();
+                    oneHundredFrameFUTime += fuEndTime - fuStartTime;
 
                     dst.put(pixelBuffer.buffer);
 
@@ -288,6 +299,17 @@ public class VideoFilterFaceUnityDemo extends ZegoVideoFilter implements Faceuni
                 }
 
                 returnProducerPixelBuffer(pixelBuffer);
+
+                if (++currentFrameCnt == 100) {
+                    currentFrameCnt = 0;
+                    long tmp = System.nanoTime();
+                    if (isBenchmarkFPS)
+                        Log.e(TAG, "dualInput FPS : " + (1000.0f * MiscUtil.NANO_IN_ONE_MILLI_SECOND / ((tmp - lastOneHundredFrameTimeStamp) / 100.0f)));
+                    lastOneHundredFrameTimeStamp = tmp;
+                    if (isBenchmarkTime)
+                        Log.e(TAG, "dualInput cost time avg : " + oneHundredFrameFUTime / 100.f / MiscUtil.NANO_IN_ONE_MILLI_SECOND);
+                    oneHundredFrameFUTime = 0;
+                }
             }
 
         });
