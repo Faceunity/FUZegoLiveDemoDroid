@@ -123,8 +123,8 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
 
             }
         });
-        // 默认"无美颜"
-        spBeauties.setSelection(0);
+        // 默认"全屏+美白"
+        spBeauties.setSelection(3);
 
         ArrayAdapter<String> filterAdapter = new ArrayAdapter<>(mParentActivity, R.layout.item_spinner, mResources.getStringArray(R.array.filters));
         spFilters.setAdapter(filterAdapter);

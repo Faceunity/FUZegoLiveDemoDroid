@@ -18,16 +18,12 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -36,9 +32,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.faceunity.wrapper.FaceunityControlView;
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.ZegoApiManager;
-import com.zego.livedemo5.faceunity.EffectAndFilterSelectAdapter;
 import com.zego.livedemo5.ui.activities.base.AbsBaseLiveActivity;
 import com.zego.livedemo5.ui.adapters.CommentsAdapter;
 import com.zego.livedemo5.ui.widgets.PublishSettingsPannel;
@@ -46,6 +42,7 @@ import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.livedemo5.utils.LiveQualityLogger;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.ZegoRoomUtil;
+import com.zego.zegoavkit2.ZegoMixEnginePlayout;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.callback.im.IZegoRoomMessageCallback;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
@@ -58,8 +55,6 @@ import com.zego.zegoliveroom.entity.ZegoRoomMessage;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
 import com.zego.zegoliveroom.entity.ZegoUserState;
 
-import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -67,17 +62,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import butterknife.Bind;
 import butterknife.OnClick;
-
-import static com.tencent.open.utils.Global.getContext;
 
 /**
  * des: 主页面
  */
-public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements View.OnClickListener {
+public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
 
-    public static final String TAG = "BaseLiveActivity";
+    public static final String MY_SELF = "MySelf";
+
+    protected FaceunityControlView mFaceunityControlView;
 
     protected InputStream mIsBackgroundMusic = null;
 
@@ -119,6 +113,8 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
 
     protected boolean mEnableLoopback = false;
 
+    protected boolean mEnableMixEngine = false;
+
     protected int mSelectedBeauty = 0;
 
     protected int mSelectedFilter = 0;
@@ -158,35 +154,6 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
 
     protected List<ZegoUserState> mListRoomUser = new ArrayList<>();
 
-    @Bind(R.id.main_bottom)
-    LinearLayout mMainBottom;
-    private RecyclerView mEffectRecyclerView;
-    private EffectAndFilterSelectAdapter mEffectRecyclerAdapter;
-    private RecyclerView mFilterRecyclerView;
-    private EffectAndFilterSelectAdapter mFilterRecyclerAdapter;
-
-    private LinearLayout mBlurLevelSelect;
-    private LinearLayout mColorLevelSelect;
-    private LinearLayout mFaceShapeSelect;
-    private LinearLayout mRedLevelSelect;
-
-
-    private Button mChooseEffectBtn;
-    private Button mChooseFilterBtn;
-    private Button mChooseBlurLevelBtn;
-    private Button mChooseColorLevelBtn;
-    private Button mChooseFaceShapeBtn;
-    private Button mChooseRedLevelBtn;
-
-    private TextView[] mBlurLevels;
-    private int[] BLUR_LEVEL_TV_ID = {R.id.blur_level0, R.id.blur_level1, R.id.blur_level2,
-            R.id.blur_level3, R.id.blur_level4, R.id.blur_level5, R.id.blur_level6};
-
-    private TextView mFaceShape0Nvshen;
-    private TextView mFaceShape1Wanghong;
-    private TextView mFaceShape2Ziran;
-    private TextView mFaceShape3Default;
-
     protected abstract void initPublishControlText();
 
     protected abstract void doPublish();
@@ -200,17 +167,6 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
     protected abstract void sendRoomMessage();
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        startPublish();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopPublish();
-    }
     @Override
     protected int getContentViewLayout() {
         return R.layout.activity_live;
@@ -236,7 +192,8 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
     private void initSettingPannel() {
 
         mSettingsPannel = (PublishSettingsPannel) findViewById(R.id.publishSettingsPannel);
-        mSettingsPannel.initPublishSettings(mEnableCamera, mEnableFrontCam, mEnableMic, mEnableTorch, mEnableBackgroundMusic, mEnableLoopback, mSelectedBeauty, mSelectedFilter);
+
+        mSettingsPannel.initPublishSettings(mEnableCamera, mEnableFrontCam, mEnableMic, mEnableTorch, mEnableBackgroundMusic, mEnableLoopback, mSelectedBeauty, mSelectedFilter, mEnableMixEngine);
         mSettingsPannel.setPublishSettingsCallback(new PublishSettingsPannel.PublishSettingsCallback() {
             @Override
             public void onEnableCamera(boolean isEnable) {
@@ -286,6 +243,13 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
             }
 
             @Override
+            public void onEnableMixEnginePlayout(boolean isEnable) {
+                recordLog(MY_SELF + ": call onEnableMixEnginePlayout");
+                mEnableMixEngine = isEnable;
+                ZegoMixEnginePlayout.mixEnginePlayout(isEnable);
+            }
+
+            @Override
             public void onSetBeauty(int beauty) {
                 mSelectedBeauty = beauty;
                 mZegoLiveRoom.enableBeautifying(ZegoRoomUtil.getZegoBeauty(beauty));
@@ -314,6 +278,16 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
 
     @Override
     protected void initViews(Bundle savedInstanceState) {
+
+        mFaceunityControlView = (FaceunityControlView) findViewById(R.id.main_FaceunityControlView);
+
+        if (!(ZegoApiManager.getInstance().isUseVideoCapture() || ZegoApiManager.getInstance().isUseVideoFilter()) || !(this instanceof BasePublishActivity)) {
+            mFaceunityControlView.setVisibility(View.GONE);
+        } else {
+            mFaceunityControlView.setVisibility(View.VISIBLE);
+        }
+
+        mFaceunityControlView.setOnViewEventListener(ZegoApiManager.getInstance().getFaceunityController());
 
         mTvSpeaker = (TextView) findViewById(R.id.tv_speaker);
         mTvPublishSetting = (TextView) findViewById(R.id.tv_publish_settings);
@@ -367,167 +341,6 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
         mTvTag = (TextView) findViewById(R.id.tv_tag);
 
         mRlytControlHeader.bringToFront();
-
-        if (!(ZegoApiManager.getInstance().isUseVideoCapture() || ZegoApiManager.getInstance().isUseVideoFilter()) || !isShowFaceunityUi()) {
-            mMainBottom.setVisibility(View.GONE);
-            return;
-        }
-        mMainBottom.setVisibility(View.VISIBLE);
-
-        mEffectRecyclerView = (RecyclerView) findViewById(R.id.effect_recycle_view);
-        mEffectRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        mEffectRecyclerAdapter = new EffectAndFilterSelectAdapter(mEffectRecyclerView, EffectAndFilterSelectAdapter.RECYCLEVIEW_TYPE_EFFECT);
-        mEffectRecyclerAdapter.setOnItemSelectedListener(new EffectAndFilterSelectAdapter.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(int itemPosition) {
-                Log.d(TAG, "effect item selected " + itemPosition);
-                ZegoApiManager.getInstance().getFaceunityController().onEffectItemSelected(EffectAndFilterSelectAdapter.EFFECT_ITEM_FILE_NAME[itemPosition]);
-            }
-        });
-        mEffectRecyclerView.setAdapter(mEffectRecyclerAdapter);
-
-        mFilterRecyclerView = (RecyclerView) findViewById(R.id.filter_recycle_view);
-        mFilterRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        mFilterRecyclerAdapter = new EffectAndFilterSelectAdapter(mFilterRecyclerView, EffectAndFilterSelectAdapter.RECYCLEVIEW_TYPE_FILTER);
-        mFilterRecyclerAdapter.setOnItemSelectedListener(new EffectAndFilterSelectAdapter.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(int itemPosition) {
-                Log.d(TAG, "filter item selected " + itemPosition);
-                ZegoApiManager.getInstance().getFaceunityController().onFilterSelected(EffectAndFilterSelectAdapter.FILTERS_NAME[itemPosition]);
-            }
-        });
-        mFilterRecyclerView.setAdapter(mFilterRecyclerAdapter);
-
-        mChooseEffectBtn = (Button) findViewById(R.id.btn_choose_effect);
-        mChooseFilterBtn = (Button) findViewById(R.id.btn_choose_filter);
-        mChooseBlurLevelBtn = (Button) findViewById(R.id.btn_choose_blur_level);
-        mChooseColorLevelBtn = (Button) findViewById(R.id.btn_choose_color_level);
-        mChooseFaceShapeBtn = (Button) findViewById(R.id.btn_choose_face_shape);
-        mChooseRedLevelBtn = (Button) findViewById(R.id.btn_choose_red_level);
-
-        mFaceShape0Nvshen = (TextView) findViewById(R.id.face_shape_0_nvshen);
-        mFaceShape1Wanghong = (TextView) findViewById(R.id.face_shape_1_wanghong);
-        mFaceShape2Ziran = (TextView) findViewById(R.id.face_shape_2_ziran);
-        mFaceShape3Default = (TextView) findViewById(R.id.face_shape_3_default);
-
-        mBlurLevelSelect = (LinearLayout) findViewById(R.id.blur_level_select_block);
-        mColorLevelSelect = (LinearLayout) findViewById(R.id.color_level_select_block);
-        mFaceShapeSelect = (LinearLayout) findViewById(R.id.lin_face_shape);
-        mRedLevelSelect = (LinearLayout) findViewById(R.id.red_level_select_block);
-
-        mBlurLevels = new TextView[BLUR_LEVEL_TV_ID.length];
-        for (int i = 0; i < BLUR_LEVEL_TV_ID.length; i++) {
-            final int level = i;
-            mBlurLevels[i] = (TextView) findViewById(BLUR_LEVEL_TV_ID[i]);
-            mBlurLevels[i].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    setBlurLevelTextBackground(mBlurLevels[level]);
-                    ZegoApiManager.getInstance().getFaceunityController().onBlurLevelSelected(level);
-                }
-            });
-        }
-
-        DiscreteSeekBar colorLevelSeekbar = (DiscreteSeekBar) findViewById(R.id.color_level_seekbar);
-        colorLevelSeekbar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
-            @Override
-            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-                ZegoApiManager.getInstance().getFaceunityController().onColorLevelSelected(value, 100);
-            }
-
-            @Override
-            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-        });
-
-        DiscreteSeekBar cheekThinSeekbar = (DiscreteSeekBar) findViewById(R.id.cheekthin_level_seekbar);
-        cheekThinSeekbar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
-            @Override
-            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-                ZegoApiManager.getInstance().getFaceunityController().onCheekThinSelected(value, 100);
-            }
-
-            @Override
-            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-        });
-
-        DiscreteSeekBar enlargeEyeSeekbar = (DiscreteSeekBar) findViewById(R.id.enlarge_eye_level_seekbar);
-        enlargeEyeSeekbar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
-            @Override
-            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-                ZegoApiManager.getInstance().getFaceunityController().onEnlargeEyeSelected(value, 100);
-            }
-
-            @Override
-            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-        });
-
-        DiscreteSeekBar faceShapeLevelSeekbar = (DiscreteSeekBar) findViewById(R.id.face_shape_seekbar);
-        faceShapeLevelSeekbar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
-            @Override
-            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-                ZegoApiManager.getInstance().getFaceunityController().onFaceShapeLevelSelected(value, 100);
-            }
-
-            @Override
-            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-        });
-
-        DiscreteSeekBar redLevelShapeLevelSeekbar = (DiscreteSeekBar) findViewById(R.id.red_level_seekbar);
-        redLevelShapeLevelSeekbar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
-            @Override
-            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-                ZegoApiManager.getInstance().getFaceunityController().onRedLevelSelected(value, 100);
-            }
-
-            @Override
-            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-        });
-
-        mChooseEffectBtn.setOnClickListener(this);
-        mChooseFilterBtn.setOnClickListener(this);
-        mChooseBlurLevelBtn.setOnClickListener(this);
-        mChooseColorLevelBtn.setOnClickListener(this);
-        mChooseFaceShapeBtn.setOnClickListener(this);
-        mChooseRedLevelBtn.setOnClickListener(this);
-        mFaceShape0Nvshen.setOnClickListener(this);
-        mFaceShape1Wanghong.setOnClickListener(this);
-        mFaceShape2Ziran.setOnClickListener(this);
-        mFaceShape3Default.setOnClickListener(this);
     }
 
     private void initViewList(final ViewLive vlBigView) {
@@ -567,6 +380,11 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
     protected void doBusiness(Bundle savedInstanceState) {
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
     /**
      * 电话状态监听.
      */
@@ -579,23 +397,16 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
                     case TelephonyManager.CALL_STATE_IDLE:
                         if (mHostHasBeenCalled) {
                             mHostHasBeenCalled = false;
-                            recordLog(TAG + ": call state idle");
-                            // 登陆频道
-                            for (ViewLive viewLive : mListViewLive) {
-                                if (viewLive.isPublishView()) {
-                                    startPublish();
-                                } else if (viewLive.isPlayView()) {
-                                    startPlay(viewLive.getStreamID());
-                                }
-                            }
+                            recordLog(MY_SELF + ": call state idle");
+                            mZegoLiveRoom.resumeModule(ZegoConstants.ModuleType.AUDIO);
                         }
 
                         break;
                     case TelephonyManager.CALL_STATE_RINGING:
-                        recordLog(TAG + ": call state ringing");
+                        recordLog(MY_SELF + ": call state ringing");
                         mHostHasBeenCalled = true;
-                        // 来电停止发布与播放
-                        stopAllStream();
+                        // 来电，暂停音频模块
+                        mZegoLiveRoom.pauseModule(ZegoConstants.ModuleType.AUDIO);
                         break;
 
                     case TelephonyManager.CALL_STATE_OFFHOOK:
@@ -732,7 +543,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
         initPublishConfigs();
 
         // 输出发布状态
-        recordLog(TAG + ": start publishing(" + mPublishStreamID + ")");
+        recordLog(MY_SELF + ": start publishing(" + mPublishStreamID + ")");
 
         // 设置水印
         mZegoLiveRoom.setWaterMarkImagePath("asset:watermark.png");
@@ -782,7 +593,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
             handlePublishStop(1, mPublishStreamID);
             initPublishControlText();
 
-            recordLog(TAG + ": stop publishing(" + mPublishStreamID + ")");
+            recordLog(MY_SELF + ": stop publishing(" + mPublishStreamID + ")");
             mZegoLiveRoom.stopPreview();
             mZegoLiveRoom.stopPublishing();
             mZegoLiveRoom.setPreviewView(null);
@@ -795,7 +606,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
             handlePlayStop(1, streamID);
 
             // 输出播放状态
-            recordLog(TAG + ": stop play stream(" + streamID + ")");
+            recordLog(MY_SELF + ": stop play stream(" + streamID + ")");
             mZegoLiveRoom.stopPlayingStream(streamID);
         }
     }
@@ -841,7 +652,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
         freeViewLive.setPlayView(true);
 
         // 输出播放状态
-        recordLog(TAG + ": start play stream(" + streamID + ")");
+        recordLog(MY_SELF + ": start play stream(" + streamID + ")");
 
         // 初始化拉流参数, 外部渲染模式使用
         initPlayConfigs(freeViewLive, streamID);
@@ -954,7 +765,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
      */
     protected void handlePublishSucc(String streamID) {
         mIsPublishing = true;
-        recordLog(TAG + ": onPublishSucc(" + streamID + ")");
+        recordLog(MY_SELF + ": onPublishSucc(" + streamID + ")");
 
         initPublishControlText();
 //        mRlytControlHeader.bringToFront();
@@ -965,7 +776,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
      */
     protected void handlePublishStop(int stateCode, String streamID) {
         mIsPublishing = false;
-        recordLog(TAG + ": onPublishStop(" + streamID + ") --stateCode:" + stateCode);
+        recordLog(MY_SELF + ": onPublishStop(" + streamID + ") --stateCode:" + stateCode);
 
         // 释放View
         releaseLiveView(streamID);
@@ -978,7 +789,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
      * 拉流成功.
      */
     protected void handlePlaySucc(String streamID) {
-        recordLog(TAG + ": onPlaySucc(" + streamID + ")");
+        recordLog(MY_SELF + ": onPlaySucc(" + streamID + ")");
 
         mLiveCount++;
         setPublishEnabled();
@@ -990,7 +801,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
      * 停止拉流.
      */
     protected void handlePlayStop(int stateCode, String streamID) {
-        recordLog(TAG + ": onPlayStop(" + streamID + ") --stateCode:" + stateCode);
+        recordLog(MY_SELF + ": onPlayStop(" + streamID + ") --stateCode:" + stateCode);
 
         // 释放View
         releaseLiveView(streamID);
@@ -1014,22 +825,27 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
         LiveQualityLogger.write("publishStreamQuality:%d, streamId: %s, videoFPS: %.2f, videoBitrate: %.2fKb/s", quality, streamID, videoFPS, videoBitrate);
     }
 
-    protected AuxData handleAuxCallback(int dataLen) {
+    final static int AUX_DATA_CHANNEL_COUNT = 2;
+    final static int AUX_DATA_SAMPLE_RATE = 44100;
+    final static int AUX_DATA_LENGHT = AUX_DATA_SAMPLE_RATE * AUX_DATA_CHANNEL_COUNT * 2 / 50;
+
+    protected AuxData handleAuxCallback(int exceptDataLength) {
         // 开启伴奏后, sdk每20毫秒一次取数据
-        if (!mEnableBackgroundMusic || dataLen <= 0) {
+        if (!mEnableBackgroundMusic) {
             return null;
         }
 
         AuxData auxData = new AuxData();
-        auxData.dataBuf = new byte[dataLen];
+        auxData.dataBuf = new byte[AUX_DATA_LENGHT];
 
         try {
             AssetManager am = getAssets();
             if (mIsBackgroundMusic == null) {
+                // a.pcm 为用于混音的音频数据，其采样率为 44100，声道数为 2，位深 16
                 mIsBackgroundMusic = am.open("a.pcm");
             }
-            int len = mIsBackgroundMusic.read(auxData.dataBuf);
 
+            int len = mIsBackgroundMusic.read(auxData.dataBuf);
             if (len <= 0) {
                 // 歌曲播放完毕
                 mIsBackgroundMusic.close();
@@ -1039,8 +855,8 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
             e.printStackTrace();
         }
 
-        auxData.channelCount = 2;
-        auxData.sampleRate = 44100;
+        auxData.channelCount = AUX_DATA_CHANNEL_COUNT;
+        auxData.sampleRate = AUX_DATA_SAMPLE_RATE;
 
 
         return auxData;
@@ -1111,7 +927,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
      * 用户掉线.
      */
     protected void handleDisconnect(int errorCode, String roomID) {
-        recordLog(TAG + ": onDisconnected, roomID:" + roomID + ", errorCode:" + errorCode);
+        recordLog(MY_SELF + ": onDisconnected, roomID:" + roomID + ", errorCode:" + errorCode);
     }
 
     /**
@@ -1190,9 +1006,10 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
             @Override
             public void onSendRoomMessage(int errorCode, String roomID, long messageID) {
                 if (errorCode == 0) {
-                    recordLog(TAG + ": 发送房间消息成功, roomID:" + roomID);
+                    mEdtMessage.setText("");
+                    recordLog(MY_SELF + ": 发送房间消息成功, roomID:" + roomID);
                 } else {
-                    recordLog(TAG + ": 发送房间消息失败, roomID:" + roomID + ", messageID:" + messageID);
+                    recordLog(MY_SELF + ": 发送房间消息失败, roomID:" + roomID + ", messageID:" + messageID);
                 }
             }
         });
@@ -1212,7 +1029,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
 
         // 注销电话监听
         TelephonyManager tm = (TelephonyManager) getSystemService(Service.TELEPHONY_SERVICE);
-        tm.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        tm.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
         mPhoneStateListener = null;
 
         // 清空回调, 避免内存泄漏
@@ -1288,92 +1105,4 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity implements Vi
         return listUrls;
     }
 
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_choose_effect:
-                setEffectFilterBeautyChooseBtnTextColor(mChooseEffectBtn);
-                setEffectFilterBeautyChooseBlock(mEffectRecyclerView);
-                break;
-            case R.id.btn_choose_filter:
-                setEffectFilterBeautyChooseBtnTextColor(mChooseFilterBtn);
-                setEffectFilterBeautyChooseBlock(mFilterRecyclerView);
-                break;
-            case R.id.btn_choose_blur_level:
-                setEffectFilterBeautyChooseBtnTextColor(mChooseBlurLevelBtn);
-                setEffectFilterBeautyChooseBlock(mBlurLevelSelect);
-                break;
-            case R.id.btn_choose_color_level:
-                setEffectFilterBeautyChooseBtnTextColor(mChooseColorLevelBtn);
-                setEffectFilterBeautyChooseBlock(mColorLevelSelect);
-                break;
-            case R.id.btn_choose_face_shape:
-                setEffectFilterBeautyChooseBtnTextColor(mChooseFaceShapeBtn);
-                setEffectFilterBeautyChooseBlock(mFaceShapeSelect);
-                break;
-            case R.id.btn_choose_red_level:
-                setEffectFilterBeautyChooseBtnTextColor(mChooseRedLevelBtn);
-                setEffectFilterBeautyChooseBlock(mRedLevelSelect);
-                break;
-            case R.id.face_shape_0_nvshen:
-                setFaceShapeBackground(mFaceShape0Nvshen);
-                ZegoApiManager.getInstance().getFaceunityController().onFaceShapeSelected(0);
-                break;
-            case R.id.face_shape_1_wanghong:
-                setFaceShapeBackground(mFaceShape1Wanghong);
-                ZegoApiManager.getInstance().getFaceunityController().onFaceShapeSelected(1);
-                break;
-            case R.id.face_shape_2_ziran:
-                setFaceShapeBackground(mFaceShape2Ziran);
-                ZegoApiManager.getInstance().getFaceunityController().onFaceShapeSelected(2);
-                break;
-            case R.id.face_shape_3_default:
-                setFaceShapeBackground(mFaceShape3Default);
-                ZegoApiManager.getInstance().getFaceunityController().onFaceShapeSelected(3);
-                break;
-        }
-    }
-
-    private void setBlurLevelTextBackground(TextView tv) {
-        mBlurLevels[0].setBackground(getResources().getDrawable(R.drawable.zero_blur_level_item_unselected));
-        for (int i = 1; i < BLUR_LEVEL_TV_ID.length; i++) {
-            mBlurLevels[i].setBackground(getResources().getDrawable(R.drawable.blur_level_item_unselected));
-        }
-        if (tv == mBlurLevels[0]) {
-            tv.setBackground(getResources().getDrawable(R.drawable.zero_blur_level_item_selected));
-        } else {
-            tv.setBackground(getResources().getDrawable(R.drawable.blur_level_item_selected));
-        }
-    }
-
-    private void setFaceShapeBackground(TextView tv) {
-        mFaceShape0Nvshen.setBackground(getResources().getDrawable(R.color.unselect_gray));
-        mFaceShape1Wanghong.setBackground(getResources().getDrawable(R.color.unselect_gray));
-        mFaceShape2Ziran.setBackground(getResources().getDrawable(R.color.unselect_gray));
-        mFaceShape3Default.setBackground(getResources().getDrawable(R.color.unselect_gray));
-        tv.setBackground(getResources().getDrawable(R.color.faceunityYellow));
-    }
-
-    private void setEffectFilterBeautyChooseBlock(View v) {
-        mEffectRecyclerView.setVisibility(View.INVISIBLE);
-        mFilterRecyclerView.setVisibility(View.INVISIBLE);
-        mFaceShapeSelect.setVisibility(View.INVISIBLE);
-        mBlurLevelSelect.setVisibility(View.INVISIBLE);
-        mColorLevelSelect.setVisibility(View.INVISIBLE);
-        mRedLevelSelect.setVisibility(View.INVISIBLE);
-        v.setVisibility(View.VISIBLE);
-    }
-
-    private void setEffectFilterBeautyChooseBtnTextColor(Button selectedBtn) {
-        mChooseEffectBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        mChooseColorLevelBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        mChooseBlurLevelBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        mChooseFilterBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        mChooseFaceShapeBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        mChooseRedLevelBtn.setTextColor(getResources().getColor(R.color.white));
-        selectedBtn.setTextColor(getResources().getColor(R.color.faceunityYellow));
-    }
-
-    protected abstract boolean isShowFaceunityUi();
 }

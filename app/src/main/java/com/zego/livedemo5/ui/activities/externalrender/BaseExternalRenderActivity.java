@@ -37,6 +37,7 @@ import com.zego.livedemo5.ui.widgets.PublishSettingsPannel;
 import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.ZegoRoomUtil;
+import com.zego.zegoavkit2.ZegoMixEnginePlayout;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.callback.IZegoResponseCallback;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
@@ -102,6 +103,8 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
 
     protected boolean mEnableLoopback = false;
 
+    protected boolean mEnableMixEngine = false;
+
     protected int mSelectedBeauty = 0;
 
     protected int mSelectedFilter = 0;
@@ -116,7 +119,7 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
 
     protected PhoneStateListener mPhoneStateListener = null;
 
-    protected PublishSettingsPannel mSettingsPannel = null;
+    protected PublishSettingsPannel mSettingsPannel= null;
 
     protected AlertDialog mDialogHandleRequestPublish = null;
 
@@ -149,7 +152,7 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
     private void initSettingPannel() {
 
         mSettingsPannel = (PublishSettingsPannel) findViewById(R.id.publishSettingsPannel);
-        mSettingsPannel.initPublishSettings(mEnableCamera, mEnableFrontCam, mEnableMic, mEnableTorch, mEnableBackgroundMusic, mEnableLoopback, mSelectedBeauty, mSelectedFilter);
+        mSettingsPannel.initPublishSettings(mEnableCamera, mEnableFrontCam, mEnableMic, mEnableTorch, mEnableBackgroundMusic, mEnableLoopback, mSelectedBeauty, mSelectedFilter, mEnableMixEngine);
         mSettingsPannel.setPublishSettingsCallback(new PublishSettingsPannel.PublishSettingsCallback() {
             @Override
             public void onEnableCamera(boolean isEnable) {
@@ -196,6 +199,12 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
             public void onEnableLoopback(boolean isEnable) {
                 mEnableLoopback = isEnable;
                 mZegoLiveRoom.enableLoopback(isEnable);
+            }
+
+            @Override
+            public void onEnableMixEnginePlayout(boolean isEnable) {
+                mEnableMixEngine = isEnable;
+                ZegoMixEnginePlayout.mixEnginePlayout(isEnable);
             }
 
             @Override
@@ -303,13 +312,13 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
                             mHostHasBeenCalled = false;
                             recordLog(MY_SELF + ": call state idle");
                             // 登陆频道
-                            for (ViewLive viewLive : mListViewLive) {
-                                if (viewLive.isPublishView()) {
+                           for(ViewLive viewLive : mListViewLive){
+                                if(viewLive.isPublishView()){
                                     startPublish();
-                                } else if (viewLive.isPlayView()) {
+                                }else if(viewLive.isPlayView()){
                                     startPlay(viewLive.getStreamID());
                                 }
-                            }
+                           }
                         }
 
                         break;
@@ -354,7 +363,7 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
      * @param streamID
      */
     protected void releaseLiveView(String streamID) {
-        if (TextUtils.isEmpty(streamID)) {
+        if(TextUtils.isEmpty(streamID)){
             return;
         }
 
@@ -599,7 +608,7 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
     }
 
     protected void setPublishEnabled() {
-        if (!mIsPublishing) {
+        if(!mIsPublishing){
             if (mLiveCount < ZegoLiveRoom.getMaxPlayChannelCount() + 1) {
                 tvPublisnControl.setEnabled(true);
             } else {
@@ -823,7 +832,7 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
     }
 
     /**
-     * 房间内用户删除流.
+     *  房间内用户删除流.
      */
     protected void handleStreamDeleted(final ZegoStreamInfo[] listStream, final String roomID) {
         if (listStream != null && listStream.length > 0) {
@@ -839,14 +848,14 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
      */
     protected void handleAnchorLoginRoom(int errorCode, ZegoStreamInfo[] zegoStreamInfos) {
         // 登录房间回调
-        if (errorCode == 0) {
+        if(errorCode == 0){
             mPublishTitle = PreferenceUtil.getInstance().getUserName() + " is coming";
             mPublishStreamID = ZegoRoomUtil.getPublishStreamID();
             startPublish();
 
             // 打印log
             recordLog(MY_SELF + ": onLoginRoom success(" + mRoomID + "), streamCounts:" + zegoStreamInfos.length);
-        } else {
+        }else {
             // 打印log
             recordLog(MY_SELF + ": onLoginRoom fail(" + mRoomID + "), errorCode:" + errorCode);
         }
@@ -874,7 +883,7 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
     /**
      * 请求连麦.
      */
-    protected void requestJoinLive() {
+    protected  void requestJoinLive(){
         mZegoLiveRoom.requestJoinLive(new IZegoResponseCallback() {
             @Override
             public void onResponse(int result, String fromUserID, String fromUserName) {
@@ -936,7 +945,7 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
 
         // 注销电话监听
         TelephonyManager tm = (TelephonyManager) getSystemService(Service.TELEPHONY_SERVICE);
-        tm.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        tm.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
         mPhoneStateListener = null;
 
         // 清空回调, 避免内存泄漏
@@ -970,7 +979,7 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
     }
 
     /**
-     * 处理页面朝向变化, 目前只针对拉流.
+     *  处理页面朝向变化, 目前只针对拉流.
      */
     protected void handleConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -984,7 +993,7 @@ public abstract class BaseExternalRenderActivity extends AbsBaseLiveActivity {
                     } else {
                         mZegoLiveRoom.setViewRotation(Surface.ROTATION_0, viewLive.getStreamID());
                     }
-                } else {
+                }else {
                     mZegoLiveRoom.setViewRotation(currentOrientation, viewLive.getStreamID());
                 }
             }

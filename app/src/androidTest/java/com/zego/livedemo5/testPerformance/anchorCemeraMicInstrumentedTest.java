@@ -46,7 +46,7 @@ public class anchorCemeraMicInstrumentedTest {
     public void setup(){
         mActivity=mActivityRule.getActivity();
         onView(withText(mActivity.getResources().getStringArray(R.array.navigation_bar_titles)[1])).perform(click());
-        sleep(90000);
+        sleep(PerformanceTest.WAITTIMEBEFOREPUBLISH);
 //        clickToGetPermission(5);
 //        allowPermissionIfNeed();
     }

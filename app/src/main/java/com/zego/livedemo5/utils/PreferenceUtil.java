@@ -2,8 +2,10 @@ package com.zego.livedemo5.utils;
 
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Base64;
 
+import com.zego.livedemo5.ZegoAppHelper;
 import com.zego.livedemo5.ZegoApplication;
 
 import java.io.ByteArrayInputStream;
@@ -30,17 +32,20 @@ public class PreferenceUtil {
 
     public static final String PREFERENCE_KEY_USER_NAME = "PREFERENCE_KEY_USER_NAME";
 
+    private static final String Pref_key_App_Id = "zego_app_id";
+    private static final String Pref_key_App_Key = "zego_app_key";
+
 
     private SharedPreferences mSharedPreferences;
 
-    private PreferenceUtil() {
+    private PreferenceUtil(){
         mSharedPreferences = ZegoApplication.sApplicationContext.getSharedPreferences(SHARE_PREFERENCE_NAME, AppCompatActivity.MODE_PRIVATE);
     }
 
-    public static PreferenceUtil getInstance() {
-        if (sInstance == null) {
-            synchronized (PreferenceUtil.class) {
-                if (sInstance == null) {
+    public static PreferenceUtil getInstance(){
+        if(sInstance == null){
+            synchronized (PreferenceUtil.class){
+                if(sInstance == null){
                     sInstance = new PreferenceUtil();
                 }
             }
@@ -48,88 +53,112 @@ public class PreferenceUtil {
         return sInstance;
     }
 
-    public void setStringValue(String key, String value) {
+    public void setStringValue(String key, String value){
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(key, value);
         editor.commit();
     }
 
-    public String getStringValue(String key, String defaultValue) {
+    public String getStringValue(String key, String defaultValue){
         return mSharedPreferences.getString(key, defaultValue);
     }
 
-    public void setBooleanValue(String key, boolean value) {
+    public void setBooleanValue(String key, boolean value){
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putBoolean(key, value);
         editor.commit();
     }
 
 
-    public boolean getBooleanValue(String key, boolean defaultValue) {
+    public boolean getBooleanValue(String key, boolean defaultValue){
         return mSharedPreferences.getBoolean(key, defaultValue);
     }
 
-    public void setIntValue(String key, int value) {
+    public void setIntValue(String key, int value){
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putInt(key, value);
         editor.commit();
     }
 
-    public int getIntValue(String key, int defaultValue) {
+    public int getIntValue(String key, int defaultValue){
         return mSharedPreferences.getInt(key, defaultValue);
     }
 
-    public void setLongValue(String key, long value) {
+    public void setLongValue(String key, long value){
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putLong(key, value);
         editor.commit();
     }
 
-    public long getLongValue(String key, long defaultValue) {
+    public long getLongValue(String key, long defaultValue){
         return mSharedPreferences.getLong(key, defaultValue);
     }
 
-
-    public void setUserID(String userID) {
+    public void setUserID(String userID){
         setStringValue(PREFERENCE_KEY_USER_ID, userID);
     }
 
-    public String getUserID() {
+    public String getUserID(){
         return getStringValue(PREFERENCE_KEY_USER_ID, null);
     }
 
-    public void setUserName(String userName) {
+    public void setUserName(String userName){
         setStringValue(PREFERENCE_KEY_USER_NAME, userName);
     }
 
-    public String getUserName() {
+    public String getUserName(){
         return getStringValue(PREFERENCE_KEY_USER_NAME, null);
     }
 
-    public Object getObjectFromString(String key) {
-        Object value = null;
+    public void setAppId(long appId) {
+        setLongValue(Pref_key_App_Id, appId);
+    }
+
+    public long getAppId() {
+        return getLongValue(Pref_key_App_Id, -1);
+    }
+
+    public void setAppKey(byte[] signKey) {
+        String strSignKey = ZegoAppHelper.convertSignKey2String(signKey);
+        setStringValue(Pref_key_App_Key, strSignKey);
+    }
+
+    public byte[] getAppKey() {
+        String strSignKey = getStringValue(Pref_key_App_Key, null);
+        if (TextUtils.isEmpty(strSignKey)) {
+           return null;
+        }
         try {
+            return ZegoAppHelper.parseSignKeyFromString(strSignKey);
+        } catch (NumberFormatException e) {
+        }
+        return null;
+    }
+
+    public Object getObjectFromString(String key){
+        Object value = null;
+        try{
             byte[] bytes = Base64.decode(PreferenceUtil.getInstance().getStringValue(key, ""), Base64.DEFAULT);
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             ObjectInputStream oisArray = new ObjectInputStream(bais);
             value = oisArray.readObject();
-        } catch (Exception e) {
+        }catch (Exception e){
             e.printStackTrace();
         }
 
         return value;
     }
 
-    public void setObjectToString(String key, Object value) {
+    public void setObjectToString(String key, Object value){
 
-        try {
+        try{
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos;
             oos = new ObjectOutputStream(baos);
             oos.writeObject(value);
             String data = new String(Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT));
             PreferenceUtil.getInstance().setStringValue(key, data);
-        } catch (IOException e) {
+        }catch (IOException e){
             e.printStackTrace();
         }
     }

@@ -2,9 +2,10 @@ package com.zego.livedemo5.videofilter;
 
 import android.content.Context;
 
-import com.zego.livedemo5.faceunity.FaceunityController;
-import com.zego.zegoliveroom.videofilter.ZegoVideoFilter;
-import com.zego.zegoliveroom.videofilter.ZegoVideoFilterFactory;
+import com.faceunity.wrapper.FaceunityControlView;
+import com.faceunity.wrapper.FaceunityController;
+import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
+import com.zego.zegoavkit2.videofilter.ZegoVideoFilterFactory;
 
 /**
  * Created by robotding on 16/12/3.
@@ -15,6 +16,10 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
     private ZegoVideoFilter mFilter = null;
 
     private Context mContext;
+
+    public VideoFilterFactoryDemo(Context context) {
+        mContext = context;
+    }
 
     public ZegoVideoFilter create() {
         switch (mode) {
@@ -37,7 +42,7 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
                 mFilter = new VideoFilterI420MemDemo();
                 break;
             case 6:
-                mFilter = new VideoFilterFaceUnityDemo(mContext);
+                mFilter = new FUVideoFilterGlTexture2dDemo(mContext);
                 break;
         }
 
@@ -48,13 +53,9 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
         mFilter = null;
     }
 
-    public void setContext(Context context) {
-        mContext = context;
-    }
-
-    public FaceunityController getFaceunityController() {
+    public FaceunityControlView.OnViewEventListener getFaceunityController() {
         if (mFilter instanceof FaceunityController) {
-            return (FaceunityController) mFilter;
+            return ((FaceunityController) mFilter).getFaceunityController();
         }
         return null;
     }

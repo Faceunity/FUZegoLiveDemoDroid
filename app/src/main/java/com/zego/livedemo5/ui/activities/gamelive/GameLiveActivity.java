@@ -33,7 +33,7 @@ import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.entity.AuxData;
 import com.zego.zegoliveroom.entity.ZegoStreamQuality;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
-import com.zego.zegoliveroom.screencapture.ZegoScreenCaptureFactory;
+import com.zego.zegoavkit2.screencapture.ZegoScreenCaptureFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ import java.util.List;
  * Copyright © 2016 Zego. All rights reserved.
  */
 @TargetApi(21)
-public class GameLiveActivity extends AppCompatActivity {
+public  class GameLiveActivity extends AppCompatActivity {
 
     private static final String TAG = GameLiveActivity.class.getSimpleName();
 
@@ -64,7 +64,7 @@ public class GameLiveActivity extends AppCompatActivity {
 
     private ZegoScreenCaptureFactory mScreenCaptureFactory;
 
-    public static void actionStart(Activity activity, String publishTitle, int appOrientation) {
+    public static void actionStart(Activity activity, String publishTitle, int appOrientation){
         Intent intent = new Intent(activity, GameLiveActivity.class);
         intent.putExtra(IntentExtra.PUBLISH_TITLE, publishTitle);
         intent.putExtra(IntentExtra.APP_ORIENTATION, appOrientation);
@@ -77,10 +77,10 @@ public class GameLiveActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game_live);
 
         // 检测系统版本
-        if (Build.VERSION.SDK_INT < 21) {
+        if(Build.VERSION.SDK_INT < 21){
             Toast.makeText(this, "录屏功能只能在Android5.0及以上版本的系统中运行", Toast.LENGTH_LONG).show();
             finish();
-        } else {
+        }else {
 
             if (savedInstanceState == null) {
                 Intent intent = getIntent();
@@ -89,7 +89,7 @@ public class GameLiveActivity extends AppCompatActivity {
             }
 
             // 手机横屏直播
-            if ((mAppOrientation == Surface.ROTATION_90 || mAppOrientation == Surface.ROTATION_270)) {
+            if((mAppOrientation == Surface.ROTATION_90 || mAppOrientation == Surface.ROTATION_270)){
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             }
 
@@ -100,14 +100,14 @@ public class GameLiveActivity extends AppCompatActivity {
             mStartBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mIsRunning) {
+                    if(mIsRunning){
                         mIsRunning = false;
                         mStartBtn.setText("开始录屏");
 
                         mShare.setEnabled(false);
 
                         stopCapture();
-                    } else {
+                    }else {
                         mIsRunning = true;
                         mStartBtn.setText("停止录屏");
 
@@ -116,11 +116,11 @@ public class GameLiveActivity extends AppCompatActivity {
                 }
             });
 
-            mShare = (Button) findViewById(R.id.btn_share);
+            mShare = (Button)findViewById(R.id.btn_share);
             mShare.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mListUrls != null) {
+                    if(mListUrls != null){
                         ShareUtils.getInstance().shareToQQ(GameLiveActivity.this, mListUrls, mRoomID, mPublishStreamID);
                     }
                 }
@@ -134,13 +134,13 @@ public class GameLiveActivity extends AppCompatActivity {
 
             initCallback();
             // 请求录屏权限, 等待用户授权
-            mMediaProjectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+            mMediaProjectionManager =  (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
             startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_CODE);
         }
     }
 
 
-    private void initCallback() {
+    private void initCallback(){
         mZegoLiveRoom.setZegoLivePublisherCallback(new IZegoLivePublisherCallback() {
             @Override
             public void onPublishStateUpdate(int stateCode, String streamID, HashMap<String, Object> streamInfo) {
@@ -194,7 +194,7 @@ public class GameLiveActivity extends AppCompatActivity {
         });
     }
 
-    private void startCapture() {
+    private void startCapture(){
         ZegoAvConfig zegoAvConfig = ZegoApiManager.getInstance().getZegoAvConfig();
         // 开始录屏
         if (mScreenCaptureFactory != null) {
@@ -215,7 +215,7 @@ public class GameLiveActivity extends AppCompatActivity {
         mZegoLiveRoom.startPublishing(mPublishStreamID, mPublishTitle, 0);
     }
 
-    private void stopCapture() {
+    private void stopCapture(){
 
         Toast.makeText(GameLiveActivity.this, "停止推流", Toast.LENGTH_SHORT).show();
 
@@ -233,7 +233,7 @@ public class GameLiveActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+        if(requestCode == REQUEST_CODE && resultCode == RESULT_OK){
             Log.i(TAG, "获取MediaProjection成功");
 
             mMediaProjection = mMediaProjectionManager.getMediaProjection(resultCode, data);
@@ -242,7 +242,7 @@ public class GameLiveActivity extends AppCompatActivity {
             mZegoLiveRoom.loginRoom(mRoomID, mPublishTitle, ZegoConstants.RoomRole.Anchor, new IZegoLoginCompletionCallback() {
                 @Override
                 public void onLoginCompletion(int stateCode, ZegoStreamInfo[] zegoStreamInfos) {
-                    if (stateCode == 0) {
+                    if(stateCode == 0){
 
                         Log.i(TAG, "登陆房间成功");
                         mIsRunning = true;
@@ -250,13 +250,13 @@ public class GameLiveActivity extends AppCompatActivity {
                         mStartBtn.setEnabled(true);
 
                         startCapture();
-                    } else {
+                    }else {
                         Log.i(TAG, "登陆房间失败");
                         Toast.makeText(GameLiveActivity.this, "登陆房间失败", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
-        } else {
+        }else {
             Log.i(TAG, "获取MediaProjection失败");
             Toast.makeText(GameLiveActivity.this, "获取MediaProjection失败", Toast.LENGTH_SHORT).show();
         }

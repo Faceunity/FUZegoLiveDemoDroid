@@ -15,27 +15,27 @@ public enum ByteSizeUnit {
 
         @Override
         public double toKB(long size, RADIX_TYPE radix) {
-            return (double) size / (KB(radix) / C);
+            return (double)size / (KB(radix) / C);
         }
 
         @Override
         public double toMB(long size, RADIX_TYPE radix) {
-            return (double) size / (MB(radix) / C);
+            return (double)size / (MB(radix) / C);
         }
 
         @Override
         public double toGB(long size, RADIX_TYPE radix) {
-            return (double) size / (GB(radix) / C);
+            return (double)size / (GB(radix) / C);
         }
 
         @Override
         public double toTB(long size, RADIX_TYPE radix) {
-            return (double) size / (TB(radix) / C);
+            return (double)size / (TB(radix) / C);
         }
 
         @Override
         public double toPB(long size, RADIX_TYPE radix) {
-            return (double) size / (PB(radix) / C);
+            return (double)size / (PB(radix) / C);
         }
     },
     KB {
@@ -51,22 +51,22 @@ public enum ByteSizeUnit {
 
         @Override
         public double toMB(long size, RADIX_TYPE radix) {
-            return (double) size / (MB(radix) / KB(radix));
+            return (double)size / (MB(radix) / KB(radix));
         }
 
         @Override
         public double toGB(long size, RADIX_TYPE radix) {
-            return (double) size / (GB(radix) / KB(radix));
+            return (double)size / (GB(radix) / KB(radix));
         }
 
         @Override
         public double toTB(long size, RADIX_TYPE radix) {
-            return (double) size / (TB(radix) / KB(radix));
+            return (double)size / (TB(radix) / KB(radix));
         }
 
         @Override
         public double toPB(long size, RADIX_TYPE radix) {
-            return (double) size / (PB(radix) / KB(radix));
+            return (double)size / (PB(radix) / KB(radix));
         }
     },
     MB {
@@ -87,17 +87,17 @@ public enum ByteSizeUnit {
 
         @Override
         public double toGB(long size, RADIX_TYPE radix) {
-            return (double) size / (GB(radix) / MB(radix));
+            return (double)size / (GB(radix) / MB(radix));
         }
 
         @Override
         public double toTB(long size, RADIX_TYPE radix) {
-            return (double) size / (TB(radix) / MB(radix));
+            return (double)size / (TB(radix) / MB(radix));
         }
 
         @Override
         public double toPB(long size, RADIX_TYPE radix) {
-            return (double) size / (PB(radix) / MB(radix));
+            return (double)size / (PB(radix) / MB(radix));
         }
     },
     GB {
@@ -123,12 +123,12 @@ public enum ByteSizeUnit {
 
         @Override
         public double toTB(long size, RADIX_TYPE radix) {
-            return (double) size / (TB(radix) / GB(radix));
+            return (double)size / (TB(radix) / GB(radix));
         }
 
         @Override
         public double toPB(long size, RADIX_TYPE radix) {
-            return (double) size / (PB(radix) / GB(radix));
+            return (double)size / (PB(radix) / GB(radix));
         }
     },
     TB {
@@ -159,7 +159,7 @@ public enum ByteSizeUnit {
 
         @Override
         public double toPB(long size, RADIX_TYPE radix) {
-            return (double) size / (PB(radix) / TB(radix));
+            return (double)size / (PB(radix) / TB(radix));
         }
     },
     PB {
@@ -231,22 +231,22 @@ public enum ByteSizeUnit {
         double value;
         String unit;
         if (size >= PB(radix)) {
-            value = (double) BYTES.toPB(size, radix);
+            value = (double)BYTES.toPB(size, radix);
             unit = "PB";
         } else if (size >= TB(radix)) {
-            value = (double) BYTES.toTB(size, radix);
+            value = (double)BYTES.toTB(size, radix);
             unit = "TB";
         } else if (size >= GB(radix)) {
-            value = (double) BYTES.toGB(size, radix);
+            value = (double)BYTES.toGB(size, radix);
             unit = "GB";
         } else if (size >= MB(radix)) {
-            value = (double) BYTES.toMB(size, radix);
+            value = (double)BYTES.toMB(size, radix);
             unit = "MB";
         } else if (size >= KB(radix)) {
-            value = (double) BYTES.toKB(size, radix);
+            value = (double)BYTES.toKB(size, radix);
             unit = "KB";
         } else {
-            value = (double) size;
+            value = (double)size;
             unit = "B";
         }
 
@@ -271,7 +271,6 @@ public enum ByteSizeUnit {
         K(1000);
 
         int radix;
-
         RADIX_TYPE(int radix) {
             this.radix = radix;
         }

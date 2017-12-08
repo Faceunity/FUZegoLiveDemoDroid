@@ -46,13 +46,13 @@ public class CommentsAdapter extends BaseAdapter {
         return 0;
     }
 
-    public void addMsgList(List<ZegoRoomMessage> listMsg) {
+    public void addMsgList(List<ZegoRoomMessage> listMsg){
         mListMsg.addAll(listMsg);
         notifyDataSetChanged();
     }
 
-    public void addMsg(ZegoRoomMessage msg) {
-        if (msg != null) {
+    public void addMsg(ZegoRoomMessage msg){
+        if(msg != null){
             mListMsg.add(msg);
             notifyDataSetChanged();
         }
@@ -63,19 +63,17 @@ public class CommentsAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if (convertView == null) {
-
             holder = new ViewHolder();
 
             convertView = mInflater.inflate(R.layout.item_user_comment, null);
             holder.msgContent = (TextView) convertView.findViewById(R.id.tv_msg_content);
             convertView.setTag(holder);
-
         } else {
-
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.msgContent.setText(getStringBuilder(mListMsg.get(position).fromUserName, mListMsg.get(position).content));
+        ZegoRoomMessage msg = mListMsg.get(position);
+        holder.msgContent.setText(getStringBuilder(msg.fromUserName, msg.content));
 
         return convertView;
     }
@@ -84,17 +82,17 @@ public class CommentsAdapter extends BaseAdapter {
         TextView msgContent;
     }
 
-    private SpannableStringBuilder getStringBuilder(String fromUserName, String content) {
-
+    private SpannableStringBuilder getStringBuilder(String fromUserName, String content){
         fromUserName = fromUserName.trim() + ":";
-        SpannableStringBuilder builder = new SpannableStringBuilder(fromUserName + content.trim());
+        content = content.trim();
+        SpannableStringBuilder builder = new SpannableStringBuilder(fromUserName + content);
 
         //ForegroundColorSpan 为文字前景色，BackgroundColorSpan为文字背景色
         ForegroundColorSpan whiteSpan = new ForegroundColorSpan(Color.WHITE);
         ForegroundColorSpan yellowSpan = new ForegroundColorSpan(Color.YELLOW);
 
         builder.setSpan(yellowSpan, 0, fromUserName.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        builder.setSpan(whiteSpan, fromUserName.length(), fromUserName.length() + content.length() - 1, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        builder.setSpan(whiteSpan, fromUserName.length(), fromUserName.length() + content.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
         return builder;
     }

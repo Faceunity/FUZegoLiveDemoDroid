@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.ZegoApiManager;
 import com.zego.livedemo5.constants.IntentExtra;
+import com.zego.livedemo5.presenters.RoomInfo;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.callback.IZegoLivePlayerCallback;
 import com.zego.zegoliveroom.callback.IZegoLoginCompletionCallback;
@@ -45,10 +46,11 @@ public class GameLivingPlayActivity extends AppCompatActivity {
      * 启动入口.
      *
      * @param activity 源activity
+     * @param roomInfo 房间信息
      */
-    public static void actionStart(Activity activity, String roomID) {
+    public static void actionStart(Activity activity, RoomInfo roomInfo) {
         Intent intent = new Intent(activity, GameLivingPlayActivity.class);
-        intent.putExtra(IntentExtra.ROOM_ID, roomID);
+        intent.putExtra(IntentExtra.ROOM_ID, roomInfo.room_id);
         activity.startActivity(intent);
         activity.overridePendingTransition(R.anim.scale_translate,
                 R.anim.my_alpha_action);
@@ -79,15 +81,15 @@ public class GameLivingPlayActivity extends AppCompatActivity {
         mZegoLiveRoom.loginRoom(mRoomID, ZegoConstants.RoomRole.Audience, new IZegoLoginCompletionCallback() {
             @Override
             public void onLoginCompletion(int stateCode, ZegoStreamInfo[] zegoStreamInfos) {
-                if (stateCode == 0) {
+                if(stateCode == 0){
 
                     Log.i(TAG, "登陆房间成功");
 
-                    if (zegoStreamInfos != null && zegoStreamInfos.length > 0) {
+                    if(zegoStreamInfos != null && zegoStreamInfos.length > 0){
                         mPlayStreamID = zegoStreamInfos[0].streamID;
                         startPlay();
                     }
-                } else {
+                }else {
                     Log.i(TAG, "登陆房间失败");
                     Toast.makeText(GameLivingPlayActivity.this, "登陆房间失败", Toast.LENGTH_SHORT).show();
                 }
@@ -140,12 +142,22 @@ public class GameLivingPlayActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onReconnect(int i, String s) {
+
+            }
+
+            @Override
+            public void onTempBroken(int i, String s) {
+
+            }
+
+            @Override
             public void onStreamUpdated(int type, ZegoStreamInfo[] zegoStreamInfos, String s) {
-                if (zegoStreamInfos != null && zegoStreamInfos.length > 0) {
+                if(zegoStreamInfos != null && zegoStreamInfos.length > 0){
                     mPlayStreamID = zegoStreamInfos[0].streamID;
-                    if (type == ZegoConstants.StreamUpdateType.Added) {
+                    if(type == ZegoConstants.StreamUpdateType.Added){
                         startPlay();
-                    } else if (type == ZegoConstants.StreamUpdateType.Deleted) {
+                    }else if(type == ZegoConstants.StreamUpdateType.Deleted){
                         stopPlay();
                     }
                 }

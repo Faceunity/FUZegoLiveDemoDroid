@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.Surface;
 import android.view.View;
 
@@ -16,6 +17,7 @@ import com.zego.livedemo5.constants.IntentExtra;
 import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.ZegoRoomUtil;
+import com.zego.zegoliveroom.callback.IZegoEndJoinLiveCallback;
 import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
 
@@ -30,9 +32,7 @@ import java.util.Map;
 
 public abstract class BasePublishActivity extends BaseLiveActivity {
 
-    /**
-     * 已连麦用户
-     */
+    /** 已连麦用户 */
     protected ArrayList<String> hasJoinedUsers = new ArrayList<>();
 
     @Override
@@ -116,7 +116,7 @@ public abstract class BasePublishActivity extends BaseLiveActivity {
         startPublish();
 
         // 打印log
-        recordLog(TAG + ": onLoginRoom success(" + mRoomID + "), streamCounts:" + zegoStreamInfos.length);
+        recordLog(MY_SELF + ": onLoginRoom success(" + mRoomID + "), streamCounts:" + zegoStreamInfos.length);
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class BasePublishActivity extends BaseLiveActivity {
      */
     protected void handleAnchorLoginRoomFail(int errorCode) {
         // 打印log
-        recordLog(TAG + ": onLoginRoom fail(" + mRoomID + "), errorCode:" + errorCode);
+        recordLog(MY_SELF + ": onLoginRoom fail(" + mRoomID + "), errorCode:" + errorCode);
     }
 
     /**

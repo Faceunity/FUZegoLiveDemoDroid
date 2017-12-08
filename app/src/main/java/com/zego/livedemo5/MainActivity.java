@@ -1,6 +1,7 @@
 package com.zego.livedemo5;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
 
 import com.tencent.tauth.Tencent;
 import com.zego.livedemo5.ui.activities.AboutZegoActivity;
@@ -31,7 +33,7 @@ import butterknife.Bind;
  * Copyright © 2016 Zego. All rights reserved.
  * des:
  */
-public class MainActivity extends AbsBaseActivity implements NavigationBar.NavigationBarListener {
+public class MainActivity extends AbsBaseActivity implements NavigationBar.NavigationBarListener{
 
     private List<AbsBaseFragment> mFragments;
 
@@ -99,7 +101,7 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
 
                             for (int position = 0; position < mPagerAdapter.getCount(); position++) {
                                 Fragment fragment = mPagerAdapter.getItem(position);
-                                ((OnReInitSDKCallback) fragment).onReInitSDK();
+                                ((OnReInitSDKCallback)fragment).onReInitSDK();
                             }
                         }
                     });
@@ -120,7 +122,7 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
             @Override
             public void onDrawerClosed(View drawerView) {
                 // 当侧边栏关闭时, set配置
-                if (mSetConfigsCallback == null) return;
+                if(mSetConfigsCallback == null) return;
 
                 int errorCode = mSetConfigsCallback.onSetConfig();
                 if (errorCode < 0) {
@@ -244,7 +246,7 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_contact_us) {
+        if(id == R.id.action_contact_us){
             Tencent.createInstance("", MainActivity.this).startWPAConversation(MainActivity.this, "84328558", "");
             return true;
         }

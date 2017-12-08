@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.constants.IntentExtra;
+import com.zego.livedemo5.presenters.RoomInfo;
+import com.zego.livedemo5.presenters.StreamInfo;
 import com.zego.livedemo5.ui.activities.BasePlayActivity;
 import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.zegoliveroom.callback.IZegoLivePlayerCallback;
@@ -17,12 +20,13 @@ import com.zego.zegoliveroom.callback.IZegoRoomCallback;
 import com.zego.zegoliveroom.callback.im.IZegoIMCallback;
 import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.entity.AuxData;
+import com.zego.zegoliveroom.entity.ZegoStreamQuality;
 import com.zego.zegoliveroom.entity.ZegoConversationMessage;
 import com.zego.zegoliveroom.entity.ZegoRoomMessage;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
-import com.zego.zegoliveroom.entity.ZegoStreamQuality;
 import com.zego.zegoliveroom.entity.ZegoUserState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -35,14 +39,20 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
      * 启动入口.
      *
      * @param activity 源activity
+     * @param roomInfo 房间信息
      */
-    public static void actionStart(Activity activity, String roomID) {
+    public static void actionStart(Activity activity, RoomInfo roomInfo) {
         Intent intent = new Intent(activity, MoreAnchorsPlayActivity.class);
-        intent.putExtra(IntentExtra.ROOM_ID, roomID);
+        intent.putExtra(IntentExtra.ROOM_ID, roomInfo.room_id);
+
+        ArrayList<String> streamList = getStremListFromRoomInfo(roomInfo);
+        intent.putStringArrayListExtra(IntentExtra.LIST_STREAM, streamList);
+
         activity.startActivity(intent);
         activity.overridePendingTransition(R.anim.scale_translate,
                 R.anim.my_alpha_action);
     }
+
 
 
     @Override
@@ -52,9 +62,9 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
         mZegoLiveRoom.loginRoom(mRoomID, ZegoConstants.RoomRole.Audience, new IZegoLoginCompletionCallback() {
             @Override
             public void onLoginCompletion(int errorCode, ZegoStreamInfo[] zegoStreamInfos) {
-                if (errorCode == 0) {
+                if(errorCode == 0){
                     handleAudienceLoginRoomSuccess(zegoStreamInfos);
-                } else {
+                }else {
                     handleAudienceLoginRoomFail(errorCode);
                 }
             }
@@ -64,9 +74,9 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
             @Override
             public void onPublishStateUpdate(int stateCode, String streamID, HashMap<String, Object> streamInfo) {
                 //推流状态更新
-                if (stateCode == 0) {
+                if(stateCode == 0){
                     handlePublishSucc(streamID, streamInfo);
-                } else {
+                }else {
                     handlePublishStop(stateCode, streamID);
                 }
             }
@@ -87,7 +97,7 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
             }
 
             @Override
-            public void onCaptureVideoSizeChangedTo(int width, int height) {
+            public void onCaptureVideoSizeChangedTo(int width, int height){
 
             }
 
@@ -99,11 +109,11 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
 
         mZegoLiveRoom.setZegoLivePlayerCallback(new IZegoLivePlayerCallback() {
             @Override
-            public void onPlayStateUpdate(int stateCode, String streamID) {
+            public void  onPlayStateUpdate(int stateCode, String streamID) {
                 // 拉流状态更新
-                if (stateCode == 0) {
+                if(stateCode == 0){
                     handlePlaySucc(streamID);
-                } else {
+                }else {
                     handlePlayStop(stateCode, streamID);
                 }
             }
@@ -132,7 +142,7 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
 
         mZegoLiveRoom.setZegoRoomCallback(new IZegoRoomCallback() {
             @Override
-            public void onKickOut(int reason, String roomID) {
+            public void onKickOut(int reason, String roomID){
 
             }
 
@@ -142,9 +152,19 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
             }
 
             @Override
+            public void onReconnect(int i, String s) {
+
+            }
+
+            @Override
+            public void onTempBroken(int i, String s) {
+
+            }
+
+            @Override
             public void onStreamUpdated(final int type, final ZegoStreamInfo[] listStream, final String roomID) {
-                if (listStream != null && listStream.length > 0) {
-                    switch (type) {
+                if(listStream != null && listStream.length > 0){
+                    switch (type){
                         case ZegoConstants.StreamUpdateType.Added:
                             handleStreamAdded(listStream, roomID);
                             break;
@@ -167,20 +187,28 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
         mZegoLiveRoom.setZegoIMCallback(new IZegoIMCallback() {
 
             @Override
-            public void onUserUpdate(ZegoUserState[] listUser, int updateType) {
+            public void onUserUpdate(ZegoUserState[] listUser, int updateType){
                 handleUserUpdate(listUser, updateType);
             }
 
             @Override
-            public void onRecvRoomMessage(String roomID, ZegoRoomMessage[] listMsg) {
+            public void onRecvRoomMessage(String roomID, ZegoRoomMessage[] listMsg){
                 handleRecvRoomMsg(roomID, listMsg);
             }
 
             @Override
-            public void onRecvConversationMessage(String roomID, String conversationID, ZegoConversationMessage message) {
+            public void onRecvConversationMessage(String roomID, String conversationID, ZegoConversationMessage message){
                 handleRecvConversationMsg(roomID, conversationID, message);
             }
         });
+
+        // 播放从房间列表传过来的流列表
+        if (mOldSavedStreamList != null && mOldSavedStreamList.size() > 0) {
+            for (String streamId : mOldSavedStreamList) {
+                Log.w("MoreAnchorsPlayA", "Quick play: " + streamId);
+                startPlay(streamId);
+            }
+        }
     }
 
     @Override
@@ -239,10 +267,5 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
     @Override
     protected void afterPublish() {
 
-    }
-
-    @Override
-    protected boolean isShowFaceunityUi() {
-        return false;
     }
 }

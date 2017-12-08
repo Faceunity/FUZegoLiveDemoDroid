@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
-import com.zego.zegoliveroom.videofilter.ZegoVideoFilter;
+import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class VideoFilterHybridDemo extends ZegoVideoFilter {
-    private ZegoVideoFilter.Client mClient = null;
+    private Client mClient = null;
     private HandlerThread mThread = null;
     private volatile Handler mHandler = null;
 
@@ -31,7 +31,6 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
         public long timestamp_100n;
         public ByteBuffer buffer;
     }
-
     private ArrayList<PixelBuffer> mProduceQueue = new ArrayList<PixelBuffer>();
     private int mWriteIndex = 0;
     private int mWriteRemain = 0;
@@ -147,7 +146,7 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
     @Override
     protected synchronized void queueInputBuffer(int bufferIndex, final int width, final int height, int stride, long timestamp_100n) {
         if (bufferIndex == -1) {
-            return;
+            return ;
         }
 
         PixelBuffer pixelBuffer = mProduceQueue.get(bufferIndex);
@@ -231,7 +230,7 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
         if (captureEglBase.hasSurface()) {
             captureEglBase.makeCurrent();
             if (mTextureId != 0) {
-                int[] textures = new int[]{mTextureId};
+                int[] textures = new int[] {mTextureId};
                 GLES20.glDeleteTextures(1, textures, 0);
                 mTextureId = 0;
             }

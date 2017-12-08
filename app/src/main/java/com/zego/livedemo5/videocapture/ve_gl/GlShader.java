@@ -16,7 +16,7 @@ public class GlShader {
         }
         GLES20.glShaderSource(shader, source);
         GLES20.glCompileShader(shader);
-        int[] compileStatus = new int[]{
+        int[] compileStatus = new int[] {
                 GLES20.GL_FALSE
         };
         GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
@@ -41,7 +41,7 @@ public class GlShader {
         GLES20.glAttachShader(program, vertexShader);
         GLES20.glAttachShader(program, fragmentShader);
         GLES20.glLinkProgram(program);
-        int[] linkStatus = new int[]{
+        int[] linkStatus = new int[] {
                 GLES20.GL_FALSE
         };
         GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);

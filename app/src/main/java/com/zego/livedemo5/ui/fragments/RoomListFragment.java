@@ -72,8 +72,8 @@ public class RoomListFragment extends AbsBaseFragment implements MainActivity.On
             @Override
             public void onUpdateRoomList(List<RoomInfo> listRoom) {
                 mListRoom.clear();
-                for (RoomInfo roomInfo : listRoom) {
-                    if ((roomInfo.stream_info != null && roomInfo.stream_info.size() > 0) || roomInfo.room_id.startsWith(ZegoRoomUtil.ROOM_PREFIX_WERE_WOLVES)) {
+                for(RoomInfo roomInfo : listRoom){
+                    if ((roomInfo.stream_info != null && roomInfo.stream_info.size() > 0) || roomInfo.room_id.startsWith(ZegoRoomUtil.ROOM_PREFIX_WERE_WOLVES)){
                         mListRoom.add(roomInfo);
                     }
                 }
@@ -105,9 +105,9 @@ public class RoomListFragment extends AbsBaseFragment implements MainActivity.On
                     publishType = 1;
                 } else if (roomInfo.room_id.startsWith(ZegoRoomUtil.ROOM_PREFIX_MORE_ANCHORS)) {
                     publishType = 2;
-                } else if (roomInfo.room_id.startsWith(ZegoRoomUtil.ROOM_PREFIX_MIX_STREAM)) {
+                } else if (roomInfo.room_id.startsWith(ZegoRoomUtil.ROOM_PREFIX_MIX_STREAM)){
                     publishType = 3;
-                } else if (roomInfo.room_id.startsWith(ZegoRoomUtil.ROOM_PREFIX_GAME_LIVING)) {
+                } else if(roomInfo.room_id.startsWith(ZegoRoomUtil.ROOM_PREFIX_GAME_LIVING)){
                     publishType = 4;
                 } else if (roomInfo.room_id.startsWith(ZegoRoomUtil.ROOM_PREFIX_WERE_WOLVES)) {
                     publishType = 5;
@@ -115,20 +115,20 @@ public class RoomListFragment extends AbsBaseFragment implements MainActivity.On
 
                 switch (publishType) {
                     case 1:
-                        if (ZegoApiManager.getInstance().isUseExternalRender()) {
-                            ExternalRenderPlayActivity.actionStart(mParentActivity, roomInfo.room_id);
-                        } else {
-                            SingleAnchorPlayActivity.actionStart(mParentActivity, roomInfo.room_id);
+                        if(ZegoApiManager.getInstance().isUseExternalRender()){
+                            ExternalRenderPlayActivity.actionStart(mParentActivity, roomInfo);
+                        }else {
+                            SingleAnchorPlayActivity.actionStart(mParentActivity, roomInfo);
                         }
                         break;
                     case 2:
-                        MoreAnchorsPlayActivity.actionStart(getActivity(), roomInfo.room_id);
+                        MoreAnchorsPlayActivity.actionStart(getActivity(), roomInfo);
                         break;
                     case 3:
-                        MixStreamPlayActivity.actionStart(getActivity(), roomInfo.room_id);
+                        MixStreamPlayActivity.actionStart(getActivity(), roomInfo);
                         break;
                     case 4:
-                        GameLivingPlayActivity.actionStart(mParentActivity, roomInfo.room_id);
+                        GameLivingPlayActivity.actionStart(mParentActivity, roomInfo);
                         break;
                     case 5:
                         WolvesGameInTurnActivity.actionStart(mParentActivity, roomInfo);

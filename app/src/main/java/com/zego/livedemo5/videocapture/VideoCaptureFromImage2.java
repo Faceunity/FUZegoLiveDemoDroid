@@ -23,7 +23,7 @@ import android.view.View;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
-import com.zego.zegoliveroom.videocapture.ZegoVideoCaptureDevice;
+import com.zego.zegoavkit2.ZegoVideoCaptureDevice;
 
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
@@ -192,16 +192,16 @@ public class VideoCaptureFromImage2 extends ZegoVideoCaptureDevice
 
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
             previewDrawer.drawRgb(mBitmapTextureId, flipMatrix,
-                    mImageWidth, mImageHeight,
-                    mImageWidth / 4 * mX, mImageHeight / 4 * mY,
-                    mImageWidth / 4, mImageHeight / 4);
+                                  mImageWidth, mImageHeight,
+                                  mImageWidth / 4 * mX, mImageHeight / 4 * mY,
+                                  mImageWidth / 4, mImageHeight / 4);
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
             previewDrawer.drawRgb(mPreviewTextureId, transformationMatrix,
-                    mViewWidth, mViewHeight,
-                    0, 0,
-                    mViewWidth, mViewHeight);
+                                  mViewWidth, mViewHeight,
+                                  0, 0,
+                                  mViewWidth, mViewHeight);
 
             previewEglBase.swapBuffers();
 
@@ -537,7 +537,7 @@ public class VideoCaptureFromImage2 extends ZegoVideoCaptureDevice
     }
 
     private void releasePreviewSurfaceSafe() {
-        if (mHandler != null) {
+        if(mHandler != null){
             final CountDownLatch barrier = new CountDownLatch(1);
             mHandler.post(new Runnable() {
                 @Override
@@ -551,7 +551,7 @@ public class VideoCaptureFromImage2 extends ZegoVideoCaptureDevice
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } else {
+        }else {
             releasePreviewSurface();
         }
     }

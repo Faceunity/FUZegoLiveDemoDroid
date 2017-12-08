@@ -13,7 +13,6 @@ package com.zego.livedemo5.videocapture.ve_gl;
 
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 
 import java.nio.FloatBuffer;
 import java.util.IdentityHashMap;
@@ -27,14 +26,6 @@ import java.util.Map;
  * manually to free the resources held by this object.
  */
 public class GlRectDrawer {
-
-    public static final float[] IDENTITY_MATRIX;
-
-    static {
-        IDENTITY_MATRIX = new float[16];
-        Matrix.setIdentityM(IDENTITY_MATRIX, 0);
-    }
-
     // clang-format off
     // Simple vertex shader, used for both YUV and OES.
     private static final String VERTEX_SHADER_STRING =
@@ -42,11 +33,11 @@ public class GlRectDrawer {
                     + "attribute vec4 in_pos;\n"
                     + "attribute vec4 in_tc;\n"
                     + "\n"
-                    + "uniform mat4 mvpMatrix;\n"
+                    + "uniform mat4 uMVPMatrix;\n"
                     + "uniform mat4 texMatrix;\n"
                     + "\n"
                     + "void main() {\n"
-                    + "    gl_Position = mvpMatrix * in_pos;\n"
+                    + "    gl_Position = uMVPMatrix * in_pos;\n"
                     + "    interp_tc = (texMatrix * in_tc).xy;\n"
                     + "}\n";
 
@@ -109,8 +100,8 @@ public class GlRectDrawer {
 
     private static class Shader {
         public final GlShader glShader;
-        public final int mvpMatrixLocation;
         public final int texMatrixLocation;
+        public final int mvpMatrixLocation;
         public final int posLocation;
         public final int tcLocation;
         public int tex0Location;
@@ -119,8 +110,8 @@ public class GlRectDrawer {
 
         public Shader(String fragmentShader) {
             this.glShader = new GlShader(VERTEX_SHADER_STRING, fragmentShader);
-            this.mvpMatrixLocation = glShader.getUniformLocation("mvpMatrix");
             this.texMatrixLocation = glShader.getUniformLocation("texMatrix");
+            this.mvpMatrixLocation = glShader.getUniformLocation("uMVPMatrix");
             this.posLocation = glShader.getAttribLocation("in_pos");
             this.tcLocation = glShader.getAttribLocation("in_tc");
 
@@ -140,7 +131,7 @@ public class GlRectDrawer {
      */
     public void drawOes(int oesTextureId, float[] texMatrix, int frameWidth, int frameHeight,
                         int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
-        prepareShader(OES_FRAGMENT_SHADER_STRING, texMatrix);
+        prepareShader(OES_FRAGMENT_SHADER_STRING, texMatrix, GlUtil.IDENTITY_MATRIX);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         // updateTexImage() may be called from another thread in another EGL context, so we need to
         // bind/unbind the texture in each draw call so that GLES understads it's a new texture.
@@ -149,17 +140,12 @@ public class GlRectDrawer {
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
     }
 
-
-    /**
-     * Draw a RGB(A) texture frame with specified texture transformation matrix. Required resources
-     * are allocated at the first call to this function.
-     */
     public void drawRgb(int textureId, float[] texMatrix, int frameWidth, int frameHeight,
                         int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
-
-        drawRgb(textureId, texMatrix, IDENTITY_MATRIX, frameWidth, frameHeight,
+        drawRgb(textureId, texMatrix, GlUtil.IDENTITY_MATRIX, frameWidth, frameHeight,
                 viewportX, viewportY, viewportWidth, viewportHeight);
     }
+
 
     /**
      * Draw a RGB(A) texture frame with specified texture transformation matrix. Required resources
@@ -167,7 +153,6 @@ public class GlRectDrawer {
      */
     public void drawRgb(int textureId, float[] texMatrix, float[] mvpMatrix, int frameWidth, int frameHeight,
                         int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
-
         prepareShader(RGB_FRAGMENT_SHADER_STRING, texMatrix, mvpMatrix);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
@@ -182,7 +167,7 @@ public class GlRectDrawer {
      */
     public void drawYuv(int[] yuvTextures, float[] texMatrix, int frameWidth, int frameHeight,
                         int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
-        prepareShader(YUV_FRAGMENT_SHADER_STRING, texMatrix);
+        prepareShader(YUV_FRAGMENT_SHADER_STRING, texMatrix, GlUtil.IDENTITY_MATRIX);
         // Bind the textures.
         for (int i = 0; i < 3; ++i) {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + i);
@@ -200,10 +185,6 @@ public class GlRectDrawer {
         // Draw quad.
         GLES20.glViewport(x, y, width, height);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-    }
-
-    private void prepareShader(String fragmentShader, float[] texMatrix) {
-        prepareShader(fragmentShader, texMatrix, IDENTITY_MATRIX);
     }
 
     private void prepareShader(String fragmentShader, float[] texMatrix, float[] mvpMatrix) {
@@ -247,8 +228,9 @@ public class GlRectDrawer {
 
         GLES20.glVertexAttribPointer(shader.posLocation, 2, GLES20.GL_FLOAT, false, 0, FULL_RECTANGLE_BUF);
         GLES20.glVertexAttribPointer(shader.tcLocation, 2, GLES20.GL_FLOAT, false, 0, FULL_RECTANGLE_TEX_BUF);
-        GLES20.glUniformMatrix4fv(shader.mvpMatrixLocation, 1, false, mvpMatrix, 0);
         GLES20.glUniformMatrix4fv(shader.texMatrixLocation, 1, false, texMatrix, 0);
+        GLES20.glUniformMatrix4fv(shader.mvpMatrixLocation, 1, false, mvpMatrix, 0);
+
     }
 
     /**

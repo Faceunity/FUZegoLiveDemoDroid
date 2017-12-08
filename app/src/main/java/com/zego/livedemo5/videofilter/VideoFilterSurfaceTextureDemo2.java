@@ -6,14 +6,13 @@ import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.util.Log;
 import android.view.Surface;
 
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase14;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
-import com.zego.zegoliveroom.videofilter.ZegoVideoFilter;
+import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
@@ -23,9 +22,7 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements SurfaceTexture.OnFrameAvailableListener {
-    private static final String TAG = "FilterSurfaceTexture2";
-
-    private ZegoVideoFilter.Client mClient = null;
+    private Client mClient = null;
     private HandlerThread mThread = null;
     private volatile Handler mHandler = null;
 
@@ -48,8 +45,7 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
     };
 
     @Override
-    protected void allocateAndStart(ZegoVideoFilter.Client client) {
-        Log.e(TAG, "allocateAndStart");
+    protected void allocateAndStart(Client client) {
         mClient = client;
         mThread = new HandlerThread("video-filter");
         mThread.start();
@@ -96,7 +92,6 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
 
     @Override
     protected void stopAndDeAllocate() {
-        Log.e(TAG, "stopAndDeAllocate");
         final CountDownLatch barrier = new CountDownLatch(1);
         mHandler.post(new Runnable() {
             @Override
@@ -122,13 +117,11 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
 
     @Override
     protected int supportBufferType() {
-        Log.e(TAG, "supportBufferType");
         return BUFFER_TYPE_SURFACE_TEXTURE;
     }
 
     @Override
     protected int dequeueInputBuffer(final int width, final int height, int stride) {
-        Log.e(TAG, "dequeueInputBuffer");
         if (stride != width * 4) {
             return -1;
         }
@@ -162,29 +155,25 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
 
     @Override
     protected ByteBuffer getInputBuffer(int index) {
-        Log.e(TAG, "getInputBuffer");
         return null;
     }
 
     @Override
     protected void queueInputBuffer(int bufferIndex, int width, int height, int stride, long timestamp_100n) {
-        Log.e(TAG, "queueInputBuffer");
     }
 
     @Override
     protected SurfaceTexture getSurfaceTexture() {
-        Log.e(TAG, "getSurfaceTexture");
         return mInputSurfaceTexture;
     }
 
     @Override
     protected void onProcessCallback(int textureId, int width, int height, long timestamp_100n) {
-        Log.e(TAG, "onProcessCallback");
+
     }
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        Log.e(TAG, "onFrameAvailable");
         mDummyContext.makeCurrent();
         surfaceTexture.updateTexImage();
         long timestampNs = surfaceTexture.getTimestamp();
@@ -192,7 +181,7 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
         mEglContext.makeCurrent();
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         mDrawer.drawOes(mInputTextureId, transformationMatrix,
-                mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
+                        mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
 
         if (mIsEgl14) {
             ((EglBase14) mEglContext).swapBuffers(timestampNs);
@@ -224,7 +213,7 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
 
         mDummyContext.makeCurrent();
         if (mInputTextureId != 0) {
-            int[] textures = new int[]{mInputTextureId};
+            int[] textures = new int[] {mInputTextureId};
             GLES20.glDeleteTextures(1, textures, 0);
             mInputTextureId = 0;
         }

@@ -168,6 +168,16 @@ public class MixStreamPublishActivity extends BasePublishActivity {
             }
 
             @Override
+            public void onReconnect(int i, String s) {
+
+            }
+
+            @Override
+            public void onTempBroken(int i, String s) {
+
+            }
+
+            @Override
             public void onStreamUpdated(final int type, final ZegoStreamInfo[] listStream, final String roomID) {
                 if (listStream != null && listStream.length > 0) {
                     switch (type) {
@@ -286,7 +296,6 @@ public class MixStreamPublishActivity extends BasePublishActivity {
     }
 
     private int mixStreamRequestSeq = 1;
-
     private void startMixStream() {
         int size = mMixStreamInfos.size();
         ZegoMixStreamInfo[] inputStreamList = new ZegoMixStreamInfo[size];
@@ -309,18 +318,18 @@ public class MixStreamPublishActivity extends BasePublishActivity {
     protected void handleMixStreamStateUpdate(int errorCode, String mixStreamID, HashMap<String, Object> streamInfo) {
         int seq = -1;
         if (streamInfo != null) {
-            seq = (int) streamInfo.get(ZegoConstants.StreamKey.MIX_CONFIG_SEQ);
+            seq = (int)streamInfo.get(ZegoConstants.StreamKey.MIX_CONFIG_SEQ);
         }
         if (errorCode == 0) {
 
             ViewLive viewLivePublish = getViewLiveByStreamID(mPublishStreamID);
             List<String> listUrls = getShareUrlList(streamInfo);
 
-            if (listUrls.size() == 0) {
+            if(listUrls.size() == 0){
                 recordLog("混流失败...errorCode: %d, seq: %d", errorCode, seq);
             }
 
-            if (viewLivePublish != null && listUrls.size() >= 2) {
+            if(viewLivePublish != null && listUrls.size() >= 2){
                 recordLog("混流地址: %s; seq: %d", listUrls.get(1), seq);
                 viewLivePublish.setListShareUrls(listUrls);
 
@@ -384,11 +393,5 @@ public class MixStreamPublishActivity extends BasePublishActivity {
         } else {
             startPublish();
         }
-    }
-
-
-    @Override
-    protected boolean isShowFaceunityUi() {
-        return true;
     }
 }

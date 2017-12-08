@@ -2,11 +2,10 @@ package com.zego.livedemo5.videofilter;
 
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
-import android.util.Log;
 
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
-import com.zego.zegoliveroom.videofilter.ZegoVideoFilter;
+import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;
 
@@ -15,9 +14,7 @@ import java.nio.ByteBuffer;
  */
 
 public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
-    private static final String TAG = "VideoFilterGlTexture2d";
-
-    private ZegoVideoFilter.Client mClient = null;
+    private Client mClient = null;
 
     private GlRectDrawer mDrawer;
     private int mTextureId = 0;
@@ -32,7 +29,6 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
 
     @Override
     protected void allocateAndStart(Client client) {
-        Log.e(TAG, "allocateAndStart");
         mClient = client;
         mWidth = mHeight = 0;
         if (mDrawer == null) {
@@ -42,7 +38,6 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
 
     @Override
     protected void stopAndDeAllocate() {
-        Log.e(TAG, "stopAndDeAllocate");
         if (mTextureId != 0) {
             int[] textures = new int[]{mTextureId};
             GLES20.glDeleteTextures(1, textures, 0);
@@ -66,36 +61,31 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
 
     @Override
     protected int supportBufferType() {
-        Log.e(TAG, "supportBufferType");
         return BUFFER_TYPE_SYNC_GL_TEXTURE_2D;
     }
 
     @Override
     protected int dequeueInputBuffer(int width, int height, int stride) {
-        Log.e(TAG, "dequeueInputBuffer");
         return 0;
     }
 
     @Override
     protected ByteBuffer getInputBuffer(int index) {
-        Log.e(TAG, "getInputBuffer");
         return null;
     }
 
     @Override
     protected void queueInputBuffer(int bufferIndex, int width, int height, int stride, long timestamp_100n) {
-        Log.e(TAG, "queueInputBuffer");
+
     }
 
     @Override
     protected SurfaceTexture getSurfaceTexture() {
-        Log.e(TAG, "getSurfaceTexture");
         return null;
     }
 
     @Override
     protected void onProcessCallback(int textureId, int width, int height, long timestamp_100n) {
-        Log.e(TAG, "onProcessCallback");
         if (mWidth != width || mHeight != height) {
             if (mTextureId != 0) {
                 int[] textures = new int[]{mTextureId};
@@ -125,7 +115,7 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         mDrawer.drawRgb(textureId, transformationMatrix,
-                width, height, 0, 0, width, height);
+                        width, height, 0, 0, width, height);
 
         mClient.onProcessCallback(mTextureId, width, height, timestamp_100n);
     }

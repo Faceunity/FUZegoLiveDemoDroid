@@ -23,7 +23,7 @@ import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase14;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
-import com.zego.zegoliveroom.videocapture.ZegoVideoCaptureDevice;
+import com.zego.zegoavkit2.ZegoVideoCaptureDevice;
 
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
@@ -579,7 +579,7 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
 
     private void releasePreviewSurfaceSafe() {
 
-        if (mHandler != null) {
+        if(mHandler != null){
             final CountDownLatch barrier = new CountDownLatch(1);
             mHandler.post(new Runnable() {
                 @Override
@@ -593,7 +593,7 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } else {
+        }else {
             releasePreviewSurface();
         }
 

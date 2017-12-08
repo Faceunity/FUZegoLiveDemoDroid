@@ -83,8 +83,8 @@ public class CircleImageViewSupport extends ImageView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (!elevationSupported()) {
-            setMeasuredDimension(getMeasuredWidth() + mShadowRadius * 2, getMeasuredHeight()
-                    + mShadowRadius * 2);
+            setMeasuredDimension(getMeasuredWidth() + mShadowRadius*2, getMeasuredHeight()
+                    + mShadowRadius*2);
         }
     }
 
@@ -135,9 +135,9 @@ public class CircleImageViewSupport extends ImageView {
             mShadowRadius = shadowRadius;
             mCircleDiameter = circleDiameter;
             mRadialGradient = new RadialGradient(mCircleDiameter / 2, mCircleDiameter / 2,
-                    mShadowRadius, new int[]{
-                    FILL_SHADOW_COLOR, Color.TRANSPARENT
-            }, null, Shader.TileMode.CLAMP);
+                    mShadowRadius, new int[] {
+                            FILL_SHADOW_COLOR, Color.TRANSPARENT
+                    }, null, Shader.TileMode.CLAMP);
             mShadowPaint.setShader(mRadialGradient);
         }
 

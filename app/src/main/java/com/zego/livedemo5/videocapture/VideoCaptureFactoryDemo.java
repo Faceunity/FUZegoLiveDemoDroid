@@ -2,16 +2,17 @@ package com.zego.livedemo5.videocapture;
 
 import android.content.Context;
 
-import com.zego.livedemo5.faceunity.FaceunityController;
-import com.zego.zegoliveroom.videocapture.ZegoVideoCaptureDevice;
-import com.zego.zegoliveroom.videocapture.ZegoVideoCaptureFactory;
+import com.faceunity.wrapper.FaceunityControlView;
+import com.faceunity.wrapper.FaceunityController;
+import com.zego.zegoavkit2.ZegoVideoCaptureDevice;
+import com.zego.zegoavkit2.ZegoVideoCaptureFactory;
 
 
 /**
  * Created by robotding on 16/6/5.
  */
 public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
-    private int mode = 3;
+    private int mode = 4;
     private ZegoVideoCaptureDevice mDevice = null;
     private Context mContext = null;
 
@@ -23,7 +24,9 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         } else if (mode == 2) {
             mDevice = new VideoCaptureFromImage2(mContext);
         } else if (mode == 3) {
-            mDevice = new VideoCaptureFromFaceunity2(mContext);
+            mDevice = new VideoCaptureFromCamera2();
+        } else if (mode == 4) {
+            mDevice = new FUVideoCaptureFromCamera2(mContext);
         }
 
         return mDevice;
@@ -37,9 +40,9 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         mContext = context;
     }
 
-    public FaceunityController getFaceunityController() {
+    public FaceunityControlView.OnViewEventListener getFaceunityController() {
         if (mDevice instanceof FaceunityController) {
-            return (FaceunityController) mDevice;
+            return ((FaceunityController) mDevice).getFaceunityController();
         }
         return null;
     }

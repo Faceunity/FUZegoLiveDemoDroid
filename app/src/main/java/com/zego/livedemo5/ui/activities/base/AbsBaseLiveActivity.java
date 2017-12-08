@@ -59,7 +59,6 @@ public abstract class AbsBaseLiveActivity extends AppCompatActivity {
 
     /**
      * Handler 处理类，当子类需要处理 mHandler 的消息时，可以重写此方法
-     *
      * @return 处理
      */
     protected Handler.Callback getHandlerCallback() {
@@ -86,6 +85,7 @@ public abstract class AbsBaseLiveActivity extends AppCompatActivity {
     }
 
 
+
     /**
      * 初始化基类中的变量.
      */
@@ -97,7 +97,6 @@ public abstract class AbsBaseLiveActivity extends AppCompatActivity {
     }
 
     static private SimpleDateFormat sDataFormat = new SimpleDateFormat("[hh:mm:ss.SSS]");
-
     protected void recordLog(String msg) {
         String now = sDataFormat.format(new Date());
         mListLog.addFirst(String.format("%s %s", now, msg));

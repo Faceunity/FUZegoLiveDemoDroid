@@ -13,10 +13,10 @@ import java.util.LinkedList;
 
 /**
  * Created by 赵晨璞 on 2016/6/19.
- * RecyclerView适配器
+ *RecyclerView适配器
  */
 
-public class LogListAdapter extends RecyclerView.Adapter<LogListAdapter.MyViewHolder> {
+public  class LogListAdapter extends RecyclerView.Adapter<LogListAdapter.MyViewHolder> {
 
     private Context mContext;
 
@@ -25,13 +25,14 @@ public class LogListAdapter extends RecyclerView.Adapter<LogListAdapter.MyViewHo
     private LayoutInflater mLayoutInflater;
 
     public LogListAdapter(Context context, LinkedList<String> datas) {
-        mContext = context;
+        mContext=context;
         mDatas = datas;
         mLayoutInflater = LayoutInflater.from(context);
     }
 
     @Override
-    public LogListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public LogListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
         return new MyViewHolder(mLayoutInflater.inflate(R.layout.item_log_list, parent, false));
     }
 
@@ -41,23 +42,27 @@ public class LogListAdapter extends RecyclerView.Adapter<LogListAdapter.MyViewHo
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return mDatas.size();
     }
 
-    public void setDatas(LinkedList<String> datas) {
+    public void setDatas(LinkedList<String> datas){
         mDatas = datas;
         notifyDataSetChanged();
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder {
+    class MyViewHolder extends RecyclerView.ViewHolder
+    {
         private TextView tv;
 
-        public MyViewHolder(View view) {
+        public MyViewHolder(View view)
+        {
             super(view);
             tv = (TextView) view.findViewById(R.id.tv);
         }
     }
+
 
 
 }

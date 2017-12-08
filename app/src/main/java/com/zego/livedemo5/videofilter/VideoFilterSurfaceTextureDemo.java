@@ -4,7 +4,7 @@ import android.graphics.SurfaceTexture;
 import android.view.Surface;
 
 import com.zego.zegoimagefilter.ZegoImageFilter;
-import com.zego.zegoliveroom.videofilter.ZegoVideoFilter;
+import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;
 
@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
  */
 
 public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter {
-    private ZegoVideoFilter.Client mClient = null;
+    private Client mClient = null;
     private ZegoImageFilter mFilter = null;
     private int mWidth = 0;
     private int mHeight = 0;

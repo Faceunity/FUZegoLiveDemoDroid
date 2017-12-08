@@ -8,6 +8,8 @@ import android.view.View;
 
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.constants.IntentExtra;
+import com.zego.livedemo5.presenters.RoomInfo;
+import com.zego.livedemo5.presenters.StreamInfo;
 import com.zego.livedemo5.ui.activities.BasePlayActivity;
 import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.zegoliveroom.callback.IZegoLivePlayerCallback;
@@ -23,6 +25,7 @@ import com.zego.zegoliveroom.entity.ZegoRoomMessage;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
 import com.zego.zegoliveroom.entity.ZegoUserState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -40,10 +43,15 @@ public class MixStreamPlayActivity extends BasePlayActivity {
      * 启动入口.
      *
      * @param activity 源activity
+     * @param roomInfo 房间信息
      */
-    public static void actionStart(Activity activity, String roomID) {
+    public static void actionStart(Activity activity, RoomInfo roomInfo) {
         Intent intent = new Intent(activity, MixStreamPlayActivity.class);
-        intent.putExtra(IntentExtra.ROOM_ID, roomID);
+        intent.putExtra(IntentExtra.ROOM_ID, roomInfo.room_id);
+
+//        ArrayList<String> streamList = getStremListFromRoomInfo(roomInfo);
+//        intent.putStringArrayListExtra(IntentExtra.LIST_STREAM, streamList);
+
         activity.startActivity(intent);
         activity.overridePendingTransition(R.anim.scale_translate,
                 R.anim.my_alpha_action);
@@ -142,6 +150,16 @@ public class MixStreamPlayActivity extends BasePlayActivity {
             @Override
             public void onDisconnect(int errorCode, String roomID) {
                 handleDisconnect(errorCode, roomID);
+            }
+
+            @Override
+            public void onReconnect(int i, String s) {
+
+            }
+
+            @Override
+            public void onTempBroken(int i, String s) {
+
             }
 
             @Override
@@ -281,13 +299,8 @@ public class MixStreamPlayActivity extends BasePlayActivity {
     @Override
     protected void afterPublish() {
         // 播放房间的流
-        for (ZegoStreamInfo streamInfo : mListStreamOfRoom) {
+        for(ZegoStreamInfo streamInfo : mListStreamOfRoom){
             startPlay(streamInfo.streamID);
         }
-    }
-
-    @Override
-    protected boolean isShowFaceunityUi() {
-        return false;
     }
 }

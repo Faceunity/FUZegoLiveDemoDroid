@@ -24,8 +24,8 @@ import android.support.v7.widget.RecyclerView;
 
 /**
  * @author Jorge Castillo Pérez
- *         <p>
- *         modify at 2015/08/23
+ *
+ * modify at 2015/08/23
  */
 public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScrollListener {
     public static String TAG = EndlessRecyclerOnScrollListener.class.getSimpleName();

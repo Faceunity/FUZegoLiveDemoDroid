@@ -4,7 +4,7 @@ package com.zego.livedemo5;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.zego.livedemo5.faceunity.FaceunityController;
+import com.faceunity.wrapper.FaceunityControlView;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.SystemUtil;
 import com.zego.livedemo5.videocapture.VideoCaptureFactoryDemo;
@@ -38,14 +38,10 @@ public class ZegoApiManager {
      */
     private boolean mUseVideoCapture = false;
 
-    private VideoCaptureFactoryDemo mVideoCaptureFactoryDemo = null;
-
     /**
      * 外部滤镜开关.
      */
     private boolean mUseVideoFilter = false;
-
-    private VideoFilterFactoryDemo mVideoFilterFactoryDemo = null;
 
     private boolean mUseHardwareEncode = false;
 
@@ -55,6 +51,10 @@ public class ZegoApiManager {
 
     private long mAppID = 0;
     private byte[] mSignKey = null;
+
+    private VideoCaptureFactoryDemo mVideoCaptureFactoryDemo;
+
+    private VideoFilterFactoryDemo mVideoFilterFactoryDemo;
 
     private ZegoApiManager() {
         mZegoLiveRoom = new ZegoLiveRoom();
@@ -98,8 +98,7 @@ public class ZegoApiManager {
         // 外部滤镜
         if (mUseVideoFilter) {
             // 外部滤镜
-            mVideoFilterFactoryDemo = new VideoFilterFactoryDemo();
-            mVideoFilterFactoryDemo.setContext(ZegoApplication.sApplicationContext);
+            mVideoFilterFactoryDemo = new VideoFilterFactoryDemo(ZegoApplication.sApplicationContext);
             ZegoLiveRoom.setVideoFilterFactory(mVideoFilterFactoryDemo);
         }
     }
@@ -133,6 +132,8 @@ public class ZegoApiManager {
 
         mAppID = appID;
         mSignKey = signKey;
+        PreferenceUtil.getInstance().setAppId(mAppID);
+        PreferenceUtil.getInstance().setAppKey(mSignKey);
 
         // 初始化sdk
         boolean ret = mZegoLiveRoom.initSDK(appID, signKey, ZegoApplication.sApplicationContext);
@@ -170,8 +171,14 @@ public class ZegoApiManager {
     public void initSDK() {
         // 即构分配的key与id, 默认使用 UDP 协议的 AppId
         if (mAppID <= 0) {
-            mAppID = ZegoAppHelper.UDP_APP_ID;
-            mSignKey = requestSignKey(mAppID);
+            long storedAppId = PreferenceUtil.getInstance().getAppId();
+            if (storedAppId > 0) {
+                mAppID = storedAppId;
+                mSignKey = PreferenceUtil.getInstance().getAppKey();
+            } else {
+                mAppID = ZegoAppHelper.UDP_APP_ID;
+                mSignKey = requestSignKey(mAppID);
+            }
         }
 
         init(mAppID, mSignKey);
@@ -275,10 +282,10 @@ public class ZegoApiManager {
         return mUseTestEvn;
     }
 
-    public FaceunityController getFaceunityController() {
-        if (mVideoCaptureFactoryDemo != null) {
+    public FaceunityControlView.OnViewEventListener getFaceunityController() {
+        if (isUseVideoCapture() && mVideoCaptureFactoryDemo != null) {
             return mVideoCaptureFactoryDemo.getFaceunityController();
-        } else if (mVideoFilterFactoryDemo != null) {
+        } else if (isUseVideoFilter() && mVideoFilterFactoryDemo != null) {
             return mVideoFilterFactoryDemo.getFaceunityController();
         }
         return null;

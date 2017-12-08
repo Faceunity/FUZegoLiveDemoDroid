@@ -33,9 +33,12 @@ public class PublishSettingsPannel extends LinearLayout {
 
     private ToggleButton mTbLoopback;
 
+    private ToggleButton mTbMixEnginePlayout;
+
     private Spinner mSpBeauty;
 
     private Spinner mSpFilter;
+
 
 
     private PublishSettingsCallback mPublishSettingsCallback;
@@ -54,14 +57,14 @@ public class PublishSettingsPannel extends LinearLayout {
         initViews(context);
     }
 
-    private void initViews(Context context) {
-        mRootView = LayoutInflater.from(context).inflate(R.layout.view_publish_settings, this);
+    private void initViews(Context context){
+        mRootView =  LayoutInflater.from(context).inflate(R.layout.view_publish_settings, this);
 
         mTbCamera = (ToggleButton) mRootView.findViewById(R.id.tb_camera);
         mTbCamera.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mPublishSettingsCallback != null) {
+                if(mPublishSettingsCallback != null){
                     mPublishSettingsCallback.onEnableCamera(isChecked);
                 }
             }
@@ -71,23 +74,23 @@ public class PublishSettingsPannel extends LinearLayout {
         mTbFrontCam.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mPublishSettingsCallback != null) {
+                if(mPublishSettingsCallback != null){
                     mPublishSettingsCallback.onEnableFrontCamera(isChecked);
                 }
-                if (isChecked) {
+                if(isChecked){
                     mTbTorch.setEnabled(false);
-                } else {
+                }else {
                     mTbTorch.setEnabled(true);
                 }
             }
         });
 
 
-        mTbMic = (ToggleButton) mRootView.findViewById(R.id.tb_mic);
+        mTbMic = (ToggleButton)mRootView.findViewById(R.id.tb_mic);
         mTbMic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mPublishSettingsCallback != null) {
+                if(mPublishSettingsCallback != null){
                     mPublishSettingsCallback.onEnableMic(isChecked);
                 }
             }
@@ -97,28 +100,38 @@ public class PublishSettingsPannel extends LinearLayout {
         mTbTorch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mPublishSettingsCallback != null) {
+                if(mPublishSettingsCallback != null){
                     mPublishSettingsCallback.onEnableTorch(isChecked);
                 }
             }
         });
 
-        mTbBackgroundMusic = (ToggleButton) mRootView.findViewById(R.id.tb_background_music);
+        mTbBackgroundMusic = (ToggleButton)mRootView.findViewById(R.id.tb_background_music);
         mTbBackgroundMusic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mPublishSettingsCallback != null) {
+                if(mPublishSettingsCallback != null){
                     mPublishSettingsCallback.onEnableBackgroundMusic(isChecked);
                 }
             }
         });
 
-        mTbLoopback = (ToggleButton) mRootView.findViewById(R.id.tb_loopback);
+        mTbLoopback = (ToggleButton)mRootView.findViewById(R.id.tb_loopback);
         mTbLoopback.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if (mPublishSettingsCallback != null) {
+                if (mPublishSettingsCallback != null){
                     mPublishSettingsCallback.onEnableLoopback(isChecked);
+                }
+            }
+        });
+
+        mTbMixEnginePlayout = (ToggleButton)mRootView.findViewById(R.id.tb_mix_engine_playout);
+        mTbMixEnginePlayout.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (mPublishSettingsCallback != null){
+                    mPublishSettingsCallback.onEnableMixEnginePlayout(isChecked);
                 }
             }
         });
@@ -129,7 +142,7 @@ public class PublishSettingsPannel extends LinearLayout {
         mSpBeauty.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (mPublishSettingsCallback != null) {
+                if(mPublishSettingsCallback != null){
                     mPublishSettingsCallback.onSetBeauty(position);
                 }
             }
@@ -146,7 +159,7 @@ public class PublishSettingsPannel extends LinearLayout {
         mSpFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (mPublishSettingsCallback != null) {
+                if(mPublishSettingsCallback != null){
                     mPublishSettingsCallback.onSetFilter(position);
                 }
             }
@@ -158,13 +171,13 @@ public class PublishSettingsPannel extends LinearLayout {
         });
     }
 
-    public void setPublishSettingsCallback(PublishSettingsCallback callback) {
+    public void setPublishSettingsCallback(PublishSettingsCallback callback){
         mPublishSettingsCallback = callback;
     }
 
     public void initPublishSettings(boolean isEnableCamera, boolean isEnableFrontCam, boolean isEnableMic,
-                                    boolean isEnableTorch, boolean isEnableBackgroundMusic, boolean isEnableLoopback, int beauty, int filter) {
-        if (isEnableFrontCam) {
+                                    boolean isEnableTorch, boolean isEnableBackgroundMusic, boolean isEnableLoopback, int beauty, int filter, boolean isEnableMixEngine){
+        if(isEnableFrontCam){
             mTbTorch.setEnabled(false);
         }
         mTbCamera.setChecked(isEnableCamera);
@@ -173,29 +186,24 @@ public class PublishSettingsPannel extends LinearLayout {
         mTbTorch.setChecked(isEnableTorch);
         mTbBackgroundMusic.setChecked(isEnableBackgroundMusic);
         mTbLoopback.setChecked(isEnableLoopback);
+        mTbMixEnginePlayout.setChecked(isEnableMixEngine);
         mSpBeauty.setSelection(beauty);
         mSpFilter.setSelection(filter);
     }
 
-    public void setSelectedBeauty(int index) {
+    public void setSelectedBeauty(int index){
         mSpBeauty.setSelection(index);
     }
 
-    public interface PublishSettingsCallback {
+    public interface PublishSettingsCallback{
         void onEnableCamera(boolean isEnable);
-
         void onEnableFrontCamera(boolean isEnable);
-
         void onEnableMic(boolean isEnable);
-
         void onEnableTorch(boolean isEnable);
-
         void onEnableBackgroundMusic(boolean isEnable);
-
         void onEnableLoopback(boolean isEnable);
-
+        void onEnableMixEnginePlayout(boolean isEnable);
         void onSetBeauty(int beauty);
-
         void onSetFilter(int filter);
     }
 }

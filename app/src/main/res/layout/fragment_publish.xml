@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
-
+<ScrollView      xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
     <FrameLayout
+        android:id="@+id/main_content"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/bg_black">
@@ -23,10 +22,10 @@
             />
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/transparent"
-                        android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:orientation="vertical"
             >
 
 
@@ -76,8 +75,8 @@
                         android:textSize="@dimen/text_size_2"/>
 
                     <ToggleButton
-                        android:id="@+id/tb_enable_torch"
                         style="@style/ToggleButtonText"
+                        android:id="@+id/tb_enable_torch"
                         android:layout_width="@dimen/dimen_80"
                         android:layout_height="@dimen/dimen_40"/>
                 </LinearLayout>
@@ -87,12 +86,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_40"
                     android:layout_below="@id/llyt_front_cam"
-                    android:layout_marginBottom="@dimen/dimen_20"
                     android:layout_marginLeft="@dimen/dimen_20"
                     android:layout_marginRight="@dimen/dimen_20"
                     android:layout_marginTop="@dimen/dimen_20"
+                    android:layout_marginBottom="@dimen/dimen_20"
                     android:orientation="horizontal"
-                    android:visibility="gone"
                     >
 
                     <Spinner
@@ -130,14 +128,14 @@
                 android:textSize="@dimen/text_size_4"/>
 
             <Button
+                android:textAllCaps="false"
                 android:id="@+id/btn_start_publish"
                 android:layout_width="@dimen/dimen_150"
                 android:layout_height="@dimen/dimen_50"
                 android:layout_below="@id/et_publish_title"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/dimen_50"
-                android:text="@string/go_publish"
-                android:textAllCaps="false"/>
+                android:text="@string/go_publish"/>
         </RelativeLayout>
     </FrameLayout>
 </ScrollView>

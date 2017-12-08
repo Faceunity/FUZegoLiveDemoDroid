@@ -14,7 +14,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by wubiao on 2015/12/29
- * <p>
+ *
  * Des: fragment 基类
  */
 public abstract class AbsBaseFragment extends Fragment {

@@ -57,9 +57,9 @@ public class SingleAnchorPublishActivity extends BasePublishActivity {
         mZegoLiveRoom.loginRoom(mRoomID, mPublishTitle, ZegoConstants.RoomRole.Anchor, new IZegoLoginCompletionCallback() {
             @Override
             public void onLoginCompletion(int errorCode, ZegoStreamInfo[] zegoStreamInfos) {
-                if (errorCode == 0) {
+                if(errorCode == 0){
                     handleAnchorLoginRoomSuccess(zegoStreamInfos);
-                } else {
+                }else {
                     handleAnchorLoginRoomFail(errorCode);
                 }
             }
@@ -114,6 +114,16 @@ public class SingleAnchorPublishActivity extends BasePublishActivity {
             }
 
             @Override
+            public void onReconnect(int i, String s) {
+
+            }
+
+            @Override
+            public void onTempBroken(int i, String s) {
+
+            }
+
+            @Override
             public void onStreamUpdated(final int type, final ZegoStreamInfo[] listStream, final String roomID) {
                 if (listStream != null && listStream.length > 0) {
                     switch (type) {
@@ -159,7 +169,7 @@ public class SingleAnchorPublishActivity extends BasePublishActivity {
         mZegoLiveRoom.setZegoAudioPrepCallback(new IZegoAudioPrepCallback() {
             @Override
             public void onAudioPrep(ByteBuffer inData, int sampleCount, int bitDepth, int sampleRate, ByteBuffer outData) {
-                if (inData != null && outData != null) {
+                if(inData != null && outData != null){
                     inData.position(0);
                     outData.position(0);
                     // outData的长度固定为sampleCount * bitDepth
@@ -210,11 +220,5 @@ public class SingleAnchorPublishActivity extends BasePublishActivity {
         } else {
             startPublish();
         }
-    }
-
-
-    @Override
-    protected boolean isShowFaceunityUi() {
-        return true;
     }
 }

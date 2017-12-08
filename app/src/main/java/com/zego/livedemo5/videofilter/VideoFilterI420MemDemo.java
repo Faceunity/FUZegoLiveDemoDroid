@@ -5,9 +5,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
-
-import com.zego.zegoliveroom.videofilter.ZegoVideoFilter;
-
+import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -20,7 +18,7 @@ import java.util.concurrent.CountDownLatch;
 public class VideoFilterI420MemDemo extends ZegoVideoFilter {
     private static final String TAG = "VideoFilterMemDemo";
 
-    private ZegoVideoFilter.Client mClient = null;
+    private Client mClient = null;
     private HandlerThread mThread = null;
     private volatile Handler mHandler = null;
 
@@ -31,7 +29,6 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
         public long timestamp_100n;
         public ByteBuffer buffer;
     }
-
     private ArrayList<PixelBuffer> mProduceQueue = new ArrayList<PixelBuffer>();
     private int mWriteIndex = 0;
     private int mWriteRemain = 0;
@@ -121,7 +118,7 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
     @Override
     protected synchronized void queueInputBuffer(int bufferIndex, final int width, int height, int stride, long timestamp_100n) {
         if (bufferIndex == -1) {
-            return;
+            return ;
         }
 
         PixelBuffer pixelBuffer = mProduceQueue.get(bufferIndex);
@@ -139,7 +136,7 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
             public void run() {
                 if (!mIsRunning) {
                     Log.e(TAG, "already stopped");
-                    return;
+                    return ;
                 }
 
                 PixelBuffer pixelBuffer = getConsumerPixelBuffer();

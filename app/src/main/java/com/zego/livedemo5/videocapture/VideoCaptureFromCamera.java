@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 
-import com.zego.zegoliveroom.videocapture.ZegoVideoCaptureDevice;
+import com.zego.zegoavkit2.ZegoVideoCaptureDevice;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -515,7 +515,7 @@ public class VideoCaptureFromCamera extends ZegoVideoCaptureDevice implements Ca
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         mTexture = surface;
 //        restartCam();
-        startCapture();
+        startCapture();  // 不能使用 restartCam ，因为切后台时再切回时，isCameraRunning 已经被置为 false 
     }
 
     @Override

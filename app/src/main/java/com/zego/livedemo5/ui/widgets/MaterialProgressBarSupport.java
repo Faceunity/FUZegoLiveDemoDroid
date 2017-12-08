@@ -69,13 +69,13 @@ public class MaterialProgressBarSupport extends ViewGroup {
     }
 
 
-    public void startProgress() {
+
+    public void startProgress(){
         mCircleView.setVisibility(View.VISIBLE);
         mProgress.setAlpha(MAX_ALPHA);
         mProgress.start();
     }
-
-    public void stopProgress() {
+    public void stopProgress(){
         mCircleView.setVisibility(View.GONE);
         mProgress.stop();
     }

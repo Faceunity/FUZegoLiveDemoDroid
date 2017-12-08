@@ -1,6 +1,5 @@
 package com.zego.livedemo5.testPerformance;
 
-import com.zego.livedemo5.PerformanceInstrumentedTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -9,7 +8,7 @@ import org.junit.runners.Suite;
  * 性能检查
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({PerformanceInstrumentedTest.class})
 public class PerformanceTest {
-    public final static int RUNTIME=20;
+    public final static int RUNTIME=1;
+    public final static int WAITTIMEBEFOREPUBLISH=1000*60*2;//2min
 }

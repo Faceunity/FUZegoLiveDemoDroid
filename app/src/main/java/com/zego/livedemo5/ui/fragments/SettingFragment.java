@@ -1,7 +1,9 @@
 package com.zego.livedemo5.ui.fragments;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -23,9 +25,13 @@ import com.zego.livedemo5.ui.activities.AboutZegoActivity;
 import com.zego.livedemo5.ui.activities.base.AbsBaseFragment;
 import com.zego.livedemo5.utils.ByteSizeUnit;
 import com.zego.livedemo5.utils.PreferenceUtil;
+import com.zego.livedemo5.utils.ShareUtils;
 import com.zego.livedemo5.utils.SystemUtil;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
+
+import java.io.File;
+import java.io.FilenameFilter;
 
 import butterknife.Bind;
 import butterknife.OnCheckedChanged;
@@ -224,23 +230,15 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
 
         long appId = ZegoApiManager.getInstance().getAppID();
         if (ZegoAppHelper.isUdpProduct(appId)) {
-            spAppFlavors.setSelection(0);
+            spAppFlavors.setSelection( 0 );
         } else if (ZegoAppHelper.isRtmpProduct(appId)) {
-            spAppFlavors.setSelection(1);
+            spAppFlavors.setSelection( 1 );
         } else if (ZegoAppHelper.isInternationalProduct(appId)) {
-            spAppFlavors.setSelection(2);
+            spAppFlavors.setSelection( 2 );
         } else {
-            spAppFlavors.setSelection(3);
+            spAppFlavors.setSelection( 3 );
         }
         spAppFlavors.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            private String convertSignKey2String(byte[] signKey) {
-                StringBuilder buffer = new StringBuilder();
-                for (int b : signKey) {
-                    buffer.append("0x").append(Integer.toHexString((b & 0x000000FF) | 0xFFFFFF00).substring(6)).append(",");
-                }
-                buffer.setLength(buffer.length() - 1);
-                return buffer.toString();
-            }
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -268,7 +266,7 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
                     etAppID.setText(String.valueOf(appId));
 
                     byte[] signKey = ZegoAppHelper.requestSignKey(appId);
-                    etAppKey.setText(convertSignKey2String(signKey));
+                    etAppKey.setText(ZegoAppHelper.convertSignKey2String(signKey));
                     llAppKey.setVisibility(View.GONE);
                 }
             }
@@ -282,6 +280,25 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
         seekbarResolution.setEnabled(false);
         seekBarFps.setEnabled(false);
         seekBarBitrate.setEnabled(false);
+
+        LinearLayout container = (LinearLayout)mRootView.findViewById(R.id.container);
+        container.setOnClickListener(new View.OnClickListener() {
+
+            private long[] mHits = new long[5];
+
+            @Override
+            public void onClick(View v) {
+                System.arraycopy(mHits, 1, mHits, 0, mHits.length - 1);
+                mHits[mHits.length - 1] = SystemClock.uptimeMillis();
+                if (mHits[0] >= SystemClock.uptimeMillis() - 700) {
+                    sendLog2App();
+
+                    for (int i = 0; i < mHits.length; i++) {
+                        mHits[i] = 0;
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -398,20 +415,18 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
             etAppID.requestFocus();
             return -1;
         }
-        // appKey长度必须等于32位
-        String[] keys = strSignKey.split(",");
-        if (keys.length != 32) {
+
+        byte[] byteSignKey;
+        try {
+            byteSignKey = ZegoAppHelper.parseSignKeyFromString(strSignKey);
+        } catch (NumberFormatException e) {
             Toast.makeText(mParentActivity, "SignKey 格式非法", Toast.LENGTH_LONG).show();
             etAppKey.requestFocus();
             return -1;
         }
 
         final long newAppId = Long.valueOf(strAppID);
-        final byte[] newSignKey = new byte[32];
-        for (int i = 0; i < 32; i++) {
-            int data = Integer.valueOf(keys[i].trim().replace("0x", ""), 16);
-            newSignKey[i] = (byte) data;
-        }
+        final byte[] newSignKey = byteSignKey;
 
         if (newAppId != ZegoApiManager.getInstance().getAppID() && newSignKey != ZegoApiManager.getInstance().getSignKey()) {
             mNeedToReInitSDK = true;
@@ -435,7 +450,7 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
     }
 
     @OnCheckedChanged({R.id.tb_modify_test_env, R.id.tb_hardware_encode, R.id.tb_hardware_decode, R.id.tb_rate_control
-            , R.id.tb_preview_mirror, R.id.tb_capture_mirror})
+    , R.id.tb_preview_mirror, R.id.tb_capture_mirror})
     public void onCheckedChanged1(CompoundButton compoundButton, boolean checked) {
         // "非点击按钮"时不触发回调
         if (!compoundButton.isPressed()) return;
@@ -484,7 +499,7 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
 
         switch (compoundButton.getId()) {
             case R.id.tb_video_capture:
-                if (checked) {
+                if(checked){
                     // 开启外部采集时, 关闭外部滤镜
                     tbVideoFilter.setChecked(false);
                     ZegoApiManager.getInstance().setUseVideoFilter(false);
@@ -493,7 +508,7 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
                 ZegoApiManager.getInstance().setUseVideoCapture(checked);
                 break;
             case R.id.tb_video_filter:
-                if (checked) {
+                if(checked){
                     // 开启外部滤镜时, 关闭外部采集
                     tbVideoCapture.setChecked(false);
                     ZegoApiManager.getInstance().setUseVideoCapture(false);
@@ -508,5 +523,22 @@ public class SettingFragment extends AbsBaseFragment implements MainActivity.OnS
 
         // 标记需要"重新初始化sdk"
         mNeedToReInitSDK = true;
+    }
+
+    private void sendLog2App() {
+        String rootPath = com.zego.zegoavkit2.utils.ZegoLogUtil.getLogPath(getActivity());
+        File rootDir = new File(rootPath);
+        File[] logFiles = rootDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return !TextUtils.isEmpty(name) && name.startsWith("zegoavlog") && name.endsWith(".txt");
+            }
+        });
+
+        if (logFiles.length > 0) {
+            ShareUtils.sendFiles(logFiles, getActivity());
+        } else {
+            Log.w("SettingFragment", "not found any log files.");
+        }
     }
 }

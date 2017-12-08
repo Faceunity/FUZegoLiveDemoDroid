@@ -1,7 +1,7 @@
 package com.zego.livedemo5.videocapture.ve_gl;
 
 import android.opengl.GLES20;
-import android.util.Log;
+import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,8 +11,15 @@ import java.nio.FloatBuffer;
  * Some OpenGL static utility functions.
  */
 public class GlUtil {
-    private GlUtil() {
+
+    public static final float[] IDENTITY_MATRIX;
+
+    static {
+        IDENTITY_MATRIX = new float[16];
+        Matrix.setIdentityM(IDENTITY_MATRIX, 0);
     }
+
+    private GlUtil() {}
 
     // Assert that no OpenGL ES 2.0 error has been raised.
     public static void checkNoGLES2Error(String msg) {
@@ -62,18 +69,5 @@ public class GlUtil {
 
         checkNoGLES2Error("generateFrameBuffer");
         return frameBufferId;
-    }
-
-
-    /**
-     * Checks to see if a GLES error has been raised.
-     */
-    public static void checkGlError(String op) {
-        int error = GLES20.glGetError();
-        if (error != GLES20.GL_NO_ERROR) {
-            String msg = op + ": glError 0x" + Integer.toHexString(error);
-            Log.e("checkGlError", msg);
-            throw new RuntimeException(msg);
-        }
     }
 }

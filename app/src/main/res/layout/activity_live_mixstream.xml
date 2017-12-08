@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
+    android:id="@+id/coordinatorLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -46,11 +46,10 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/rlyt_control_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:id="@+id/rlyt_control_header"
             >
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dimen_50"
@@ -112,13 +111,13 @@
 
             <TextView
                 android:id="@+id/tv_play_mixstream"
+                android:layout_marginTop="@dimen/dimen_100"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dimen_10"
-                android:layout_marginTop="@dimen/dimen_100"
-                android:text="@string/play_mixstream"
-                android:textColor="@color/sl_btn"
                 android:textSize="@dimen/text_size_5"
+                android:textColor="@color/sl_btn"
+                android:text="@string/play_mixstream"
                 android:visibility="invisible"
                 />
 

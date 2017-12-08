@@ -6,10 +6,12 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.ZegoApiManager;
 import com.zego.livedemo5.constants.IntentExtra;
+import com.zego.livedemo5.presenters.RoomInfo;
 import com.zego.livedemo5.ui.activities.BasePlayActivity;
 import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.zegoliveroom.callback.IZegoLivePlayerCallback;
@@ -31,10 +33,11 @@ public class ExternalRenderPlayActivity extends BasePlayActivity {
      * 启动入口.
      *
      * @param activity 源activity
+     * @param roomInfo 房间信息
      */
-    public static void actionStart(Activity activity, String roomID) {
+    public static void actionStart(Activity activity, RoomInfo roomInfo) {
         Intent intent = new Intent(activity, ExternalRenderPlayActivity.class);
-        intent.putExtra(IntentExtra.ROOM_ID, roomID);
+        intent.putExtra(IntentExtra.ROOM_ID, roomInfo.room_id);
         activity.startActivity(intent);
         activity.overridePendingTransition(R.anim.scale_translate,
                 R.anim.my_alpha_action);
@@ -124,6 +127,16 @@ public class ExternalRenderPlayActivity extends BasePlayActivity {
             }
 
             @Override
+            public void onReconnect(int i, String s) {
+
+            }
+
+            @Override
+            public void onTempBroken(int i, String s) {
+
+            }
+
+            @Override
             public void onStreamUpdated(final int type, final ZegoStreamInfo[] listStream, final String roomID) {
                 if (listStream != null && listStream.length > 0) {
                     switch (type) {
@@ -175,7 +188,7 @@ public class ExternalRenderPlayActivity extends BasePlayActivity {
         videoRenderer.init();
         videoRenderer.setRendererView(viewLive.getTextureView());
         mZegoLiveRoom.setZegoExternalRenderCallback(videoRenderer);
-        recordLog(TAG + ": 开启外部渲染 " + streamID);
+        recordLog(MY_SELF + ": 开启外部渲染 " + streamID);
     }
 
     @Override
@@ -186,9 +199,9 @@ public class ExternalRenderPlayActivity extends BasePlayActivity {
                 @Override
                 public void onSendRoomMessage(int errorCode, String roomID, long messageID) {
                     if (errorCode == 0) {
-                        recordLog(TAG + ": 发送房间消息成功, roomID:" + roomID);
+                        recordLog(MY_SELF + ": 发送房间消息成功, roomID:" + roomID);
                     } else {
-                        recordLog(TAG + ": 发送房间消息失败, roomID:" + roomID + ", messageID:" + messageID);
+                        recordLog(MY_SELF + ": 发送房间消息失败, roomID:" + roomID + ", messageID:" + messageID);
                     }
                 }
             });
@@ -213,10 +226,5 @@ public class ExternalRenderPlayActivity extends BasePlayActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         handleConfigurationChanged(newConfig);
-    }
-
-    @Override
-    protected boolean isShowFaceunityUi() {
-        return false;
     }
 }
