@@ -9,9 +9,6 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.faceunity.wrapper.gles.FullFrameRect;
-import com.faceunity.wrapper.gles.Texture2dProgram;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -46,6 +43,8 @@ public class FaceunityWrapper {
     private String mEffectFileName = EffectAndFilterSelectAdapter.EFFECT_ITEM_FILE_NAME[1];
 
     private int mCurrentCameraId;
+    private boolean isNeedUpdateEffectParam = true;
+    private int inputImageOrientation;
 
     private HandlerThread mCreateItemThread;
     private Handler mCreateItemHandler;
@@ -59,12 +58,10 @@ public class FaceunityWrapper {
     private boolean isBenchmarkFPS = true;
     private boolean isBenchmarkTime = false;
 
-    private FullFrameRect mFullScreenFUDisplay;
-
     public FaceunityWrapper(Context context, int cameraFaceId) {
         Log.e(TAG, "FaceunityWrapper = " + Thread.currentThread().getId());
         mContext = context;
-        mCurrentCameraId = cameraFaceId;
+        setCameraId(cameraFaceId);
     }
 
     public void onSurfaceCreated(Context context) {
@@ -72,9 +69,6 @@ public class FaceunityWrapper {
         mCreateItemThread = new HandlerThread("faceunity-efect");
         mCreateItemThread.start();
         mCreateItemHandler = new CreateItemHandler(mCreateItemThread.getLooper());
-
-        mFullScreenFUDisplay = new FullFrameRect(new Texture2dProgram(
-                Texture2dProgram.ProgramType.TEXTURE_2D));
 
         try {
             InputStream is = context.getAssets().open("v3.mp3");
@@ -98,11 +92,6 @@ public class FaceunityWrapper {
             e.printStackTrace();
         }
         isInit = true;
-    }
-
-    public void onSurfaceChanged(int width, int height, int previewWidth, int previewHeight) {
-        Log.e(TAG, "onSurfaceChanged width " + width + " height " + height + " previewWidth " + previewWidth + " previewHeight " + previewHeight);
-
     }
 
     public void onSurfaceDestroyed() {
@@ -129,13 +118,12 @@ public class FaceunityWrapper {
         isInit = false;
     }
 
-    public void switchCamera(int ordinal) {
+    public void setCameraId(int ordinal) {
         mCurrentCameraId = ordinal;
-        if (isInit) {
-            Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-            Camera.getCameraInfo(mCurrentCameraId, info);
-            faceunity.fuItemSetParam(mEffectItem, "rotationAngle", (360 - info.orientation));
-        }
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(mCurrentCameraId, info);
+        inputImageOrientation = info.orientation;
+        isNeedUpdateEffectParam = true;
     }
 
     /**
@@ -179,6 +167,12 @@ public class FaceunityWrapper {
         if (isNeedEffectItem) {
             isNeedEffectItem = false;
             mCreateItemHandler.sendEmptyMessage(CreateItemHandler.HANDLE_CREATE_ITEM);
+        }
+
+        if (isNeedUpdateEffectParam) {
+            faceunity.fuItemSetParam(mEffectItem, "isAndroid", 1.0);
+            faceunity.fuItemSetParam(mEffectItem, "rotationAngle", (360 - inputImageOrientation));
+            isNeedUpdateEffectParam = false;
         }
 
         faceunity.fuItemSetParam(mFacebeautyItem, "color_level", mFacebeautyColorLevel);
@@ -256,6 +250,12 @@ public class FaceunityWrapper {
             mCreateItemHandler.sendEmptyMessage(CreateItemHandler.HANDLE_CREATE_ITEM);
         }
 
+        if (isNeedUpdateEffectParam) {
+            faceunity.fuItemSetParam(mEffectItem, "isAndroid", 1.0);
+            faceunity.fuItemSetParam(mEffectItem, "rotationAngle", (360 - inputImageOrientation));
+            isNeedUpdateEffectParam = false;
+        }
+
         faceunity.fuItemSetParam(mFacebeautyItem, "color_level", mFacebeautyColorLevel);
         faceunity.fuItemSetParam(mFacebeautyItem, "blur_level", mFacebeautyBlurLevel);
         faceunity.fuItemSetParam(mFacebeautyItem, "filter_name", mFilterName);
@@ -307,29 +307,7 @@ public class FaceunityWrapper {
 
             @Override
             public void onBlurLevelSelected(int level) {
-                switch (level) {
-                    case 0:
-                        mFacebeautyBlurLevel = 0;
-                        break;
-                    case 1:
-                        mFacebeautyBlurLevel = 1.0f;
-                        break;
-                    case 2:
-                        mFacebeautyBlurLevel = 2.0f;
-                        break;
-                    case 3:
-                        mFacebeautyBlurLevel = 3.0f;
-                        break;
-                    case 4:
-                        mFacebeautyBlurLevel = 4.0f;
-                        break;
-                    case 5:
-                        mFacebeautyBlurLevel = 5.0f;
-                        break;
-                    case 6:
-                        mFacebeautyBlurLevel = 6.0f;
-                        break;
-                }
+                mFacebeautyBlurLevel = level;
             }
 
             @Override
@@ -406,11 +384,7 @@ public class FaceunityWrapper {
                             is.close();
                             int tmp = itemsArray[1];
                             itemsArray[1] = mEffectItem = faceunity.fuCreateItemFromPackage(itemData);
-                            faceunity.fuItemSetParam(mEffectItem, "isAndroid", 1.0);
-                            Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-                            Camera.getCameraInfo(mCurrentCameraId, info);
-                            faceunity.fuItemSetParam(mEffectItem, "rotationAngle",
-                                    (360 - info.orientation));
+                            isNeedUpdateEffectParam = true;
                             if (tmp != 0) {
                                 faceunity.fuDestroyItem(tmp);
                             }
@@ -421,10 +395,6 @@ public class FaceunityWrapper {
                     break;
             }
         }
-    }
-
-    public int getFaceTrackingStatus() {
-        return faceTrackingStatus;
     }
 
 }

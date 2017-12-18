@@ -279,7 +279,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
     protected int setFrontCam(int bFront) {
         mFront = bFront;
-        mFaceunityWrapper.switchCamera(mFront);
+        mFaceunityWrapper.setCameraId(mFront);
         restartCam();
         return 0;
     }
