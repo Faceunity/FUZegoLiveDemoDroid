@@ -8,10 +8,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
 import com.zego.livedemo5.R;
+import com.zego.zegoavkit2.camera.ZegoCameraExposureMode;
+import com.zego.zegoavkit2.camera.ZegoCameraFocusMode;
 
 /**
  * Copyright © 2016 Zego. All rights reserved.
@@ -35,11 +38,19 @@ public class PublishSettingsPannel extends LinearLayout {
 
     private ToggleButton mTbMixEnginePlayout;
 
+    private ToggleButton mTbVirtualStereo;
+
+    private ToggleButton mTbReverb;
+
+    private ToggleButton mTbCustomFocus;
+
+    private ToggleButton mTbCustomExposure;
+
     private Spinner mSpBeauty;
 
     private Spinner mSpFilter;
 
-
+    private SeekBar mSbCustomExposure;
 
     private PublishSettingsCallback mPublishSettingsCallback;
 
@@ -79,8 +90,10 @@ public class PublishSettingsPannel extends LinearLayout {
                 }
                 if(isChecked){
                     mTbTorch.setEnabled(false);
+                    mTbCustomFocus.setEnabled(false);
                 }else {
                     mTbTorch.setEnabled(true);
+                    mTbCustomFocus.setEnabled(true);
                 }
             }
         });
@@ -136,6 +149,76 @@ public class PublishSettingsPannel extends LinearLayout {
             }
         });
 
+        mTbVirtualStereo = (ToggleButton)mRootView.findViewById(R.id.tb_virtual_stereo);
+        mTbVirtualStereo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (mPublishSettingsCallback != null){
+                    mPublishSettingsCallback.onEnableVirtualStereo(isChecked);
+                }
+            }
+        });
+
+        mTbReverb = (ToggleButton)mRootView.findViewById(R.id.tb_reverb);
+        mTbReverb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (mPublishSettingsCallback != null){
+                    mPublishSettingsCallback.onEnableReverb(isChecked);
+                }
+            }
+        });
+
+        mTbCustomFocus = (ToggleButton)mRootView.findViewById(R.id.tb_custom_focus);
+        mTbCustomFocus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (mPublishSettingsCallback != null){
+                    mPublishSettingsCallback.onEnableCustomFocus(isChecked);
+                }
+            }
+        });
+
+        mTbCustomExposure = (ToggleButton)mRootView.findViewById(R.id.tb_custom_exposure);
+        mTbCustomExposure.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (mPublishSettingsCallback != null){
+                    mPublishSettingsCallback.onEnableCustomExposure(isChecked);
+                }
+                if(isChecked)
+                {
+                    mSbCustomExposure.setEnabled(true);
+                }
+                else
+                {
+                    //恢复原来状态
+                    mSbCustomExposure.setProgress(10);
+                    mSbCustomExposure.setEnabled(false);
+                }
+            }
+        });
+
+        mSbCustomExposure = (SeekBar) mRootView.findViewById(R.id.sb_custom_exposure);
+        mSbCustomExposure.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(mPublishSettingsCallback != null){
+                    mPublishSettingsCallback.onSetCustomExposureProgress(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         mSpBeauty = (Spinner) mRootView.findViewById(R.id.sp_beauties);
         ArrayAdapter<String> beautyAdapter = new ArrayAdapter<>(context, R.layout.item_spinner, context.getResources().getStringArray(R.array.beauties));
         mSpBeauty.setAdapter(beautyAdapter);
@@ -176,9 +259,14 @@ public class PublishSettingsPannel extends LinearLayout {
     }
 
     public void initPublishSettings(boolean isEnableCamera, boolean isEnableFrontCam, boolean isEnableMic,
-                                    boolean isEnableTorch, boolean isEnableBackgroundMusic, boolean isEnableLoopback, int beauty, int filter, boolean isEnableMixEngine){
+                                    boolean isEnableTorch, boolean isEnableBackgroundMusic, boolean isEnableLoopback, int beauty, int filter,
+                                    boolean isEnableMixEngine, boolean isEnableVirtualStereo, boolean isEnableReverb, boolean isEnalbeCustomFocus,
+                                    boolean isEnableCustomExposure){
         if(isEnableFrontCam){
             mTbTorch.setEnabled(false);
+        }
+        if(!isEnableCustomExposure){
+            mSbCustomExposure.setEnabled(false);
         }
         mTbCamera.setChecked(isEnableCamera);
         mTbFrontCam.setChecked(isEnableFrontCam);
@@ -187,8 +275,13 @@ public class PublishSettingsPannel extends LinearLayout {
         mTbBackgroundMusic.setChecked(isEnableBackgroundMusic);
         mTbLoopback.setChecked(isEnableLoopback);
         mTbMixEnginePlayout.setChecked(isEnableMixEngine);
+        mTbVirtualStereo.setChecked(isEnableVirtualStereo);
+        mTbReverb.setChecked(isEnableReverb);
+        mTbCustomFocus.setChecked(isEnalbeCustomFocus);
+        mTbCustomExposure.setChecked(isEnableCustomExposure);
         mSpBeauty.setSelection(beauty);
         mSpFilter.setSelection(filter);
+
     }
 
     public void setSelectedBeauty(int index){
@@ -203,7 +296,12 @@ public class PublishSettingsPannel extends LinearLayout {
         void onEnableBackgroundMusic(boolean isEnable);
         void onEnableLoopback(boolean isEnable);
         void onEnableMixEnginePlayout(boolean isEnable);
+        void onEnableVirtualStereo(boolean isEnable);
+        void onEnableReverb(boolean isEnable);
+        void onEnableCustomFocus(boolean isEnable);
+        void onEnableCustomExposure(boolean isEnable);
         void onSetBeauty(int beauty);
         void onSetFilter(int filter);
+        void onSetCustomExposureProgress(int progress);
     }
 }

@@ -365,14 +365,11 @@
                 android:visibility="gone"
                 />
 
-            <com.faceunity.wrapper.FaceunityControlView
-                android:id="@+id/main_FaceunityControlView"
+            <com.faceunity.beautycontrolview.BeautyControlView
+                android:id="@+id/faceunity_control"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_gravity="bottom"
-                android:gravity="bottom"
-                android:orientation="vertical"/>
+                android:layout_height="wrap_content" />
         </RelativeLayout>
     </FrameLayout>
 

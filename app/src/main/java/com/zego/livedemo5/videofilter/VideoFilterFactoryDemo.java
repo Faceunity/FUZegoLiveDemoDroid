@@ -2,8 +2,7 @@ package com.zego.livedemo5.videofilter;
 
 import android.content.Context;
 
-import com.faceunity.wrapper.FaceunityControlView;
-import com.faceunity.wrapper.FaceunityController;
+import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilterFactory;
 
@@ -50,12 +49,13 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
     }
 
     public void destroy(ZegoVideoFilter vf) {
+        // uninitSDK时回调
         mFilter = null;
     }
 
-    public FaceunityControlView.OnViewEventListener getFaceunityController() {
-        if (mFilter instanceof FaceunityController) {
-            return ((FaceunityController) mFilter).getFaceunityController();
+    public OnFaceUnityControlListener getFaceunityController() {
+        if (mFilter instanceof FUVideoFilterGlTexture2dDemo) {
+            return ((FUVideoFilterGlTexture2dDemo) mFilter).getFaceunityController();
         }
         return null;
     }

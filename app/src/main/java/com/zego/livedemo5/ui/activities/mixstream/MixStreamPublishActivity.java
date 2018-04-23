@@ -12,6 +12,10 @@ import com.zego.livedemo5.constants.IntentExtra;
 import com.zego.livedemo5.ui.activities.BasePublishActivity;
 import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.livedemo5.utils.ZegoRoomUtil;
+import com.zego.zegoavkit2.mixstream.IZegoMixStreamCallback;
+import com.zego.zegoavkit2.mixstream.ZegoCompleteMixStreamInfo;
+import com.zego.zegoavkit2.mixstream.ZegoMixStreamInfo;
+import com.zego.zegoavkit2.mixstream.ZegoStreamMixer;
 import com.zego.zegoliveroom.callback.IZegoLivePlayerCallback;
 import com.zego.zegoliveroom.callback.IZegoLivePublisherCallback;
 import com.zego.zegoliveroom.callback.IZegoLoginCompletionCallback;
@@ -20,10 +24,9 @@ import com.zego.zegoliveroom.callback.im.IZegoIMCallback;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
 import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.entity.AuxData;
-import com.zego.zegoliveroom.entity.ZegoCompleteMixStreamInfo;
+import com.zego.zegoliveroom.entity.ZegoBigRoomMessage;
 import com.zego.zegoliveroom.entity.ZegoStreamQuality;
 import com.zego.zegoliveroom.entity.ZegoConversationMessage;
-import com.zego.zegoliveroom.entity.ZegoMixStreamInfo;
 import com.zego.zegoliveroom.entity.ZegoRoomMessage;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
 import com.zego.zegoliveroom.entity.ZegoUserState;
@@ -40,6 +43,8 @@ import java.util.Map;
 public class MixStreamPublishActivity extends BasePublishActivity {
 
     protected List<ZegoMixStreamInfo> mMixStreamInfos = new ArrayList<>();
+
+    private ZegoStreamMixer mStreamMixer = new ZegoStreamMixer();
 
     /**
      * 启动入口.
@@ -219,19 +224,36 @@ public class MixStreamPublishActivity extends BasePublishActivity {
             public void onRecvConversationMessage(String roomID, String conversationID, ZegoConversationMessage message) {
                 handleRecvConversationMsg(roomID, conversationID, message);
             }
+
+            @Override
+            public void onUpdateOnlineCount(String s, int i) {
+                recordLog("Online Count: " + i);
+            }
+
+            @Override
+            public void onRecvBigRoomMessage(String s, ZegoBigRoomMessage[] zegoBigRoomMessages) {
+
+            }
+        });
+
+        mStreamMixer.setCallback(new IZegoMixStreamCallback() {
+            @Override
+            public void onMixStreamConfigUpdate(int i, String s, HashMap<String, Object> hashMap) {
+                handleMixStreamStateUpdate(i,s,hashMap);
+            }
         });
     }
 
     @Override
     protected void handlePublishSuccMix(String streamID, HashMap<String, Object> info) {
         super.handlePublishSucc(streamID);
-
+        final int margin = 25;
         ZegoMixStreamInfo mixStreamInfo = new ZegoMixStreamInfo();
         mixStreamInfo.streamID = mPublishStreamID;
-        mixStreamInfo.top = 0;
-        mixStreamInfo.bottom = ZegoApiManager.getInstance().getZegoAvConfig().getVideoEncodeResolutionHeight();
-        mixStreamInfo.left = 0;
-        mixStreamInfo.right = ZegoApiManager.getInstance().getZegoAvConfig().getVideoEncodeResolutionWidth();
+        mixStreamInfo.top = 0 + margin;
+        mixStreamInfo.bottom = ZegoApiManager.getInstance().getZegoAvConfig().getVideoEncodeResolutionHeight() - margin;
+        mixStreamInfo.left = 0 + margin;
+        mixStreamInfo.right = ZegoApiManager.getInstance().getZegoAvConfig().getVideoEncodeResolutionWidth() - margin;
         mMixStreamInfos.add(mixStreamInfo);
 
         startMixStream();
@@ -312,7 +334,10 @@ public class MixStreamPublishActivity extends BasePublishActivity {
         mixStreamConfig.outputHeight = ZegoApiManager.getInstance().getZegoAvConfig().getVideoCaptureResolutionHeight();
         mixStreamConfig.outputFps = 15;
         mixStreamConfig.outputBitrate = 600 * 1000;
-        mZegoLiveRoom.mixStream(mixStreamConfig, mixStreamRequestSeq++);
+        mixStreamConfig.outputBackgroundColor = 0xc8c8c800;
+//        mZegoLiveRoom.mixStream(mixStreamConfig, mixStreamRequestSeq++);
+
+        mStreamMixer.mixStream(mixStreamConfig, mixStreamRequestSeq++);
     }
 
     protected void handleMixStreamStateUpdate(int errorCode, String mixStreamID, HashMap<String, Object> streamInfo) {
@@ -394,4 +419,5 @@ public class MixStreamPublishActivity extends BasePublishActivity {
             startPublish();
         }
     }
+
 }

@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class VideoFilterHybridDemo extends ZegoVideoFilter {
-    private Client mClient = null;
+    private ZegoVideoFilter.Client mClient = null;
     private HandlerThread mThread = null;
     private volatile Handler mHandler = null;
 

@@ -22,7 +22,7 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements SurfaceTexture.OnFrameAvailableListener {
-    private Client mClient = null;
+    private ZegoVideoFilter.Client mClient = null;
     private HandlerThread mThread = null;
     private volatile Handler mHandler = null;
 
@@ -45,7 +45,7 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
     };
 
     @Override
-    protected void allocateAndStart(Client client) {
+    protected void allocateAndStart(ZegoVideoFilter.Client client) {
         mClient = client;
         mThread = new HandlerThread("video-filter");
         mThread.start();

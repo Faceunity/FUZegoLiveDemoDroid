@@ -16,6 +16,7 @@ import com.zego.zegoliveroom.callback.IZegoRoomCallback;
 import com.zego.zegoliveroom.callback.im.IZegoIMCallback;
 import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.entity.AuxData;
+import com.zego.zegoliveroom.entity.ZegoBigRoomMessage;
 import com.zego.zegoliveroom.entity.ZegoStreamQuality;
 import com.zego.zegoliveroom.entity.ZegoConversationMessage;
 import com.zego.zegoliveroom.entity.ZegoRoomMessage;
@@ -163,6 +164,16 @@ public class SingleAnchorPublishActivity extends BasePublishActivity {
             @Override
             public void onRecvConversationMessage(String roomID, String conversationID, ZegoConversationMessage message) {
                 handleRecvConversationMsg(roomID, conversationID, message);
+            }
+
+            @Override
+            public void onUpdateOnlineCount(String s, int i) {
+                recordLog("Online Count: " + i);
+            }
+
+            @Override
+            public void onRecvBigRoomMessage(String s, ZegoBigRoomMessage[] zegoBigRoomMessages) {
+
             }
         });
 

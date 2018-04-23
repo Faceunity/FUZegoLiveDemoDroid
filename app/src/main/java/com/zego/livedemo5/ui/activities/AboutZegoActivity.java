@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 
@@ -27,7 +30,7 @@ public class AboutZegoActivity extends AbsBaseActivity {
     @Bind(R.id.pb_progress)
     public ProgressBar pbProgress;
 
-    public static void actionStart(Activity activity){
+    public static void actionStart(Activity activity) {
         Intent intent = new Intent(activity, AboutZegoActivity.class);
         activity.startActivity(intent);
     }
@@ -45,18 +48,21 @@ public class AboutZegoActivity extends AbsBaseActivity {
     @Override
     protected void initVariables(Bundle savedInstanceState) {
         pbProgress.setMax(100);
-        webView.setWebChromeClient(new WebChromeClient(){
+
+        webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                if(newProgress >= 100){
+                if (newProgress >= 100) {
                     pbProgress.setVisibility(View.GONE);
-                }else {
+                } else {
                     pbProgress.setVisibility(View.VISIBLE);
                     pbProgress.setProgress(newProgress);
                 }
                 super.onProgressChanged(view, newProgress);
             }
         });
+
+
     }
 
     @Override
@@ -66,11 +72,19 @@ public class AboutZegoActivity extends AbsBaseActivity {
 
     @Override
     protected void loadData(Bundle savedInstanceState) {
+
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        webView.getSettings().setSupportMultipleWindows(true);
+        webView.setWebViewClient(new WebViewClient());
+
         webView.loadUrl("https://www.zego.im");
+
+
     }
 
     @OnClick(R.id.tv_back)
-    public void back(){
+    public void back() {
         finish();
     }
 }

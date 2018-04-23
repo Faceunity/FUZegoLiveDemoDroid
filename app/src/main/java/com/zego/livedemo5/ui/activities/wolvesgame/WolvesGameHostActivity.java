@@ -28,6 +28,7 @@ import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.constants.ZegoIM;
 import com.zego.zegoliveroom.constants.ZegoVideoViewMode;
 import com.zego.zegoliveroom.entity.AuxData;
+import com.zego.zegoliveroom.entity.ZegoBigRoomMessage;
 import com.zego.zegoliveroom.entity.ZegoStreamQuality;
 import com.zego.zegoliveroom.entity.ZegoConversationMessage;
 import com.zego.zegoliveroom.entity.ZegoRoomMessage;
@@ -895,6 +896,16 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         @Override
         public void onRecvConversationMessage(String roomId, String conversationId, ZegoConversationMessage message) {
             recordLog("收到会话消息, roomId: %s; conversationId: %s", roomId, conversationId);
+        }
+
+        @Override
+        public void onUpdateOnlineCount(String s, int i) {
+            recordLog("Online Count: " + i);
+        }
+
+        @Override
+        public void onRecvBigRoomMessage(String s, ZegoBigRoomMessage[] zegoBigRoomMessages) {
+
         }
     }
 

@@ -5,9 +5,9 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLES20;
 
-import com.faceunity.wrapper.FaceunityControlView;
-import com.faceunity.wrapper.FaceunityController;
-import com.faceunity.wrapper.FaceunityWrapper;
+import com.faceunity.beautycontrolview.FURenderer;
+import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
+import com.faceunity.wrapper.faceunity;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
  * Created by robotding on 17/2/23.
  */
 
-public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter implements FaceunityController {
+public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
 
     private Context mContext;
 
@@ -35,11 +35,11 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter implements Fac
     private int mWidth = 0;
     private int mHeight = 0;
 
-    private FaceunityWrapper mFaceunityWrapper;
+    private FURenderer mFURenderer;
 
     public FUVideoFilterGlTexture2dDemo(Context context) {
         mContext = context;
-        mFaceunityWrapper = new FaceunityWrapper(mContext, Camera.CameraInfo.CAMERA_FACING_FRONT);
+        mFURenderer = new FURenderer.Builder(context).build();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter implements Fac
         if (mDrawer == null) {
             mDrawer = new GlRectDrawer();
         }
-        mFaceunityWrapper.onSurfaceCreated(mContext);
+        mFURenderer.loadItems();
     }
 
     @Override
@@ -70,7 +70,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter implements Fac
             mDrawer.release();
             mDrawer = null;
         }
-        mFaceunityWrapper.onSurfaceDestroyed();
+        mFURenderer.destroyItems();
         mClient.destroy();
         mClient = null;
     }
@@ -129,7 +129,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter implements Fac
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferId);
         }
 
-        int texture = mFaceunityWrapper.onDrawFrameRenderToTexture(textureId, width, height);
+        int texture = mFURenderer.onDrawFrame(textureId, width, height);
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         mDrawer.drawRgb(texture, transformationMatrix,
@@ -138,8 +138,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter implements Fac
         mClient.onProcessCallback(mTextureId, width, height, timestamp_100n);
     }
 
-    @Override
-    public FaceunityControlView.OnViewEventListener getFaceunityController() {
-        return mFaceunityWrapper == null ? null : mFaceunityWrapper.initUIEventListener();
+    public OnFaceUnityControlListener getFaceunityController() {
+        return mFURenderer;
     }
 }

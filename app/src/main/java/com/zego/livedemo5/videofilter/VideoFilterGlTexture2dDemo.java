@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
  */
 
 public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
-    private Client mClient = null;
+    private ZegoVideoFilter.Client mClient = null;
 
     private GlRectDrawer mDrawer;
     private int mTextureId = 0;

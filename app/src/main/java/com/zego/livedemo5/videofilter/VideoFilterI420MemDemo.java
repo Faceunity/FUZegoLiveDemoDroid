@@ -18,7 +18,7 @@ import java.util.concurrent.CountDownLatch;
 public class VideoFilterI420MemDemo extends ZegoVideoFilter {
     private static final String TAG = "VideoFilterMemDemo";
 
-    private Client mClient = null;
+    private ZegoVideoFilter.Client mClient = null;
     private HandlerThread mThread = null;
     private volatile Handler mHandler = null;
 

@@ -50,6 +50,11 @@
     <string name="background_music">Backgroud Music</string>
     <string name="loopback">Loopback</string>
     <string name="mixengine_playout">MixEnginePlayout</string>
+    <string name="virtual_stereo">Virtual Stereo</string>
+    <string name="reverb">Reverb</string>
+    <string name="custom_focus">Custom Focus</string>
+    <string name="custom_exposure">Custom Exposure</string>
+    <string name="custom_exposure_title">Exposure</string>
     <string name="mic">Microphone</string>
     <string name="flashlight">Flashlight</string>
     <string name="beauty">Beauty</string>

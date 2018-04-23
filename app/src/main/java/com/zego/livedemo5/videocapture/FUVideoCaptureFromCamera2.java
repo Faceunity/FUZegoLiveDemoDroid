@@ -15,9 +15,9 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 
-import com.faceunity.wrapper.FaceunityControlView;
-import com.faceunity.wrapper.FaceunityController;
-import com.faceunity.wrapper.FaceunityWrapper;
+import com.faceunity.beautycontrolview.FURenderer;
+import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
+import com.faceunity.wrapper.faceunity;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase14;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
@@ -37,14 +37,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         SurfaceTexture.OnFrameAvailableListener,
         TextureView.SurfaceTextureListener,
-        Camera.PreviewCallback,
-        FaceunityController {
+        Camera.PreviewCallback {
     private static final String TAG = "VideoCaptureFromCamera2";
     private static final int CAMERA_STOP_TIMEOUT_MS = 7000;
 
     private Context mContext;
 
-    private FaceunityWrapper mFaceunityWrapper;
+    private FURenderer mFURenderer;
 
     private Camera mCam = null;
     private Camera.CameraInfo mCamInfo = null;
@@ -89,7 +88,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     public FUVideoCaptureFromCamera2(Context context) {
         mContext = context;
 
-        mFaceunityWrapper = new FaceunityWrapper(mContext, Camera.CameraInfo.CAMERA_FACING_FRONT);
+        mFURenderer = new FURenderer.Builder(context).inputTextureType(faceunity.FU_ADM_FLAG_EXTERNAL_OES_TEXTURE).build();
     }
 
     protected void allocateAndStart(Client client) {
@@ -119,7 +118,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 mInputSurfaceTexture = new SurfaceTexture(mInputTextureId);
                 mInputSurfaceTexture.setOnFrameAvailableListener(FUVideoCaptureFromCamera2.this);
 
-                mFaceunityWrapper.onSurfaceCreated(mContext);
+                mFURenderer.loadItems();
 
                 barrier.countDown();
             }
@@ -139,7 +138,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
             cameraThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    mFaceunityWrapper.onSurfaceDestroyed();
+                    mFURenderer.destroyItems();
 
                     if (captureEglBase != null) {
                         captureEglBase.makeCurrent();
@@ -271,15 +270,14 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     }
 
     protected int setResolution(int width, int height) {
-        mWidth = width;
-        mHeight = height;
+//        mWidth = width;
+//        mHeight = height;
         restartCam();
         return 0;
     }
 
     protected int setFrontCam(int bFront) {
         mFront = bFront;
-        mFaceunityWrapper.setCameraId(mFront);
         restartCam();
         return 0;
     }
@@ -515,6 +513,10 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
             result = (mCamInfo.orientation - mRotation + 360) % 360;
         }
         mCam.setDisplayOrientation(result);
+
+        if (mFURenderer != null) {
+            mFURenderer.onCameraChange(mCamInfo.facing, mCamInfo.orientation);
+        }
 
         return 0;
     }
@@ -788,7 +790,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId[0]);
 
-        int texture = mFaceunityWrapper.onDrawFrameDualInputToTexture(mInputTextureId, mWidth, mHeight);
+        int texture = mFURenderer.onDrawFrame(mCameraNV21Byte, mInputTextureId, mWidth, mHeight);
         drawRgb.drawRgb(texture, GlUtil.IDENTITY_MATRIX, mWidth, mHeight,
                 0, 0,
                 mWidth, mHeight);
@@ -805,14 +807,15 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
     }
 
-    @Override
-    public void onPreviewFrame(byte[] data, Camera camera) {
-        mFaceunityWrapper.onPreviewFrame(data, mWidth, mHeight);
-    }
+    private byte[] mCameraNV21Byte;
 
     @Override
-    public FaceunityControlView.OnViewEventListener getFaceunityController() {
-        return mFaceunityWrapper == null ? null : mFaceunityWrapper.initUIEventListener();
+    public void onPreviewFrame(byte[] data, Camera camera) {
+        mCameraNV21Byte = data;
+    }
+
+    public OnFaceUnityControlListener getFaceunityController() {
+        return mFURenderer;
     }
 
     private int fboId[];

@@ -4,7 +4,7 @@ package com.zego.livedemo5;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.faceunity.wrapper.FaceunityControlView;
+import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.SystemUtil;
 import com.zego.livedemo5.videocapture.VideoCaptureFactoryDemo;
@@ -29,7 +29,7 @@ public class ZegoApiManager {
     private boolean mUseExternalRender = false;
 
     /**
-     * 测试环境开关.
+     *  测试环境开关.
      */
     private boolean mUseTestEvn = false;
 
@@ -74,21 +74,21 @@ public class ZegoApiManager {
     /**
      * 高级功能.
      */
-    private void openAdvancedFunctions() {
+    private void openAdvancedFunctions(){
 
         // 开启测试环境
-        if (mUseTestEvn) {
+        if(mUseTestEvn){
             ZegoLiveRoom.setTestEnv(true);
         }
 
         // 外部渲染
-        if (mUseExternalRender) {
+        if(mUseExternalRender){
             // 开启外部渲染
             ZegoLiveRoom.enableExternalRender(true);
         }
 
         // 外部采集
-        if (mUseVideoCapture) {
+        if(mUseVideoCapture){
             // 外部采集
             mVideoCaptureFactoryDemo = new VideoCaptureFactoryDemo();
             mVideoCaptureFactoryDemo.setContext(ZegoApplication.sApplicationContext);
@@ -96,14 +96,14 @@ public class ZegoApiManager {
         }
 
         // 外部滤镜
-        if (mUseVideoFilter) {
+        if(mUseVideoFilter){
             // 外部滤镜
             mVideoFilterFactoryDemo = new VideoFilterFactoryDemo(ZegoApplication.sApplicationContext);
             ZegoLiveRoom.setVideoFilterFactory(mVideoFilterFactoryDemo);
         }
     }
 
-    private void initUserInfo() {
+    private void initUserInfo(){
         // 初始化用户信息
         String userID = PreferenceUtil.getInstance().getUserID();
         String userName = PreferenceUtil.getInstance().getUserName();
@@ -123,7 +123,7 @@ public class ZegoApiManager {
     }
 
 
-    private void init(long appID, byte[] signKey) {
+    private void init(long appID, byte[] signKey){
 
         initUserInfo();
 
@@ -137,7 +137,7 @@ public class ZegoApiManager {
 
         // 初始化sdk
         boolean ret = mZegoLiveRoom.initSDK(appID, signKey, ZegoApplication.sApplicationContext);
-        if (!ret) {
+        if(!ret){
             // sdk初始化失败
             Toast.makeText(ZegoApplication.sApplicationContext, "Zego SDK初始化失败!", Toast.LENGTH_LONG).show();
         } else {
@@ -168,7 +168,7 @@ public class ZegoApiManager {
     /**
      * 初始化sdk.
      */
-    public void initSDK() {
+    public void initSDK(){
         // 即构分配的key与id, 默认使用 UDP 协议的 AppId
         if (mAppID <= 0) {
             long storedAppId = PreferenceUtil.getInstance().getAppId();
@@ -192,9 +192,10 @@ public class ZegoApiManager {
         // 清空高级设置
         ZegoLiveRoom.setTestEnv(false);
         ZegoLiveRoom.enableExternalRender(false);
+
+        // 先置空factory后unintSDK, 或者调换顺序，factory中的destroy方法都会被回调
         ZegoLiveRoom.setVideoCaptureFactory(null);
         ZegoLiveRoom.setVideoFilterFactory(null);
-
         mZegoLiveRoom.unInitSDK();
     }
 
@@ -208,8 +209,8 @@ public class ZegoApiManager {
     }
 
 
-    public ZegoAvConfig getZegoAvConfig() {
-        return mZegoAvConfig;
+    public ZegoAvConfig getZegoAvConfig(){
+        return  mZegoAvConfig;
     }
 
 
@@ -217,11 +218,11 @@ public class ZegoApiManager {
         mUseTestEvn = useTestEvn;
     }
 
-    public boolean isUseExternalRender() {
+    public boolean isUseExternalRender(){
         return mUseExternalRender;
     }
 
-    public void setUseExternalRender(boolean useExternalRender) {
+    public void setUseExternalRender(boolean useExternalRender){
         mUseExternalRender = useExternalRender;
     }
 
@@ -242,9 +243,9 @@ public class ZegoApiManager {
     }
 
     public void setUseHardwareEncode(boolean useHardwareEncode) {
-        if (useHardwareEncode) {
+        if(useHardwareEncode){
             // 开硬编时, 关闭码率控制
-            if (mUseRateControl) {
+            if(mUseRateControl){
                 mUseRateControl = false;
                 mZegoLiveRoom.enableRateControl(false);
             }
@@ -259,9 +260,9 @@ public class ZegoApiManager {
     }
 
     public void setUseRateControl(boolean useRateControl) {
-        if (useRateControl) {
+        if(useRateControl){
             // 开码率控制时, 关硬编
-            if (mUseHardwareEncode) {
+            if(mUseHardwareEncode){
                 mUseHardwareEncode = false;
                 ZegoLiveRoom.requireHardwareEncoder(false);
             }
@@ -278,11 +279,11 @@ public class ZegoApiManager {
         return mSignKey;
     }
 
-    public boolean isUseTestEvn() {
+    public boolean isUseTestEvn(){
         return mUseTestEvn;
     }
 
-    public FaceunityControlView.OnViewEventListener getFaceunityController() {
+    public OnFaceUnityControlListener getFaceunityController() {
         if (isUseVideoCapture() && mVideoCaptureFactoryDemo != null) {
             return mVideoCaptureFactoryDemo.getFaceunityController();
         } else if (isUseVideoFilter() && mVideoFilterFactoryDemo != null) {

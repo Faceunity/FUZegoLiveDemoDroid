@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
               android:paddingLeft="@dimen/dimen_30"
               android:paddingRight="@dimen/dimen_30"
     android:paddingBottom="@dimen/dimen_30">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dimen_30"
+        android:paddingRight="@dimen/dimen_30"
+        android:paddingBottom="@dimen/dimen_30">
 
     <TextView
         android:layout_width="wrap_content"
@@ -207,6 +216,88 @@
         style="@style/HorizontalDivider"
         android:layout_alignParentBottom="true"/>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_45"
+        android:paddingLeft="@dimen/dimen_15"
+        android:paddingRight="@dimen/dimen_15">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/virtual_stereo"
+            android:textColor="@color/text_black"
+            android:textSize="@dimen/text_size_3"/>
+
+        <ToggleButton
+            style="@style/ToggleButtonText"
+            android:id="@+id/tb_virtual_stereo"
+            android:layout_width="@dimen/dimen_80"
+            android:layout_height="@dimen/dimen_40"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
+
+    <View
+        style="@style/HorizontalDivider"
+        android:layout_alignParentBottom="true"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_45"
+        android:paddingLeft="@dimen/dimen_15"
+        android:paddingRight="@dimen/dimen_15">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/reverb"
+            android:textColor="@color/text_black"
+            android:textSize="@dimen/text_size_3"/>
+
+        <ToggleButton
+            style="@style/ToggleButtonText"
+            android:id="@+id/tb_reverb"
+            android:layout_width="@dimen/dimen_80"
+            android:layout_height="@dimen/dimen_40"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
+
+    <View
+        style="@style/HorizontalDivider"
+        android:layout_alignParentBottom="true"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_45"
+        android:paddingLeft="@dimen/dimen_15"
+        android:paddingRight="@dimen/dimen_15">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/custom_focus"
+            android:textColor="@color/text_black"
+            android:textSize="@dimen/text_size_3"/>
+
+        <ToggleButton
+            style="@style/ToggleButtonText"
+            android:id="@+id/tb_custom_focus"
+            android:layout_width="@dimen/dimen_80"
+            android:layout_height="@dimen/dimen_40"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
+
+    <View
+        style="@style/HorizontalDivider"
+        android:layout_alignParentBottom="true"/>
+
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -250,5 +341,68 @@
             />
     </RelativeLayout>
 
+    <View
+        style="@style/HorizontalDivider"
+        android:layout_alignParentBottom="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_20"
+        android:text="@string/custom_exposure_title"
+        android:textSize="@dimen/text_size_2"/>
+    <View
+        style="@style/HorizontalDivider"
+        android:layout_alignParentBottom="true"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_45"
+        android:paddingLeft="@dimen/dimen_15"
+        android:paddingRight="@dimen/dimen_15">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="@string/custom_exposure"
+        android:textColor="@color/text_black"
+        android:textSize="@dimen/text_size_3"/>
+
+    <ToggleButton
+        style="@style/ToggleButtonText"
+        android:id="@+id/tb_custom_exposure"
+        android:layout_width="@dimen/dimen_80"
+        android:layout_height="@dimen/dimen_40"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="暗"
+        android:textSize="@dimen/text_size_2"
+        android:textColor="@color/text_black"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="明"
+        android:textSize="@dimen/text_size_2"
+        android:textColor="@color/text_black"
+        android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+
+    <SeekBar
+        android:id="@+id/sb_custom_exposure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="20"
+        android:progress="10"/>
 
 </LinearLayout>
+    </ScrollView>
