@@ -348,7 +348,7 @@ public class FURenderer implements OnFaceUnityControlListener {
         int flags = mInputTextureType;
 
         if (mNeedBenchmark) mFuCallStartTime = System.nanoTime();
-        int fuTex = faceunity.fuBeautifyImage(tex, flags, w, h, mFrameId++, mItemsArray);
+        int fuTex = faceunity.fuRenderToTexture(tex, w, h, mFrameId++, mItemsArray, flags);
         if (mNeedBenchmark) mOneHundredFrameFUTime += System.nanoTime() - mFuCallStartTime;
         return fuTex;
     }

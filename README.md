@@ -47,25 +47,33 @@ previewDrawer = new GlRectDrawer();
 加载Faceunity SDK所需要的数据文件（读取人脸数据文件、美颜数据文件）：
 
 ```
-try {
-    //加载读取人脸数据 v3.mp3 文件
-    InputStream is = getAssets().open("v3.mp3");
-    byte[] v3data = new byte[is.available()];
-    is.read(v3data);
-    is.close();
-    faceunity.fuSetup(v3data, null, authpack.A());
-    //faceunity.fuSetMaxFaces(1);
-    Log.e(TAG, "fuSetup");
+InputStream v3 = context.getAssets().open(BUNDLE_v3);
+byte[] v3Data = new byte[v3.available()];
+v3.read(v3Data);
+v3.close();
+faceunity.fuSetup(v3Data, null, authpack.A());
 
-    //加载美颜 face_beautification.mp3 文件
-    is = getAssets().open("face_beautification.mp3");
-    byte[] itemData = new byte[is.available()];
-    is.read(itemData);
-    is.close();
-    mFacebeautyItem = faceunity.fuCreateItemFromPackage(itemData);
-} catch (IOException e) {
-    e.printStackTrace();
-}
+/**
+ * 加载优化表情跟踪功能所需要加载的动画数据文件anim_model.bundle；
+ * 启用该功能可以使表情系数及avatar驱动表情更加自然，减少异常表情、模型缺陷的出现。该功能对性能的影响较小。
+ * 启用该功能时，通过 fuLoadAnimModel 加载动画模型数据，加载成功即可启动。该功能会影响通过fuGetFaceInfo获取的expression表情系数，以及通过表情驱动的avatar模型。
+ * 适用于使用Animoji和avatar功能的用户，如果不是，可不加载
+ */
+InputStream animModel = context.getAssets().open(BUNDLE_anim_model);
+byte[] animModelData = new byte[animModel.available()];
+animModel.read(animModelData);
+animModel.close();
+faceunity.fuLoadAnimModel(animModelData);
+
+/**
+ * 加载高精度模式的三维张量数据文件ardata_ex.bundle。
+ * 适用于换脸功能，如果没用该功能可不加载；如果使用了换脸功能，必须加载，否则会报错
+ */
+InputStream ar = context.getAssets().open(BUNDLE_ardata_ex);
+byte[] arDate = new byte[ar.available()];
+ar.read(arDate);
+ar.close();
+faceunity.fuLoadExtendedARData(arDate);
 ```
 
 #### 实现Camera.PreviewCallback接口
@@ -216,19 +224,6 @@ protected int setFrameRate(int framerate) {
 }
 ```
 
-设置视频流宽高
-
-```
-@Override
-protected int setResolution(int width, int height) {
-    Log.e(TAG, "setResolution");
-    mCameraWidth = width;
-    mCameraHeight = height;
-    restartCam();
-    return 0;
-}
-```
-
 切换摄像头朝向
 
 ```
@@ -256,28 +251,6 @@ protected int setView(View view) {
 }
 ```
 
-#### 人脸识别状态
-
-获取人脸识别状态，判断并修改UI以提示用户。
-
-```
-final int isTracking = faceunity.fuIsTracking();
-if (isTracking != faceTrackingStatus) {
-    new Handler(Looper.getMainLooper()).post(new Runnable() {
-        @Override
-        public void run() {
-            if (isTracking == 0) {
-                Toast.makeText(mContext, "人脸识别失败。", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(mContext, "人脸识别成功。", Toast.LENGTH_SHORT).show();
-            }
-        }
-    });
-    faceTrackingStatus = isTracking;
-    Log.e(TAG, "isTracking " + isTracking);
-}
-```
-
 #### 道具加载
 
 判断isNeedEffectItem（是否需要加载新道具数据flag），由于加载数据比较耗时，防止画面卡顿采用异步加载形式。
@@ -285,67 +258,122 @@ if (isTracking != faceTrackingStatus) {
 ##### 发送加载道具Message
 
 ```
-if (isNeedEffectItem) {
-    isNeedEffectItem = false;
-    mCreateItemHandler.sendEmptyMessage(CreateItemHandler.HANDLE_CREATE_ITEM);
+public void createItem(Effect item) {
+    if (item == null) return;
+    mFuItemHandler.removeMessages(FUItemHandler.HANDLE_CREATE_ITEM);
+    mFuItemHandler.sendMessage(Message.obtain(mFuItemHandler, FUItemHandler.HANDLE_CREATE_ITEM, item));
 }
 ```
 
 ##### 自定义Handler，收到Message异步加载道具
 
 ```
-class CreateItemHandler extends Handler {
+class FUItemHandler extends Handler {
 
-        static final int HANDLE_CREATE_ITEM = 1;
+    static final int HANDLE_CREATE_ITEM = 1;
+    static final int HANDLE_CREATE_BEAUTY_ITEM = 2;
+    static final int HANDLE_CREATE_ANIMOJI3D_ITEM = 3;
 
-        WeakReference<Context> mContext;
+    FUItemHandler(Looper looper) {
+        super(looper);
+    }
 
-        CreateItemHandler(Looper looper, Context context) {
-            super(looper);
-            mContext = new WeakReference<Context>(context);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case HANDLE_CREATE_ITEM:
-                    Log.e(TAG, "HANDLE_CREATE_ITEM = " + mEffectFileName);
-                    try {
-                        if (mEffectFileName.equals("none")) {
-                            mEffectItem = 0;
-                        } else {
-                            InputStream is = mContext.get().getAssets().open(mEffectFileName);
-                            byte[] itemData = new byte[is.available()];
-                            is.read(itemData);
-                            is.close();
-                            int tmp = mEffectItem;
-                            mEffectItem = faceunity.fuCreateItemFromPackage(itemData);
-                            faceunity.fuItemSetParam(mEffectItem, "isAndroid", 1.0);
-                            if (tmp != 0) {
-                                faceunity.fuDestroyItem(tmp);
-                            }
+    @Override
+    public void handleMessage(Message msg) {
+        super.handleMessage(msg);
+        switch (msg.what) {
+            //加载道具
+            case HANDLE_CREATE_ITEM:
+                final Effect effect = (Effect) msg.obj;
+                final int newEffectItem = loadItem(effect);
+                queueEvent(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mItemsArray[ITEM_ARRAYS_EFFECT] > 0) {
+                            faceunity.fuDestroyItem(mItemsArray[ITEM_ARRAYS_EFFECT]);
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        mItemsArray[ITEM_ARRAYS_EFFECT] = newEffectItem;
+                        setMaxFaces(effect.maxFace());
                     }
-                    break;
-            }
+                });
+                break;
+            //加载美颜bundle
+            case HANDLE_CREATE_BEAUTY_ITEM:
+                try {
+                    InputStream beauty = mContext.getAssets().open(BUNDLE_face_beautification);
+                    byte[] beautyData = new byte[beauty.available()];
+                    beauty.read(beautyData);
+                    beauty.close();
+                    mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX] = faceunity.fuCreateItemFromPackage(beautyData);
+                    isNeedUpdateFaceBeauty = true;
+                    Log.e(TAG, "face beauty item handle " + mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            //加载animoji道具3D抗锯齿bundle
+            case HANDLE_CREATE_ANIMOJI3D_ITEM:
+                try {
+                    InputStream animoji3D = mContext.getAssets().open(BUNDLE_animoji_3d);
+                    byte[] animoji3DData = new byte[animoji3D.available()];
+                    animoji3D.read(animoji3DData);
+                    animoji3D.close();
+                    mItemsArray[ITEM_ARRAYS_EFFECT_ABIMOJI_3D] = faceunity.fuCreateItemFromPackage(animoji3DData);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
     }
+}
 ```
 
 #### 美颜参数设置
 
 ```
-faceunity.fuItemSetParam(mFacebeautyItem, "color_level", mFacebeautyColorLevel);
-faceunity.fuItemSetParam(mFacebeautyItem, "blur_level", mFacebeautyBlurLevel);
-faceunity.fuItemSetParam(mFacebeautyItem, "filter_name", mFilterName);
-faceunity.fuItemSetParam(mFacebeautyItem, "cheek_thinning", mFacebeautyCheeckThin);
-faceunity.fuItemSetParam(mFacebeautyItem, "eye_enlarging", mFacebeautyEnlargeEye);
-faceunity.fuItemSetParam(mFacebeautyItem, "face_shape", mFaceShape);
-faceunity.fuItemSetParam(mFacebeautyItem, "face_shape_level", mFaceShapeLevel);
-faceunity.fuItemSetParam(mFacebeautyItem, "red_level", mFacebeautyRedLevel);
+if (isNeedUpdateFaceBeauty && mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX] != 0) {
+    //filter_level 滤镜强度 范围0~1 SDK默认为 1
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "filter_level", mFaceBeautyFilterLevel);
+    //filter_name 滤镜
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "filter_name", mFilterName.filterName());
+
+    //skin_detect 精准美肤 0:关闭 1:开启 SDK默认为 0
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "skin_detect", mFaceBeautyALLBlurLevel);
+    //heavy_blur 美肤类型 0:清晰美肤 1:朦胧美肤 SDK默认为 0
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "heavy_blur", mFaceBeautyType);
+    //blur_level 磨皮 范围0~6 SDK默认为 6
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "blur_level", 6 * mFaceBeautyBlurLevel);
+    //blur_blend_ratio 磨皮结果和原图融合率 范围0~1 SDK默认为 1
+//          faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "blur_blend_ratio", 1);
+
+    //color_level 美白 范围0~1 SDK默认为 1
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "color_level", mFaceBeautyColorLevel);
+    //red_level 红润 范围0~1 SDK默认为 1
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "red_level", mFaceBeautyRedLevel);
+    //eye_bright 亮眼 范围0~1 SDK默认为 0
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "eye_bright", mBrightEyesLevel);
+    //tooth_whiten 美牙 范围0~1 SDK默认为 0
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "tooth_whiten", mBeautyTeethLevel);
+
+
+    //face_shape_level 美型程度 范围0~1 SDK默认为1
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "face_shape_level", mFaceShapeLevel);
+    //face_shape 脸型 0：女神 1：网红 2：自然 3：默认 SDK默认为 3
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "face_shape", mFaceBeautyFaceShape);
+    //eye_enlarging 大眼 范围0~1 SDK默认为 0
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "eye_enlarging", mFaceBeautyEnlargeEye);
+    //cheek_thinning 瘦脸 范围0~1 SDK默认为 0
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "cheek_thinning", mFaceBeautyCheekThin);
+    //intensity_chin 下巴 范围0~1 SDK默认为 0.5    大于0.5变大，小于0.5变小
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "intensity_chin", mChinLevel);
+    //intensity_forehead 额头 范围0~1 SDK默认为 0.5    大于0.5变大，小于0.5变小
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "intensity_forehead", mForeheadLevel);
+    //intensity_nose 鼻子 范围0~1 SDK默认为 0
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "intensity_nose", mThinNoseLevel);
+    //intensity_mouth 嘴型 范围0~1 SDK默认为 0.5   大于0.5变大，小于0.5变小
+    faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_FACE_BEAUTY_INDEX], "intensity_mouth", mMouthShape);
+    isNeedUpdateFaceBeauty = false;
+}
 ```
 
 #### 处理图像数据
@@ -353,8 +381,7 @@ faceunity.fuItemSetParam(mFacebeautyItem, "red_level", mFacebeautyRedLevel);
 使用fuDualInputToTexture后会得到新的texture，返回的texture类型为TEXTURE_2D，其中要求输入的图像分别以内存数组byte[]以及OpenGL纹理的方式。下方代码中mCameraNV21Byte为在PLCameraPreviewListener接口回调中获取的图像数据，i为PLVideoFilterListener接口的onDrawFrame方法的纹理ID参数，i2与i1为图像数据的宽高。
 
 ```
-int fuTex = faceunity.fuDualInputToTexture(mCameraNV21Byte, i, 1,
-        i2, i1, mFrameId++, new int[]{mEffectItem, mFacebeautyItem});
+int fuTex = faceunity.fuDualInputToTexture(img, tex, flags, w, h, mFrameId++, mItemsArray);
 ```
 
 #### 推流
@@ -424,25 +451,33 @@ faceunity.fuCreateEGLContext();
 加载Faceunity SDK所需要的数据文件（读取人脸数据文件、美颜数据文件）：
 
 ```
-try {
-    //加载读取人脸数据 v3.mp3 文件
-    InputStream is = getAssets().open("v3.mp3");
-    byte[] v3data = new byte[is.available()];
-    is.read(v3data);
-    is.close();
-    faceunity.fuSetup(v3data, null, authpack.A());
-    //faceunity.fuSetMaxFaces(1);
-    Log.e(TAG, "fuSetup");
+InputStream v3 = context.getAssets().open(BUNDLE_v3);
+byte[] v3Data = new byte[v3.available()];
+v3.read(v3Data);
+v3.close();
+faceunity.fuSetup(v3Data, null, authpack.A());
 
-    //加载美颜 face_beautification.mp3 文件
-    is = getAssets().open("face_beautification.mp3");
-    byte[] itemData = new byte[is.available()];
-    is.read(itemData);
-    is.close();
-    mFacebeautyItem = faceunity.fuCreateItemFromPackage(itemData);
-} catch (IOException e) {
-    e.printStackTrace();
-}
+/**
+ * 加载优化表情跟踪功能所需要加载的动画数据文件anim_model.bundle；
+ * 启用该功能可以使表情系数及avatar驱动表情更加自然，减少异常表情、模型缺陷的出现。该功能对性能的影响较小。
+ * 启用该功能时，通过 fuLoadAnimModel 加载动画模型数据，加载成功即可启动。该功能会影响通过fuGetFaceInfo获取的expression表情系数，以及通过表情驱动的avatar模型。
+ * 适用于使用Animoji和avatar功能的用户，如果不是，可不加载
+ */
+InputStream animModel = context.getAssets().open(BUNDLE_anim_model);
+byte[] animModelData = new byte[animModel.available()];
+animModel.read(animModelData);
+animModel.close();
+faceunity.fuLoadAnimModel(animModelData);
+
+/**
+ * 加载高精度模式的三维张量数据文件ardata_ex.bundle。
+ * 适用于换脸功能，如果没用该功能可不加载；如果使用了换脸功能，必须加载，否则会报错
+ */
+InputStream ar = context.getAssets().open(BUNDLE_ardata_ex);
+byte[] arDate = new byte[ar.available()];
+ar.read(arDate);
+ar.close();
+faceunity.fuLoadExtendedARData(arDate);
 ```
 
 #### 实现父类ZegoVideoFilter的虚函数
@@ -454,61 +489,12 @@ Zego 是通过 ZegoVideoFilter 类来控制外部滤镜，因此实现父类 Zeg
 ```
 @Override
 protected void allocateAndStart(Client client) {
-    mZegoClient = client;
-    mGlThread = new HandlerThread("video-filter");
-    mGlThread.start();
-    mGlHandler = new Handler(mGlThread.getLooper());
-
-    final CountDownLatch barrier = new CountDownLatch(1);
-    mGlHandler.post(new Runnable() {
-        @Override
-        public void run() {
-            faceunity.fuCreateEGLContext();
-
-            try {
-                InputStream is = mContext.getAssets().open("v3.mp3");
-                byte[] v3data = new byte[is.available()];
-                int len = is.read(v3data);
-                is.close();
-                faceunity.fuSetup(v3data, null, authpack.A());
-//              faceunity.fuSetMaxFaces(3);
-                Log.e(TAG, "fuGetVersion " + faceunity.fuGetVersion() + " fuSetup v3 len " + len);
-
-                is = mContext.getAssets().open("face_beautification.mp3");
-                byte[] itemData = new byte[is.available()];
-                len = is.read(itemData);
-                Log.e(TAG, "beautification len " + len);
-                is.close();
-                mFacebeautyItem = faceunity.fuCreateItemFromPackage(itemData);
-                itemsArray[0] = mFacebeautyItem;
-
-                isNeedEffectItem = true;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            barrier.countDown();
-        }
-    });
-
-    mEffectThread = new HandlerThread("video-filter-Effect");
-    mEffectThread.start();
-    mEffectHandler = new CreateItemHandler(mEffectThread.getLooper());
-
-    mProduceQueue.clear();
-    mConsumeQueue.clear();
-    mWriteIndex = 0;
-    mWriteRemain = 0;
-    mMaxBufferSize = 0;
-
-    try {
-        barrier.await();
-    } catch (InterruptedException e) {
-        e.printStackTrace();
+    mClient = client;
+    mWidth = mHeight = 0;
+    if (mDrawer == null) {
+        mDrawer = new GlRectDrawer();
     }
-
-    mIsRunning = true;
+    mFURenderer.loadItems();
 }
 ```
 
@@ -517,140 +503,26 @@ protected void allocateAndStart(Client client) {
 ```
 @Override
 protected void stopAndDeAllocate() {
-    mIsRunning = false;
-
-    final CountDownLatch barrier = new CountDownLatch(1);
-    mGlHandler.post(new Runnable() {
-        @Override
-        public void run() {
-            //Note: 切忌使用一个已经destroy的item
-            faceunity.fuDestroyItem(mEffectItem);
-            itemsArray[1] = mEffectItem = 0;
-            faceunity.fuDestroyItem(mFacebeautyItem);
-            itemsArray[0] = mFacebeautyItem = 0;
-            faceunity.fuOnDeviceLost();
-            isNeedEffectItem = true;
-
-            faceunity.fuReleaseEGLContext();
-            mFrameId = 0;
-
-            barrier.countDown();
-        }
-    });
-    try {
-        barrier.await();
-    } catch (InterruptedException e) {
-        e.printStackTrace();
+    if (mTextureId != 0) {
+        int[] textures = new int[]{mTextureId};
+        GLES20.glDeleteTextures(1, textures, 0);
+        mTextureId = 0;
     }
-    mGlHandler = null;
-    mEffectHandler.removeMessages(CreateItemHandler.HANDLE_CREATE_ITEM);
-    mEffectHandler = null;
 
-    if (Build.VERSION.SDK_INT >= 18) {
-        mGlThread.quitSafely();
-        mEffectThread.quitSafely();
-    } else {
-        mGlThread.quit();
-        mEffectThread.quit();
+    if (mFrameBufferId != 0) {
+        int[] frameBuffers = new int[]{mFrameBufferId};
+        GLES20.glDeleteFramebuffers(1, frameBuffers, 0);
+        mFrameBufferId = 0;
     }
-    mGlThread = null;
-    mEffectThread = null;
 
-    mZegoClient.destroy();
-    mZegoClient = null;
-}
-```
-
-#### 人脸识别状态
-
-获取人脸识别状态，判断并修改UI以提示用户。
-
-```
-final int isTracking = faceunity.fuIsTracking();
-if (isTracking != faceTrackingStatus) {
-    new Handler(Looper.getMainLooper()).post(new Runnable() {
-        @Override
-        public void run() {
-            if (isTracking == 0) {
-                Toast.makeText(mContext, "人脸识别失败。", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(mContext, "人脸识别成功。", Toast.LENGTH_SHORT).show();
-            }
-        }
-    });
-    faceTrackingStatus = isTracking;
-    Log.e(TAG, "isTracking " + isTracking);
-}
-```
-
-#### 道具加载
-
-判断isNeedEffectItem（是否需要加载新道具数据flag），由于加载数据比较耗时，防止画面卡顿采用异步加载形式。
-
-##### 发送加载道具Message
-
-```
-if (isNeedEffectItem) {
-    isNeedEffectItem = false;
-    mCreateItemHandler.sendEmptyMessage(CreateItemHandler.HANDLE_CREATE_ITEM);
-}
-```
-
-##### 自定义Handler，收到Message异步加载道具
-
-```
-class CreateItemHandler extends Handler {
-
-        static final int HANDLE_CREATE_ITEM = 1;
-
-        WeakReference<Context> mContext;
-
-        CreateItemHandler(Looper looper, Context context) {
-            super(looper);
-            mContext = new WeakReference<Context>(context);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case HANDLE_CREATE_ITEM:
-                    Log.e(TAG, "HANDLE_CREATE_ITEM = " + mEffectFileName);
-                    try {
-                        if (mEffectFileName.equals("none")) {
-                            mEffectItem = 0;
-                        } else {
-                            InputStream is = mContext.get().getAssets().open(mEffectFileName);
-                            byte[] itemData = new byte[is.available()];
-                            is.read(itemData);
-                            is.close();
-                            int tmp = mEffectItem;
-                            mEffectItem = faceunity.fuCreateItemFromPackage(itemData);
-                            faceunity.fuItemSetParam(mEffectItem, "isAndroid", 1.0);
-                            if (tmp != 0) {
-                                faceunity.fuDestroyItem(tmp);
-                            }
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-            }
-        }
+    if (mDrawer != null) {
+        mDrawer.release();
+        mDrawer = null;
     }
-```
-
-#### 美颜参数设置
-
-```
-faceunity.fuItemSetParam(mFacebeautyItem, "color_level", mFacebeautyColorLevel);
-faceunity.fuItemSetParam(mFacebeautyItem, "blur_level", mFacebeautyBlurLevel);
-faceunity.fuItemSetParam(mFacebeautyItem, "filter_name", mFilterName);
-faceunity.fuItemSetParam(mFacebeautyItem, "cheek_thinning", mFacebeautyCheeckThin);
-faceunity.fuItemSetParam(mFacebeautyItem, "eye_enlarging", mFacebeautyEnlargeEye);
-faceunity.fuItemSetParam(mFacebeautyItem, "face_shape", mFaceShape);
-faceunity.fuItemSetParam(mFacebeautyItem, "face_shape_level", mFaceShapeLevel);
-faceunity.fuItemSetParam(mFacebeautyItem, "red_level", mFacebeautyRedLevel);
+    mFURenderer.destroyItems();
+    mClient.destroy();
+    mClient = null;
+}
 ```
 
 #### 处理图像数据
@@ -658,8 +530,7 @@ faceunity.fuItemSetParam(mFacebeautyItem, "red_level", mFacebeautyRedLevel);
 使用faceunity.fuRenderToI420Image来处理画面数据。
 
 ```
-int fuTex = faceunity.fuRenderToI420Image(pixelBuffer.buffer.array(),
-                        pixelBuffer.width, pixelBuffer.height, mFrameId++, itemsArray);
+int fuTex = faceunity.fuRenderToTexture(tex, w, h, mFrameId++, mItemsArray, flags);
 ```
 
 #### 推流
