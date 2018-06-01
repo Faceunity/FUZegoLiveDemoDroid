@@ -712,7 +712,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         if (mTextureView != null) {
             attachTextureView();
             float ratio = (float) mViewHeight * mHeight / (mViewWidth * mWidth);
-            Matrix.frustumM(mProjectionMatrix, 0, -1f, 1f, -ratio, ratio, 3f, 10f);
+            Matrix.frustumM(mProjectionMatrix, 0, -1f / ratio, 1f / ratio, -1, 1, 3f, 10f);
             Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, 3.01f, 0f, 0f, 0f, 0f, 1f, 0f);
             Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
         }
