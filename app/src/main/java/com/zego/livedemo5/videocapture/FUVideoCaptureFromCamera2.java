@@ -506,7 +506,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         mCam.setDisplayOrientation(result);
 
         if (mFURenderer != null) {
-            //mFURenderer.onCameraChange(mCamInfo.facing, mCamInfo.orientation);
+            mFURenderer.onCameraChange(mCamInfo.facing, mCamInfo.orientation);
         }
 
         return 0;
