@@ -45,16 +45,16 @@ public final class EglBase14 extends EglBase {
     }
 
     public static class Context extends EglBase.Context {
-        private final android.opengl.EGLContext egl14Context;
+        private final EGLContext egl14Context;
 
-        public Context(android.opengl.EGLContext eglContext) {
+        public Context(EGLContext eglContext) {
             this.egl14Context = eglContext;
         }
     }
 
     // Create a new context with the specified config type, sharing data with sharedContext.
     // |sharedContext| may be null.
-    public EglBase14(EglBase14.Context sharedContext, int[] configAttributes) {
+    public EglBase14(Context sharedContext, int[] configAttributes) {
         eglDisplay = getEglDisplay();
         eglConfig = getEglConfig(eglDisplay, configAttributes);
         eglContext = createEglContext(sharedContext, eglDisplay, eglConfig);
@@ -112,7 +112,7 @@ public final class EglBase14 extends EglBase {
 
     @Override
     public Context getEglBaseContext() {
-        return new EglBase14.Context(eglContext);
+        return new Context(eglContext);
     }
 
     @Override
@@ -165,10 +165,18 @@ public final class EglBase14 extends EglBase {
     @Override
     public void makeCurrent() {
         checkIsNotReleased();
+
         if (eglSurface == EGL14.EGL_NO_SURFACE) {
             throw new RuntimeException("No EGLSurface - can't make current");
         }
+
         synchronized (EglBase.lock) {
+            EGLContext oldContext = EGL14.eglGetCurrentContext();
+            EGLSurface oldSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
+            if (oldContext == eglContext && oldSurface == eglSurface) {
+                return ;
+            }
+
             if (!EGL14.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)) {
                 throw new RuntimeException(
                         "eglMakeCurrent failed: 0x" + Integer.toHexString(EGL14.eglGetError()));
@@ -248,7 +256,7 @@ public final class EglBase14 extends EglBase {
 
     // Return an EGLConfig, or die trying.
     private static EGLContext createEglContext(
-            EglBase14.Context sharedContext, EGLDisplay eglDisplay, EGLConfig eglConfig) {
+            Context sharedContext, EGLDisplay eglDisplay, EGLConfig eglConfig) {
         if (sharedContext != null && sharedContext.egl14Context == EGL14.EGL_NO_CONTEXT) {
             throw new RuntimeException("Invalid sharedContext");
         }

@@ -1,10 +1,11 @@
 package com.zego.livedemo5.videofilter;
 
 import android.graphics.SurfaceTexture;
+import android.os.Build;
 import android.view.Surface;
 
-import com.zego.zegoimagefilter.ZegoImageFilter;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
+import com.zego.zegoimagefilter.ZegoImageFilter;
 
 import java.nio.ByteBuffer;
 
@@ -67,7 +68,9 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter {
             }
 
             SurfaceTexture surfaceTexture = mClient.getSurfaceTexture();
-            surfaceTexture.setDefaultBufferSize(width, height);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                surfaceTexture.setDefaultBufferSize(width, height);
+            }
             mOutputSurface = new Surface(surfaceTexture);
             mFilter.setOutputSurface(mOutputSurface);
             mWidth = width;

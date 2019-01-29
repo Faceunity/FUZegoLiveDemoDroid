@@ -1,17 +1,19 @@
 package com.zego.livedemo5.videocapture;
 
-import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+
 
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase14;
@@ -37,17 +39,33 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
     private Camera mCam = null;
     private Camera.CameraInfo mCamInfo = null;
-    int mFront = 0;
-    int mWidth = 640;
-    int mHeight = 480;
-    int mFrameRate = 15;
-    int mRotation = 0;
+    private int mFront = 0;
+    private int mCameraWidth = 640;
+    private int mCameraHeight = 480;
+    private int mCaptureWidth = 0;
+    private int mCaptureHeight = 0;
+    private int mViewWidth = 0;
+    private int mViewHeight = 0;
+    private int mViewMode = 0;
+    private int mFrameRate = 15;
+    private int mDisplayRotation = 0;
+    private int mImageRotation = 0;
 
-    ZegoVideoCaptureDevice.Client mClient = null;
+    private ZegoVideoCaptureDevice.Client mClient = null;
 
     private EglBase mDummyContext = null;
+    private GlRectDrawer mDummyDrawer = null;
+    private boolean mIsEgl14 = false;
     private int mInputTextureId = 0;
     private SurfaceTexture mInputSurfaceTexture = null;
+    private float[] mInputMatrix = new float[16];
+    private int mTextureId = 0;
+    private int mFrameBufferId = 0;
+
+    private float[] mIdentityMatrix = new float[]{1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f};
 
     private HandlerThread mThread = null;
     private volatile Handler cameraThreadHandler = null;
@@ -55,22 +73,20 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     private final Object pendingCameraRestartLock = new Object();
     private volatile boolean pendingCameraRestart = false;
 
-    private TextureView mTextureView = null;
+    private boolean mIsPreview = false;
     private EglBase previewEglBase = null;
     private GlRectDrawer previewDrawer = null;
-
-    private EglBase captureEglBase = null;
-    private GlRectDrawer captureDrawer = null;
-    private boolean mIsEgl14 = false;
-
-    private int mViewWidth = 0;
-    private int mViewHeight = 0;
-    private float[] mMatrix = new float[16];
+    private float[] mPreviewMatrix = new float[16];
 
     private boolean mIsCapture = false;
-    private boolean mIsPreview = false;
+    private EglBase captureEglBase = null;
+    private GlRectDrawer captureDrawer = null;
+    private float[] mCaptureMatrix = new float[16];
+
+    private TextureView mTextureView = null;
 
     protected void allocateAndStart(ZegoVideoCaptureDevice.Client client) {
+        Log.d(TAG, "allocateAndStart");
         mClient = client;
         mThread = new HandlerThread("camera-cap");
         mThread.start();
@@ -85,9 +101,11 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 try {
                     mDummyContext.createDummyPbufferSurface();
                     mDummyContext.makeCurrent();
+                    mDummyDrawer = new GlRectDrawer();
                 } catch (RuntimeException e) {
                     // Clean up before rethrowing the exception.
                     mDummyContext.releaseSurface();
+                    e.printStackTrace();
                     throw e;
                 }
 
@@ -107,6 +125,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     }
 
     protected void stopAndDeAllocate() {
+        Log.d(TAG, "stopAndDeAllocate");
         stopCapture();
 
         if (cameraThreadHandler != null) {
@@ -114,24 +133,56 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
             cameraThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
+                    releaseCaptureSurface();
+
                     if (captureEglBase != null) {
-                        captureEglBase.makeCurrent();
-                        captureDrawer = null;
                         captureEglBase.release();
                         captureEglBase = null;
                     }
 
-                    mDummyContext.makeCurrent();
+                    releasePreviewSurface();
+                    if (previewDrawer != null) {
+                        previewDrawer.release();
+                        previewDrawer = null;
+                    }
+                    if (captureEglBase != null) {
+                        captureEglBase.release();
+
+                        captureEglBase = null;
+                    }
+                        if (mTextureView != null) {
+                        if (mTextureView.getSurfaceTextureListener().equals(VideoCaptureFromCamera2.this)) {
+                            mTextureView.setSurfaceTextureListener(null);
+                        }
+                        mTextureView = null;
+                    }
+
                     mInputSurfaceTexture.release();
                     mInputSurfaceTexture = null;
 
+                    mDummyContext.makeCurrent();
                     if (mInputTextureId != 0) {
                         int[] textures = new int[] {mInputTextureId};
                         GLES20.glDeleteTextures(1, textures, 0);
                         mInputTextureId = 0;
                     }
+
+                    if (mTextureId != 0) {
+                        int[] textures = new int[]{mTextureId};
+                        GLES20.glDeleteTextures(1, textures, 0);
+                        mTextureId = 0;
+                    }
+
+                    if (mFrameBufferId != 0) {
+                        int[] frameBuffers = new int[]{mFrameBufferId};
+                        GLES20.glDeleteFramebuffers(1, frameBuffers, 0);
+                        mFrameBufferId = 0;
+                    }
+
+                    mDummyDrawer = null;
                     mDummyContext.release();
                     mDummyContext = null;
+
                     barrier.countDown();
                 }
             });
@@ -175,21 +226,6 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 // * Create and Start Cam
                 createCamOnCameraThread();
                 startCamOnCameraThread();
-
-                captureEglBase = EglBase.create(mDummyContext.getEglBaseContext(), EglBase.CONFIG_RECORDABLE);
-                SurfaceTexture temp = mClient.getSurfaceTexture();
-                temp.setDefaultBufferSize(mWidth, mHeight);
-                try {
-                    captureEglBase.createSurface(temp);
-                    captureEglBase.makeCurrent();
-                    captureDrawer = new GlRectDrawer();
-                } catch (RuntimeException e) {
-                    // Clean up before rethrowing the exception.
-                    captureEglBase.releaseSurface();
-                    throw e;
-                }
-
-
             }
         });
 
@@ -197,20 +233,15 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     }
 
     protected int stopCamera() {
+        if (mIsPreview || mIsCapture) {
+            return 0;
+        }
+
         final CountDownLatch barrier = new CountDownLatch(1);
         final boolean didPost = maybePostOnCameraThread(new Runnable() {
             @Override public void run() {
-                mIsCapture = false;
-
                 stopCaptureOnCameraThread(true /* stopHandler */);
                 releaseCam();
-
-                releaseCaptureSurface();
-                if (captureEglBase != null) {
-                    captureEglBase.release();
-                    captureEglBase = null;
-                }
-
                 barrier.countDown();
             }
         });
@@ -235,15 +266,24 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         return PIXEL_BUFFER_TYPE_SURFACE_TEXTURE;
     }
 
-    protected int setFrameRate(int framerate) {
+    protected int setFrameRate(final int framerate) {
         mFrameRate = framerate;
-        updateRateOnCameraThread(framerate);
+
+        if (cameraThreadHandler != null) {
+            cameraThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    updateRateOnCameraThread(framerate);
+                }
+            });
+        }
+
         return 0;
     }
 
     protected int setResolution(int width, int height) {
-        mWidth = width;
-        mHeight = height;
+        mCaptureWidth = width;
+        mCaptureHeight = height;
         restartCam();
         return 0;
     }
@@ -263,6 +303,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     }
 
     protected int setViewMode(int nMode) {
+        mViewMode = nMode;
         return 0;
     }
 
@@ -271,7 +312,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     }
 
     protected int setCaptureRotation(int nRotation) {
-        mRotation = nRotation;
+        mDisplayRotation = nRotation;
         return 0;
     }
 
@@ -398,12 +439,9 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         Camera.Parameters parms = mCam.getParameters();
         Camera.Size psz = parms.getPreferredPreviewSizeForVideo();
 
-        // hardcode
-        psz.width = 640;
-        psz.height = 480;
         parms.setPreviewSize(psz.width, psz.height);
-        mWidth = psz.width;
-        mHeight = psz.height;
+        mCameraWidth = psz.width;
+        mCameraHeight = psz.height;
 
         // *
         // * Now set fps
@@ -426,11 +464,6 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         }
 
         // *
-        // * Recording hint
-        // *
-        parms.setRecordingHint(false);
-
-        // *
         // * focus mode
         // *
         boolean bFocusModeSet = false;
@@ -450,18 +483,6 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
             Log.i(TAG, "[WARNING] vcap: focus mode left unset !!\n");
         }
 
-        boolean supportJPEG = false;
-        for (Integer format : parms.getSupportedPreviewFormats()) {
-            Log.i(TAG, "[INFO] vcap:" + format);
-            if (format == ImageFormat.JPEG) {
-                supportJPEG = true;
-            }
-        }
-
-        if (supportJPEG) {
-            parms.setPreviewFormat(ImageFormat.JPEG);
-        }
-
         // *
         // * Now try to set parm
         // *
@@ -473,18 +494,36 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         }
 
         Camera.Parameters actualParm = mCam.getParameters();
-        mWidth = actualParm.getPreviewSize().width;
-        mHeight = actualParm.getPreviewSize().height;
+        mCameraWidth = actualParm.getPreviewSize().width;
+        mCameraHeight = actualParm.getPreviewSize().height;
         Log.i(TAG, "[WARNING] vcap: focus mode " + actualParm.getFocusMode());
 
         int result;
         if (mCamInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            result = (mCamInfo.orientation + mRotation) % 360;
+            result = (mCamInfo.orientation + mDisplayRotation) % 360;
             result = (360 - result) % 360;  // compensate the mirror
         } else {  // back-facing
-            result = (mCamInfo.orientation - mRotation + 360) % 360;
+            result = (mCamInfo.orientation - mDisplayRotation + 360) % 360;
         }
         mCam.setDisplayOrientation(result);
+        mImageRotation = result;
+
+        // reset context here
+        mDummyContext.makeCurrent();;
+        Log.d(TAG, "ImageRotation:" + mImageRotation);
+        if (mTextureId != 0) {
+            int[] textures = new int[]{mTextureId};
+            GLES20.glDeleteTextures(1, textures, 0);
+            mTextureId = 0;
+        }
+
+        if (mFrameBufferId != 0) {
+            int[] frameBuffers = new int[]{mFrameBufferId};
+            GLES20.glDeleteFramebuffers(1, frameBuffers, 0);
+            mFrameBufferId = 0;
+        }
+
+        releaseCaptureSurface();
 
         return 0;
     }
@@ -498,6 +537,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
         // * mCam.setDisplayOrientation(90);
         if (mInputSurfaceTexture == null) {
+            Log.e(TAG, "mInputSurfaceTexture == null");
             return -1;
         }
 
@@ -508,6 +548,8 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         }
 
         mCam.startPreview();
+        Log.e(TAG, "startPreview success");
+
         return 0;
     }
 
@@ -597,14 +639,21 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         if (cameraThreadHandler != null) {
+            final CountDownLatch barrier = new CountDownLatch(1);
             cameraThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     releasePreviewSurface();
+                    barrier.countDown();
                 }
             });
+            try {
+                barrier.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -614,30 +663,14 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
     public int setRendererView(TextureView view) {
         if (cameraThreadHandler == null) {
-            if (mTextureView != null) {
-                mTextureView.setSurfaceTextureListener(null);
-                releasePreviewSurface();
-            }
-
-            mTextureView = view;
-            if (mTextureView != null) {
-                mTextureView.setSurfaceTextureListener(VideoCaptureFromCamera2.this);
-            }
+            doSetRendererView(view);
         } else {
             final CountDownLatch barrier = new CountDownLatch(1);
             final TextureView temp = view;
             cameraThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (mTextureView != null) {
-                        mTextureView.setSurfaceTextureListener(null);
-                        releasePreviewSurface();
-                    }
-
-                    mTextureView = temp;
-                    if (mTextureView != null) {
-                        mTextureView.setSurfaceTextureListener(VideoCaptureFromCamera2.this);
-                    }
+                    doSetRendererView(temp);
                     barrier.countDown();
                 }
             });
@@ -649,6 +682,20 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         }
 
         return 0;
+    }
+
+    private void doSetRendererView(TextureView temp) {
+        if (mTextureView != null) {
+            if (mTextureView.getSurfaceTextureListener().equals(VideoCaptureFromCamera2.this)) {
+                mTextureView.setSurfaceTextureListener(null);
+            }
+            releasePreviewSurface();
+        }
+
+        mTextureView = temp;
+        if (mTextureView != null) {
+            mTextureView.setSurfaceTextureListener(VideoCaptureFromCamera2.this);
+        }
     }
 
     private void attachTextureView() {
@@ -665,13 +712,14 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         try {
             previewEglBase.createSurface(mTextureView.getSurfaceTexture());
         } catch (RuntimeException e) {
-            previewEglBase.releaseSurface();
+            e.printStackTrace();
+            releasePreviewSurface();
             mViewWidth = 0;
             mViewHeight = 0;
         }
     }
 
-    private void drawToPreview(int width, int height, float[] texMatrix) {
+    private void drawToPreview(int textureId, int width, int height, float[] texMatrix) {
         if (previewEglBase == null) {
             previewEglBase = EglBase.create(mDummyContext.getEglBaseContext(), EglBase.CONFIG_RGBA);
         }
@@ -691,29 +739,85 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         try {
             previewEglBase.makeCurrent();
 
+            int scaleWidth = mViewWidth;
+            int scaleHeight = mViewHeight;
+            System.arraycopy(texMatrix, 0, mPreviewMatrix, 0, 16);
+            if (mViewMode == 0) {
+                if (mViewHeight * width <= mViewWidth * height) {
+                    scaleWidth = mViewHeight * width / height;
+                } else {
+                    scaleHeight = mViewWidth * height / width;
+                }
+            } else if (mViewMode == 1) {
+                if (mViewHeight * width <= mViewWidth * height) {
+                    scaleHeight = mViewWidth * height / width;
+                } else {
+                    scaleWidth = mViewHeight * width / height;
+                }
+                float fWidthScale = (float)mViewWidth / (float)scaleWidth;
+                float fHeightScale = (float)mViewHeight / (float)scaleHeight;
+                Matrix.scaleM(mPreviewMatrix, 0, fWidthScale, fHeightScale, 1.0f);
+                Matrix.translateM(mPreviewMatrix, 0, (1.0f - fWidthScale) / 2.0f, (1.0f - fHeightScale) / 2.0f, 1.0f);
+
+                scaleWidth = mViewWidth;
+                scaleHeight = mViewHeight;
+            }
+
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-            previewDrawer.drawOes(mInputTextureId, texMatrix, width, height,
-                                  0, 0,
-                                  mViewWidth, mViewHeight);
+            previewDrawer.drawRgb(textureId, mPreviewMatrix, (int)width, (int)height,
+                        (mViewWidth - scaleWidth) / 2,
+                        (mViewHeight - scaleHeight) / 2,
+                                  scaleWidth, scaleHeight);
             previewEglBase.swapBuffers();
             previewEglBase.detachCurrent();
         } catch (RuntimeException e) {
-            System.out.println(e.toString());
+            e.printStackTrace();
         }
     }
 
-    private void drawToCapture(int width, int height, float[] texMatrix, long timestamp_ns) {
+    private void drawToCapture(int textureId, int width, int height, float[] texMatrix, long timestamp_ns) {
         if (captureEglBase == null) {
-            return ;
+            captureEglBase = EglBase.create(mDummyContext.getEglBaseContext(), EglBase.CONFIG_RECORDABLE);
+        }
+
+        if (!captureEglBase.hasSurface()) {
+            SurfaceTexture temp = mClient.getSurfaceTexture();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                temp.setDefaultBufferSize(mCaptureWidth, mCaptureHeight);
+            }
+            try {
+                captureEglBase.createSurface(temp);
+                captureEglBase.makeCurrent();
+                captureDrawer = new GlRectDrawer();
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+                // Clean up before rethrowing the exception.
+                captureEglBase.releaseSurface();
+                return ;
+            }
         }
 
         try {
             captureEglBase.makeCurrent();
 
+            // support crop only
+            int scaleWidth = mCaptureWidth;
+            int scaleHeight = mCaptureHeight;
+            System.arraycopy(texMatrix, 0, mCaptureMatrix, 0, 16);
+            if (mCaptureHeight * width <= mCaptureWidth * height) {
+                scaleHeight = mCaptureWidth * height / width;
+            } else {
+                scaleWidth = mCaptureHeight * width / height;
+            }
+            float fWidthScale = (float)mCaptureWidth / (float)scaleWidth;
+            float fHeightScale = (float)mCaptureHeight / (float)scaleHeight;
+            Matrix.scaleM(mCaptureMatrix, 0, fWidthScale, fHeightScale, 1.0f);
+            Matrix.translateM(mCaptureMatrix, 0, (1.0f - fWidthScale) / 2.0f, (1.0f - fHeightScale) / 2.0f, 1.0f);
+
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-            captureDrawer.drawOes(mInputTextureId, texMatrix, width, height,
+            captureDrawer.drawRgb(textureId, mCaptureMatrix, width, height,
                                   0, 0,
-                                  width, height);
+                                  mCaptureWidth, mCaptureHeight);
             if (mIsEgl14) {
                 ((EglBase14) captureEglBase).swapBuffers(timestamp_ns);
             } else {
@@ -722,39 +826,94 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
             captureEglBase.detachCurrent();
         } catch (RuntimeException e) {
-            System.out.println(e.toString());
+            e.printStackTrace();
         }
     }
 
     private void releasePreviewSurface() {
+        if (previewEglBase == null) {
+            return ;
+        }
+
         if (previewEglBase.hasSurface()) {
             previewEglBase.makeCurrent();
+
+            if (previewDrawer != null) {
+                previewDrawer = null;
+            }
+
             previewEglBase.releaseSurface();
             previewEglBase.detachCurrent();
         }
+
+        previewEglBase.release();
+        previewEglBase = null;
     }
 
     private void releaseCaptureSurface() {
+        if (captureEglBase == null) {
+            return ;
+        }
+
         if (captureEglBase.hasSurface()) {
             captureEglBase.makeCurrent();
+
+            if (captureDrawer != null) {
+                captureDrawer = null;
+            }
+
             captureEglBase.releaseSurface();
             captureEglBase.detachCurrent();
         }
     }
 
+//    @Override
+//    public void doFrame(long frameTimeNanos) {
+//        if (!mIsRunning) {
+//            return ;
+//        }
+//        Choreographer.getInstance().postFrameCallback(this);
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
         mDummyContext.makeCurrent();
         surfaceTexture.updateTexImage();
         long timestamp = surfaceTexture.getTimestamp();
-        surfaceTexture.getTransformMatrix(mMatrix);
+        surfaceTexture.getTransformMatrix(mInputMatrix);
 
-        if (mIsCapture) {
-            drawToCapture(mWidth, mHeight, mMatrix, timestamp);
+        // do preprocessing here such as camera 360 sdk
+
+        // 1. correct DisplayOrientation
+        int width = mCameraWidth;
+        int height = mCameraHeight;
+        if (mImageRotation == 90 || mImageRotation == 270) {
+            int temp = width;
+            width = height;
+            height = temp;
         }
 
+        if (mTextureId == 0) {
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            mTextureId = GlUtil.generateTexture(GLES20.GL_TEXTURE_2D);
+            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+
+            mFrameBufferId = GlUtil.generateFrameBuffer(mTextureId);
+        } else {
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferId);
+        }
+
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        mDummyDrawer.drawOes(mInputTextureId, mInputMatrix,
+                width, height, 0, 0, width, height);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+
+        // 2. draw to capture
+        if (mIsCapture) {
+            drawToCapture(mTextureId, width, height, mIdentityMatrix, timestamp);
+        }
+
+        // 3. draw to preview
         if (mIsPreview) {
-            drawToPreview(mWidth, mHeight, mMatrix);
+            drawToPreview(mTextureId, width, height, mIdentityMatrix);
         }
     }
 }

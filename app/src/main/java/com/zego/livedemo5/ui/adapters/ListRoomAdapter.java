@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.presenters.RoomInfo;
+import com.zego.livedemo5.utils.StringUtil;
 import com.zego.livedemo5.utils.ZegoRoomUtil;
 import com.zego.livedemo5.ui.widgets.CirImageView;
 import com.zego.livedemo5.ui.widgets.MaterialProgressBarSupport;
@@ -74,8 +75,8 @@ public class ListRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(TextUtils.isEmpty(roomName)){
                 roomName = room.room_id;
             }
-            ((LiveListHolder) holder).tvPulishTitle.setText(roomName);
-            ((LiveListHolder) holder).tvPublishTime.setText(room.anchor_nick_name);
+            ((LiveListHolder) holder).tvPulishTitle.setText(StringUtil.replaceBlank(roomName));
+            ((LiveListHolder) holder).tvPublishTime.setText(StringUtil.replaceBlank(room.anchor_nick_name));
 
             if (mOnItemClickListener != null) {
                 ((LiveListHolder) holder).rlytItem.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +106,7 @@ public class ListRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
 
-    public static class LiveListHolder extends RecyclerView.ViewHolder {
+    public class LiveListHolder extends RecyclerView.ViewHolder {
         RelativeLayout rlytItem;
         CirImageView civAvatar;
         TextView tvPulishTitle;
@@ -122,7 +123,7 @@ public class ListRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public static class FooterViewHolder extends RecyclerView.ViewHolder {
+    public class FooterViewHolder extends RecyclerView.ViewHolder {
         public final MaterialProgressBarSupport mProgressView;
         public final TextView mTextView;
 

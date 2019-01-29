@@ -19,6 +19,7 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 
+
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase14;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
@@ -48,7 +49,7 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
     private float[] transformationMatrix = new float[]{1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, -1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 1.0f};
+            0.0f, 1.0f, 0.0f, 0.0f};
 
     private int mViewWidth = 0;
     private int mViewHeight = 0;
@@ -387,27 +388,15 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
         return bitmap;
     }
 
-    private void doSet(TextureView textureView) {
-        if (mTextureView != null) {
-            mTextureView.setSurfaceTextureListener(null);
-            releasePreviewSurface();
-        }
+    public int setRendererView(final TextureView view) {
+        final TextureView temp = view;
 
-        mTextureView = textureView;
-        if (mTextureView != null) {
-            mTextureView.setSurfaceTextureListener(VideoCaptureFromImage.this);
-        }
-
-    }
-
-    public int setRendererView(TextureView view) {
         if (mHandler != null) {
-            final TextureView temp = view;
             final CountDownLatch barrier = new CountDownLatch(1);
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    doSet(temp);
+                    doSetRendererView(temp);
                     barrier.countDown();
                 }
             });
@@ -417,36 +406,58 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
                 e.printStackTrace();
             }
         } else {
-            doSet(view);
+            doSetRendererView(temp);
         }
-
         return 0;
     }
 
-    public int setRendererView(SurfaceView view) {
-        final CountDownLatch barrier = new CountDownLatch(1);
-        final SurfaceView temp = view;
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mSurfaceView != null) {
-                    mSurfaceView.getHolder().removeCallback(VideoCaptureFromImage.this);
-                    releasePreviewSurface();
-                }
-
-                mSurfaceView = temp;
-                if (mSurfaceView != null) {
-                    mSurfaceView.getHolder().addCallback(VideoCaptureFromImage.this);
-                }
-                barrier.countDown();
+    private void doSetRendererView(TextureView temp) {
+        if (mTextureView != null) {
+            if (mTextureView.getSurfaceTextureListener().equals(VideoCaptureFromImage.this)) {
+                mTextureView.setSurfaceTextureListener(null);
             }
-        });
-        try {
-            barrier.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            releasePreviewSurface();
+        }
+
+        mTextureView = temp;
+        if (mTextureView != null) {
+            mTextureView.setSurfaceTextureListener(VideoCaptureFromImage.this);
+        }
+    }
+
+    public int setRendererView(final SurfaceView view) {
+
+        final SurfaceView temp = view;
+        if (mHandler != null) {
+            final CountDownLatch barrier = new CountDownLatch(1);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    doSetRendererView(view);
+                    barrier.countDown();
+                }
+            });
+            try {
+                barrier.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            doSetRendererView(view);
         }
         return 0;
+    }
+
+    private void doSetRendererView(SurfaceView temp) {
+        if (mSurfaceView != null) {
+            mSurfaceView.getHolder().removeCallback(VideoCaptureFromImage.this);
+            releasePreviewSurface();
+        }
+
+        mSurfaceView = temp;
+        if (mSurfaceView != null) {
+            mSurfaceView.getHolder().addCallback(VideoCaptureFromImage.this);
+        }
     }
 
     private void attachTextureView() {
@@ -492,7 +503,7 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
     }
 
     private void releaseCaptureSurface() {
-        if (captureEglBase.hasSurface()) {
+        if (captureEglBase != null && captureEglBase.hasSurface()) {
             captureEglBase.makeCurrent();
             if (mCaptureTextureId != 0) {
                 int[] textures = new int[]{mCaptureTextureId};
@@ -506,7 +517,6 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
     }
 
     private void releasePreviewSurface() {
-
         if (previewEglBase != null && previewEglBase.hasSurface()) {
             previewEglBase.makeCurrent();
             if (mPreviewTextureId != 0) {
@@ -556,7 +566,7 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         releasePreviewSurfaceSafe();
-        return false;
+        return true;
     }
 
     @Override
@@ -578,25 +588,23 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
     }
 
     private void releasePreviewSurfaceSafe() {
-
-        if(mHandler != null){
-            final CountDownLatch barrier = new CountDownLatch(1);
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    releasePreviewSurface();
-                    barrier.countDown();
-                }
-            });
-            try {
-                barrier.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }else {
+        if (mHandler == null) {
             releasePreviewSurface();
+            return;
         }
-
+        final CountDownLatch barrier = new CountDownLatch(1);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                releasePreviewSurface();
+                barrier.countDown();
+            }
+        });
+        try {
+            barrier.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
 

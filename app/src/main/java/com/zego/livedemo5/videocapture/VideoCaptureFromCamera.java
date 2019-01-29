@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.util.Log;
+import android.util.TimeUtils;
 import android.view.TextureView;
 import android.view.View;
 
@@ -92,8 +93,7 @@ public class VideoCaptureFromCamera extends ZegoVideoCaptureDevice implements Ca
         Log.d(TAG, "stopCapture");
         final CountDownLatch barrier = new CountDownLatch(1);
         final boolean didPost = maybePostOnCameraThread(new Runnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 stopCaptureOnCameraThread(true /* stopHandler */);
                 releaseCam();
                 barrier.countDown();
@@ -514,8 +514,8 @@ public class VideoCaptureFromCamera extends ZegoVideoCaptureDevice implements Ca
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         mTexture = surface;
-//        restartCam();
-        startCapture();  // 不能使用 restartCam ，因为切后台时再切回时，isCameraRunning 已经被置为 false 
+        startCapture();  // 不能使用 restartCam ，因为切后台时再切回时，isCameraRunning 已经被置为 false
+        //restartCam();
     }
 
     @Override
@@ -528,7 +528,7 @@ public class VideoCaptureFromCamera extends ZegoVideoCaptureDevice implements Ca
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         mTexture = null;
         stopCapture();
-        return false;
+        return true;
     }
 
     @Override

@@ -35,7 +35,9 @@ import com.zego.zegoliveroom.entity.ZegoUser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import butterknife.Bind;
 
@@ -111,7 +113,6 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
     protected String roomId;
     protected String roomName = "Wolves Game";
 
-    protected boolean isSpeaking;
     protected boolean hasLoginRoom = false;
 
     protected PublishMode currentPublishMode = PublishMode.Low_Delay;
@@ -181,12 +182,19 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
     @Override
     protected void initViews(Bundle savedInstanceState) {
         int spanCount = 4;
+        if(mJoinedUsers == null) {
+            mJoinedUsers = (RecyclerView)findViewById(R.id.small_view_container);
+        }
+
         mJoinedUsers.addItemDecoration(new GridSpacingItemDecoration(spanCount, 10, false));
         mJoinedUsers.setAdapter(mRecyclerAdapter);
 
         GridLayoutManager mgr = new GridLayoutManager(this, spanCount);
         mJoinedUsers.setLayoutManager(mgr);
 
+        if(toolBar == null){
+            toolBar = (Toolbar) findViewById(R.id.toolbar);
+        }
         setSupportActionBar(toolBar);
         toolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,10 +203,21 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
             }
         });
 
+        if(mBtnSpeaking == null){
+            mBtnSpeaking = (Button) findViewById(R.id.btn_start_or_stop_speaking);
+        }
         mBtnSpeaking.setEnabled(false);
+        if(mInTurnSpeaking == null){
+            mInTurnSpeaking = (TextView) findViewById(R.id.in_turn_speaking);
+        }
         mInTurnSpeaking.setEnabled(false);
+        if(mEndInTurnSpeaking == null){
+            mEndInTurnSpeaking = (TextView) findViewById(R.id.end_in_turn_speaking);
+        }
         mEndInTurnSpeaking.setEnabled(false);
-
+        if(mTextRole == null){
+            mTextRole = (TextView) findViewById(R.id.wolf_role);
+        }
         mTextRole.setVisibility(View.INVISIBLE);
     }
 
@@ -271,9 +290,8 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
                 public void onSendCustomCommand(int errorCode, String roomId) {
                     recordLog("通知别人，自己开始说话返回：%d", errorCode);
                     if (errorCode == 0) {
-                        isSpeaking = true;
-                        mTextTips.setText(R.string.is_speaking);
 
+                        mTextTips.setText(R.string.is_speaking);
                         WolfInfo wolf = getMyInfo();
                         wolf.setState(WolfInfo.SpeakingState.isSpeaking);
                         mRecyclerAdapter.updateItem(wolf);
@@ -303,6 +321,8 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
         zegoLiveRoom.setPreviewWaterMarkRect(zeroRect);
         zegoLiveRoom.setPublishWaterMarkRect(zeroRect);
 
+        WolfInfo wolf = getMyInfo();
+        wolf.setState(WolfInfo.SpeakingState.isSpeaking);
         // 开启流量自动控制
         int properties = ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_FPS
                 | ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_RESOLUTION;
@@ -312,7 +332,8 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
         int publishFlag = getPublishFlag();
         boolean success = zegoLiveRoom.startPublishing(streamId, roomName, publishFlag);
         recordLog("推流(流Id: %s)成功？%s", streamId, success);
-
+        wolf.setStreamId(success ? streamId : null);
+        mRecyclerAdapter.updateItem(wolf);
         return success ? streamId : null;
     }
 
@@ -346,7 +367,10 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
             WolfInfo wolf = getWolfById(stream.userID);
             if (wolf == null) continue;
 
-            wolf.setState(WolfInfo.SpeakingState.isSpeaking);
+            if(currentPublishMode == PublishMode.Low_Cost){
+                wolf.setState(WolfInfo.SpeakingState.isSpeaking);
+            }
+
             wolf.setStreamId(stream.streamID);
             mRecyclerAdapter.updateItem(wolf);
 
@@ -473,7 +497,7 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
             if (TextUtils.isEmpty(holder.streamId)) {
                 holder.headImg.setVisibility(View.INVISIBLE);
                 holder.itemView.setBackgroundResource(R.color.bg_gray);
-                return;
+
             }
 
             WolfInfo.SpeakingState speakState = wolf.getState();
@@ -497,6 +521,8 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
             return mData.size();
         }
 
+        Map<String, Boolean> hashMap = new HashMap<>();
+
         private void bindSpeakingViewHolder(WolfHeadViewHolder holder, WolfInfo wolfInfo) {
             if (currentSpeakingMode == SpeakingMode.FreeSpeakingMode) {
                 holder.headImg.setVisibility(View.VISIBLE);
@@ -505,8 +531,10 @@ public abstract class WolvesGameBaseActivity extends AbsBaseLiveActivity {
                     _zegoLiveRoom.setPreviewView(holder.headImg);
                     _zegoLiveRoom.startPreview();
                 } else {
+                    _zegoLiveRoom.stopPlayingStream(wolfInfo.getStreamId());
                     _zegoLiveRoom.setViewMode(ZegoVideoViewMode.ScaleAspectFill, holder.streamId);
                     _zegoLiveRoom.startPlayingStream(wolfInfo.getStreamId(), holder.headImg);
+
                 }
             } else {
                 // 轮流说话模式会显示大头像，小头像用深色背景标识即可

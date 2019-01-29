@@ -69,16 +69,16 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
     // Vertex coordinates in Normalized Device Coordinates, i.e.
     // (-1, -1) is bottom-left and (1, 1) is top-right.
     private static final FloatBuffer DEVICE_RECTANGLE =
-            GlUtil.createFloatBuffer(new float[] {
+            GlUtil.createFloatBuffer(new float[]{
                     -1.0f, -1.0f,  // Bottom left.
                     1.0f, -1.0f,  // Bottom right.
-                    -1.0f,  1.0f,  // Top left.
-                    1.0f,  1.0f,  // Top right.
+                    -1.0f, 1.0f,  // Top left.
+                    1.0f, 1.0f,  // Top right.
             });
 
     // Texture coordinates - (0, 0) is bottom-left and (1, 1) is top-right.
     private static final FloatBuffer TEXTURE_RECTANGLE =
-            GlUtil.createFloatBuffer(new float[] {
+            GlUtil.createFloatBuffer(new float[]{
                     0.0f, 1.0f,
                     1.0f, 1.0f,
                     0.0f, 0.0f,
@@ -87,23 +87,23 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
 
     private static final String VERTEX_SHADER =
             "attribute vec4 position;\n "
-            + "attribute mediump vec4 texcoord;\n"
-            + "varying mediump vec2 textureCoordinate;\n"
-            + "void main() {\n"
-            + "    gl_Position = position;\n"
-            + "    textureCoordinate = texcoord.xy;\n"
-            + "}\n";
+                    + "attribute mediump vec4 texcoord;\n"
+                    + "varying mediump vec2 textureCoordinate;\n"
+                    + "void main() {\n"
+                    + "    gl_Position = position;\n"
+                    + "    textureCoordinate = texcoord.xy;\n"
+                    + "}\n";
 
     private static final String FRAGMENT_SHADER =
             "varying highp vec2 textureCoordinate; \n"
-            +"uniform sampler2D frame; \n"
-            +"uniform lowp float factor;\n"
-            +"lowp vec3 whiteFilter;\n"
-            +"\n"
-            +"void main() {\n"
-            +"    whiteFilter = vec3(factor);\n"
-            +"    gl_FragColor = texture2D(frame, textureCoordinate) * vec4(whiteFilter, 1.0); \n"
-            +"}\n";
+                    + "uniform sampler2D frame; \n"
+                    + "uniform lowp float factor;\n"
+                    + "lowp vec3 whiteFilter;\n"
+                    + "\n"
+                    + "void main() {\n"
+                    + "    whiteFilter = vec3(factor);\n"
+                    + "    gl_FragColor = texture2D(frame, textureCoordinate) * vec4(whiteFilter, 1.0); \n"
+                    + "}\n";
 
     private HandlerThread mThread = null;
     private Handler mHandler = null;
@@ -120,22 +120,26 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                uninitEGLSurface();
-            }
-        });
+        if (mHandler != null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    uninitEGLSurface();
+                }
+            });
+        }
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                uninitEGLSurface();
-            }
-        });
+        if (mHandler != null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    uninitEGLSurface();
+                }
+            });
+        }
         return false;
     }
 
@@ -151,22 +155,26 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                uninitEGLSurface();
-            }
-        });
+        if (mHandler != null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    uninitEGLSurface();
+                }
+            });
+        }
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                uninitEGLSurface();
-            }
-        });
+        if (mHandler != null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    uninitEGLSurface();
+                }
+            });
+        }
     }
 
     static class PixelBuffer {
@@ -179,7 +187,7 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
     private int mWriteIndex = 0;
     private int mWriteRemain = 0;
     private final Object mInputlock = new Object();
-    
+
     private ConcurrentLinkedQueue<PixelBuffer> mConsumeQueue = null;
 
     private int mMaxBufferSize = 0;
@@ -229,6 +237,7 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        mHandler.removeCallbacksAndMessages(null);
         mHandler = null;
 
         if (Build.VERSION.SDK_INT >= 18) {
@@ -237,6 +246,17 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
             mThread.quit();
         }
         mThread = null;
+        if(mTextureView != null){
+             mTextureView.setSurfaceTextureListener(null);
+        }
+
+        Choreographer.getInstance().removeFrameCallback(VideoRenderer.this);
+        if(mSurfaceView != null) {
+            mSurfaceView.getHolder().removeCallback(VideoRenderer.this);
+        }
+
+        mConsumeQueue.clear();
+        mProduceQueue.clear();
 
         return 0;
     }
@@ -287,11 +307,11 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
 
     private void attachTextureView() {
         if (eglSurface != EGL14.EGL_NO_SURFACE) {
-            return ;
+            return;
         }
 
         if (!mTextureView.isAvailable()) {
-            return ;
+            return;
         }
 
         mTempSurface = new Surface(mTextureView.getSurfaceTexture());
@@ -307,12 +327,12 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
 
     private void attachSurfaceView() {
         if (eglSurface != EGL14.EGL_NO_SURFACE) {
-            return ;
+            return;
         }
 
         SurfaceHolder holder = mSurfaceView.getHolder();
         if (holder.isCreating() || null == holder.getSurface()) {
-            return ;
+            return;
         }
 
         Rect size = holder.getSurfaceFrame();
@@ -400,7 +420,7 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
 
     private void uninitEGLSurface() {
         if (mTextureId != 0) {
-            int[] textures = new int[] {mTextureId};
+            int[] textures = new int[]{mTextureId};
             GLES20.glDeleteTextures(1, textures, 0);
             mTextureId = 0;
         }
@@ -416,10 +436,10 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
 
     private void release() {
         uninitEGLSurface();
-
         EGL14.eglDestroyContext(eglDisplay, eglContext);
         EGL14.eglReleaseThread();
         EGL14.eglTerminate(eglDisplay);
+
         eglContext = EGL14.EGL_NO_CONTEXT;
         eglDisplay = EGL14.EGL_NO_DISPLAY;
         eglConfig = null;
@@ -513,7 +533,7 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
     @Override
     public void doFrame(long frameTimeNanos) {
         if (!mIsRunning) {
-            return ;
+            return;
         }
         Choreographer.getInstance().postFrameCallback(this);
 
@@ -592,6 +612,10 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
             return -1;
         }
 
+        if (mProduceQueue.size() == 0) {
+            return -1;
+        }
+
         mWriteRemain--;
         return (mWriteIndex + 1) % mProduceQueue.size();
     }
@@ -607,14 +631,15 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoExternal
     @Override
     public synchronized void queueInputBuffer(int bufferIndex, String streamID, int width, int height, int stride) {
         if (bufferIndex == -1) {
-            return ;
+            return;
         }
-
-        PixelBuffer pixelBuffer = mProduceQueue.get(bufferIndex);
-        pixelBuffer.width = width;
-        pixelBuffer.height = height;
-        mConsumeQueue.add(pixelBuffer);
-        mWriteIndex = (mWriteIndex + 1) % mProduceQueue.size();
+        if (mProduceQueue.size() > bufferIndex) {
+            PixelBuffer pixelBuffer = mProduceQueue.get(bufferIndex);
+            pixelBuffer.width = width;
+            pixelBuffer.height = height;
+            mConsumeQueue.add(pixelBuffer);
+            mWriteIndex = (mWriteIndex + 1) % mProduceQueue.size();
+        }
     }
 
     private synchronized void returnProducerPixelBuffer(PixelBuffer pixelBuffer) {

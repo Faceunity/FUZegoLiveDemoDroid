@@ -104,6 +104,12 @@ public abstract class AbsBaseFragment extends Fragment {
         super.onPause();
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     /**
      * 初始化父类中的变量.
      */

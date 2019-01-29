@@ -14,6 +14,41 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
+        <LinearLayout
+            android:id="@+id/scan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_10"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/qr_code" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dimen_10"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_7"
+                    android:textStyle="bold"
+                    android:text="@string/zg_scan_qr_code_setting" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/zg_scan_qr_code_setting_text"
+                    />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,6 +66,29 @@
 
             <TextView
                 android:id="@+id/tv_sdk_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dimen_5"
+                android:textColor="@color/text_black"
+                android:textSize="@dimen/text_size_2"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_35"
+            android:layout_marginTop="@dimen/dimen_10"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sdk_ve_version"
+                android:textColor="@color/text_black"
+                android:textSize="@dimen/text_size_4"/>
+
+            <TextView
+                android:id="@+id/tv_sdk_ve_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dimen_5"
@@ -205,6 +263,21 @@
                 android:text="@string/upload_log"
                 android:textColor="@color/text_black"
                 android:textSize="@dimen/text_size_4"/>
+            <View
+                style="@style/HorizontalDivider"/>
+
+
+            <TextView
+                android:id="@+id/tv_share_log"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_45"
+                android:background="@drawable/sl_btn"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/dimen_5"
+                android:text="@string/share_log"
+                android:textColor="@color/text_black"
+                android:textSize="@dimen/text_size_4"/>
+
 
             <View
                 style="@style/HorizontalDivider"/>

@@ -1,7 +1,6 @@
 package com.zego.livedemo5.videocapture.ve_gl;
 
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,14 +10,6 @@ import java.nio.FloatBuffer;
  * Some OpenGL static utility functions.
  */
 public class GlUtil {
-
-    public static final float[] IDENTITY_MATRIX;
-
-    static {
-        IDENTITY_MATRIX = new float[16];
-        Matrix.setIdentityM(IDENTITY_MATRIX, 0);
-    }
-
     private GlUtil() {}
 
     // Assert that no OpenGL ES 2.0 error has been raised.

@@ -54,7 +54,7 @@ public class SingleAnchorPublishActivity extends BasePublishActivity {
     protected void doBusiness(Bundle savedInstanceState) {
         super.doBusiness(savedInstanceState);
         mRoomID = ZegoRoomUtil.getRoomID(ZegoRoomUtil.ROOM_TYPE_SINGLE);
-
+        mZegoLiveRoom.setRoomConfig(false, true);
         mZegoLiveRoom.loginRoom(mRoomID, mPublishTitle, ZegoConstants.RoomRole.Anchor, new IZegoLoginCompletionCallback() {
             @Override
             public void onLoginCompletion(int errorCode, ZegoStreamInfo[] zegoStreamInfos) {
@@ -69,6 +69,8 @@ public class SingleAnchorPublishActivity extends BasePublishActivity {
         mZegoLiveRoom.setZegoLivePublisherCallback(new IZegoLivePublisherCallback() {
             @Override
             public void onPublishStateUpdate(int stateCode, String streamID, HashMap<String, Object> streamInfo) {
+                //按钮允许点击
+                setEnabled(true);
                 //推流状态更新
                 if (stateCode == 0) {
                     handlePublishSucc(streamID, streamInfo);
@@ -193,6 +195,10 @@ public class SingleAnchorPublishActivity extends BasePublishActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     protected void initPublishControlText() {

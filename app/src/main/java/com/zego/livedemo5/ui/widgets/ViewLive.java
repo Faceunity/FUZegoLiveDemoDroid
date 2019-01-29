@@ -4,13 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -123,6 +123,15 @@ public class ViewLive extends RelativeLayout {
         mActivityHost = activity;
     }
 
+    public void destroy() {
+        mActivityHost = null;
+        mShareToQQCallback = null;
+        mZegoLiveRoom = null;
+        if (mTvSwitchToFullScreen != null) {
+            mTvSwitchToFullScreen.setOnClickListener(null);
+        }
+    }
+
     public void setShareToQQCallback(IShareToQQCallback shareToQQCallback) {
         mShareToQQCallback = shareToQQCallback;
     }
@@ -156,8 +165,8 @@ public class ViewLive extends RelativeLayout {
                     if (mIsPlayView && mZegoLiveRoom != null && mActivityHost != null) {
 
                         mZegoLiveRoom.setViewMode(mZegoVideoViewMode, mStreamID);
-
-                        int currentOrientation = mActivityHost.getWindowManager().getDefaultDisplay().getRotation();
+                        WindowManager wm = (WindowManager) mActivityHost.getSystemService(Context.WINDOW_SERVICE);
+                        int currentOrientation = wm.getDefaultDisplay().getRotation();
                         if (mZegoVideoViewMode == ZegoVideoViewMode.ScaleAspectFit) {
                             if (currentOrientation == Surface.ROTATION_90 || currentOrientation == Surface.ROTATION_270) {
                                 mZegoLiveRoom.setViewRotation(Surface.ROTATION_90, mStreamID);
@@ -180,7 +189,7 @@ public class ViewLive extends RelativeLayout {
             mTvShare.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mActivityHost != null && mShareToQQCallback != null){
+                    if (mActivityHost != null && mShareToQQCallback != null) {
                         ShareUtils.getInstance().shareToQQ(mActivityHost, mListShareUrls, mShareToQQCallback.getRoomID(), mStreamID);
                     }
                 }
@@ -236,7 +245,7 @@ public class ViewLive extends RelativeLayout {
                 String streamID = vlBigView.getStreamID();
                 if (!TextUtils.isEmpty(streamID) && streamID.startsWith(MoreAnchorsPublishActivity.TAG_AUX)) {
                     mZegoLiveRoom.setPreviewView(mTextureView, MoreAnchorsPublishActivity.AUX_CHANNEL_INDEX);
-                }else {
+                } else {
                     mZegoLiveRoom.setPreviewView(mTextureView);
                 }
             }
@@ -249,9 +258,9 @@ public class ViewLive extends RelativeLayout {
         // 交换view
         if (isPublishView()) {
             if (mZegoLiveRoom != null) {
-                if (!TextUtils.isEmpty(mStreamID) && mStreamID.startsWith(MoreAnchorsPublishActivity.TAG_AUX)){
+                if (!TextUtils.isEmpty(mStreamID) && mStreamID.startsWith(MoreAnchorsPublishActivity.TAG_AUX)) {
                     mZegoLiveRoom.setPreviewView(vlBigView.getTextureView(), MoreAnchorsPublishActivity.AUX_CHANNEL_INDEX);
-                }else {
+                } else {
                     mZegoLiveRoom.setPreviewView(vlBigView.getTextureView());
                 }
             }
@@ -320,9 +329,9 @@ public class ViewLive extends RelativeLayout {
         mNeedToSwitchFullScreen = needToSwitchFullScreen;
         mZegoVideoViewMode = mode;
 
-        if(mTvSwitchToFullScreen != null){
+        if (mTvSwitchToFullScreen != null) {
             if (mNeedToSwitchFullScreen) {
-                mTvSwitchToFullScreen.setVisibility(View.VISIBLE);
+                // mTvSwitchToFullScreen.setVisibility(View.VISIBLE);
 
                 if (mode == ZegoVideoViewMode.ScaleAspectFill) {
                     // 退出全屏
@@ -380,11 +389,11 @@ public class ViewLive extends RelativeLayout {
         mStreamID = streamID;
     }
 
-    public String getStreamID(){
+    public String getStreamID() {
         return mStreamID;
     }
 
-    public boolean isPublishView(){
+    public boolean isPublishView() {
         return mIsPublishView;
     }
 
@@ -400,7 +409,7 @@ public class ViewLive extends RelativeLayout {
         mIsPlayView = playView;
     }
 
-    public interface IShareToQQCallback{
+    public interface IShareToQQCallback {
         String getRoomID();
     }
 }

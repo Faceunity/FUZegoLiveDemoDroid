@@ -10,15 +10,25 @@
     <string name="day_ago">&#160;days ago</string>
     <string name="year_ago">&#160;years ago</string>
 
+    <string name="zg_toast_config_successful">Config Successful</string>
+    <string name="zg_toast_config_failure">Config failure</string>
+
+    <string name="send_button_text">send</string>
     <string name="user_id">User ID:</string>
     <string name="user_name">User Name:</string>
     <string name="quality_options">Quality Options:</string>
     <string name="sdk_version">SDK:</string>
+    <string name="sdk_ve_version">V E:</string>
     <string name="upload_log">Upload Log</string>
+    <string name="share_log">Share Log</string>
     <string name="contact_us">Contact Us</string>
     <string name="about">About</string>
     <string name="demo_version">Version:&#160;</string>
     <string name="upload_log_successfully">Log has been uploaded successfully</string>
+
+    <string name="zg_scan_qr_code">Scan qr code</string>
+    <string name="zg_scan_qr_code_setting">Quick Setup</string>
+    <string name="zg_scan_qr_code_setting_text">Quick setup App By Scanning QRCode</string>
 
     <string name="resolution_prefix">Resolution&#160;<xliff:g id="value">%1$s</xliff:g></string>
     <string name="fps_prefix">Frame Rate&#160;<xliff:g id="value">%1$s</xliff:g></string>
@@ -63,6 +73,10 @@
     <string name="request_to_join">Join</string>
     <string name="stop_publishing">Stop</string>
 
+    <string name="portrait_mode">Portrait Mode</string>
+    <string name="landscape_mode">Landscape Mode</string>
+    <string name="select_capture_orientation">Select Capture Orientation</string>
+
     <!--broadcast-->
     <string name="hint">Hint</string>
     <string name="someone_is_requesting_to_broadcast_allow"><xliff:g id="value">%1$s</xliff:g>&#160;is requesting to broadcast, allow?</string>
@@ -73,6 +87,7 @@
     <string name="do_you_really_want_to_leave">Do you really want to leave?</string>
     <string name="Yes">Yes</string>
     <string name="No">No</string>
+    <string name="request_room_list_timeout">Request Room List Timeout</string>
 
     <!--log-->
     <string name="someone_is_requesting_to_broadcast"><xliff:g id="value">%1$s</xliff:g>:&#160;is requesting to broadcast</string>
@@ -131,6 +146,10 @@
     <string name="tips_login_failed" formatted="true">Login room failed：%1$d</string>
     <string name="tips_wait_anchor_answer">Wait for anchor answer</string>
     <string name="dialog_anchor_leave_room">Anchor has leave the room</string>
+
+    <string name="dialog_anchor_stop_live">Current  Anchor Stop Live</string>
+
+    <string name="dialog_stop_live_title">dialog</string>
     <string name="tips_all_members_leave">All members have leaved</string>
     <string name="tips_publish_failed">Publish failed，errorCode: %1$d, streamId: %2$s</string>
     <string name="tips_publish_finish">Publish finish，errorCode: %1$d, streamId: %2$s</string>

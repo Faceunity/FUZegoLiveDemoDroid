@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.view.Surface;
 import android.view.View;
 
@@ -17,7 +16,6 @@ import com.zego.livedemo5.constants.IntentExtra;
 import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.ZegoRoomUtil;
-import com.zego.zegoliveroom.callback.IZegoEndJoinLiveCallback;
 import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
 
@@ -58,10 +56,10 @@ public abstract class BasePublishActivity extends BaseLiveActivity {
         ViewLive freeViewLive = getFreeViewLive();
         if (freeViewLive != null) {
             // 根据推流方向, 设置publish界面的横、竖朝向
-            if (mAppOrientation == Surface.ROTATION_90 || mAppOrientation == Surface.ROTATION_270) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            if (mAppOrientation == Surface.ROTATION_0 || mAppOrientation == Surface.ROTATION_180) {
+                setRequestedOrientation(mAppOrientation == Surface.ROTATION_0 ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             } else {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                setRequestedOrientation(mAppOrientation == Surface.ROTATION_90 ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             }
 
             mZegoLiveRoom.setPreviewView(freeViewLive);
@@ -153,7 +151,7 @@ public abstract class BasePublishActivity extends BaseLiveActivity {
                         dialog.dismiss();
                     }
                 }).create();
-
+        mDialogHandleRequestPublish.setCancelable(false);
         mDialogHandleRequestPublish.show();
     }
 

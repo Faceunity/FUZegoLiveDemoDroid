@@ -9,11 +9,17 @@
     <string name="day_ago">&#160;天前</string>
     <string name="year_ago">&#160;年前</string>
 
+    <string name="portrait_mode">竖屏模式</string>
+    <string name="landscape_mode">横屏模式</string>
+    <string name="select_capture_orientation">选择采集朝向</string>
+
+    <string name="send_button_text">发送</string>
     <string name="user_id">账号:</string>
     <string name="user_name">名字:</string>
     <string name="quality_options">直播品质:</string>
     <string name="sdk_version">SDK:</string>
     <string name="upload_log">上传日志</string>
+    <string name="share_log">分享日志</string>
     <string name="contact_us">联系我们</string>
     <string name="about">关于</string>
     <string name="demo_version">版本:&#160;</string>
@@ -61,6 +67,14 @@
     <string name="start_publishing">开始直播</string>
     <string name="request_to_join">请求连麦</string>
     <string name="stop_publishing">停止直播</string>
+    <string name="sdk_ve_version">VE版本:</string>
+
+    <string name="zg_scan_qr_code">扫描二维码</string>
+    <string name="zg_scan_qr_code_setting">扫码设置</string>
+    <string name="zg_scan_qr_code_setting_text">通过扫描二维码快速完成是设置</string>
+
+    <string name="zg_toast_config_successful">配置成功</string>
+    <string name="zg_toast_config_failure">配置失败</string>
 
     <!--broadcast-->
     <string name="hint">提示</string>
@@ -72,6 +86,10 @@
     <string name="do_you_really_want_to_leave">确定要退出直播页面吗</string>
     <string name="Yes">确定</string>
     <string name="No">取消</string>
+    <string name="request_room_list_timeout">请求房间列表超时!</string>
+    <string name="dialog_anchor_stop_live">当前主播停止直播</string>
+    <string name="dialog_stop_live_title">提示</string>
+
 
     <!--log-->
     <string name="someone_is_requesting_to_broadcast"><xliff:g id="value">%1$s</xliff:g>:&#160;正在请求连麦</string>

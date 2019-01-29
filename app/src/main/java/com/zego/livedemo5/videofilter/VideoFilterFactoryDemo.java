@@ -49,7 +49,6 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
     }
 
     public void destroy(ZegoVideoFilter vf) {
-        // uninitSDK时回调
         mFilter = null;
     }
 

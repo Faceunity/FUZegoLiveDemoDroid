@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.Choreographer;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -27,6 +28,7 @@ import com.zego.zegoavkit2.ZegoVideoCaptureDevice;
 
 import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by robotding on 17/2/15.
@@ -191,17 +193,17 @@ public class VideoCaptureFromImage2 extends ZegoVideoCaptureDevice
             }
 
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-            previewDrawer.drawRgb(mBitmapTextureId, flipMatrix,
-                                  mImageWidth, mImageHeight,
-                                  mImageWidth / 4 * mX, mImageHeight / 4 * mY,
-                                  mImageWidth / 4, mImageHeight / 4);
+            previewDrawer.drawRgb(mBitmapTextureId, transformationMatrix,
+                    mImageWidth, mImageHeight,
+                    mImageWidth / 4 * mX, mImageHeight / 4 * mY,
+                    mImageWidth / 4, mImageHeight / 4);
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-            previewDrawer.drawRgb(mPreviewTextureId, transformationMatrix,
-                                  mViewWidth, mViewHeight,
-                                  0, 0,
-                                  mViewWidth, mViewHeight);
+            previewDrawer.drawRgb(mPreviewTextureId, flipMatrix,
+                    mViewWidth, mViewHeight,
+                    0, 0,
+                    mViewWidth, mViewHeight);
 
             previewEglBase.swapBuffers();
 
@@ -356,30 +358,16 @@ public class VideoCaptureFromImage2 extends ZegoVideoCaptureDevice
         return bitmap;
     }
 
-    private void doSet(TextureView textureView) {
-        if (mTextureView != null) {
-            if (mTextureView.getSurfaceTextureListener().equals(VideoCaptureFromImage2.this)) {
-                mTextureView.setSurfaceTextureListener(null);
-            }
+    public int setRendererView(final TextureView view) {
 
-            releasePreviewSurface();
-        }
-
-        mTextureView = textureView;
-        if (mTextureView != null) {
-            mTextureView.setSurfaceTextureListener(VideoCaptureFromImage2.this);
-        }
-
-    }
-
-    public int setRendererView(TextureView view) {
-        if (mHandler != null) {
-            final TextureView temp = view;
+        if (mHandler == null) {
+            doSetRendererView(view);
+        } else {
             final CountDownLatch barrier = new CountDownLatch(1);
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    doSet(temp);
+                    doSetRendererView(view);
                     barrier.countDown();
                 }
             });
@@ -388,36 +376,63 @@ public class VideoCaptureFromImage2 extends ZegoVideoCaptureDevice
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } else {
-            doSet(view);
         }
-
         return 0;
     }
 
-    public int setRendererView(SurfaceView view) {
-        final CountDownLatch barrier = new CountDownLatch(1);
+    private void doSetRendererView(SurfaceView view) {
         final SurfaceView temp = view;
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mSurfaceView != null) {
-                    mSurfaceView.getHolder().removeCallback(VideoCaptureFromImage2.this);
-                    releasePreviewSurface();
-                }
 
-                mSurfaceView = temp;
-                if (mSurfaceView != null) {
-                    mSurfaceView.getHolder().addCallback(VideoCaptureFromImage2.this);
-                }
-                barrier.countDown();
-            }
-        });
-        try {
-            barrier.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (mSurfaceView != null) {
+            mSurfaceView.getHolder().removeCallback(VideoCaptureFromImage2.this);
+            releasePreviewSurface();
         }
+
+        mSurfaceView = temp;
+        if (mSurfaceView != null) {
+            mSurfaceView.getHolder().addCallback(VideoCaptureFromImage2.this);
+        }
+    }
+
+    private void doSetRendererView(TextureView view) {
+        if (mTextureView != null) {
+            if (mTextureView.getSurfaceTextureListener().equals(VideoCaptureFromImage2.this)) {
+                mTextureView.setSurfaceTextureListener(null);
+            }
+
+            releasePreviewSurface();
+        }
+
+        mTextureView = view;
+        if (mTextureView != null) {
+            mTextureView.setSurfaceTextureListener(VideoCaptureFromImage2.this);
+        }
+    }
+
+    public int setRendererView(final SurfaceView view) {
+        final SurfaceView temp = view;
+        if (mHandler != null) {
+            final CountDownLatch barrier = new CountDownLatch(1);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+
+                    doSetRendererView(view);
+                    barrier.countDown();
+
+                }
+            });
+
+            try {
+                barrier.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            doSetRendererView(view);
+        }
+
         return 0;
     }
 
@@ -464,7 +479,7 @@ public class VideoCaptureFromImage2 extends ZegoVideoCaptureDevice
     }
 
     private void releasePreviewSurface() {
-        if (previewEglBase != null && previewEglBase.hasSurface()) {
+        if (previewEglBase.hasSurface()) {
             previewEglBase.makeCurrent();
 
             if (mBitmapTextureId != 0) {
@@ -515,7 +530,7 @@ public class VideoCaptureFromImage2 extends ZegoVideoCaptureDevice
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         releasePreviewSurfaceSafe();
-        return false;
+        return true;
     }
 
     @Override
@@ -537,22 +552,18 @@ public class VideoCaptureFromImage2 extends ZegoVideoCaptureDevice
     }
 
     private void releasePreviewSurfaceSafe() {
-        if(mHandler != null){
-            final CountDownLatch barrier = new CountDownLatch(1);
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    releasePreviewSurface();
-                    barrier.countDown();
-                }
-            });
-            try {
-                barrier.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        final CountDownLatch barrier = new CountDownLatch(1);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                releasePreviewSurface();
+                barrier.countDown();
             }
-        }else {
-            releasePreviewSurface();
+        });
+        try {
+            barrier.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

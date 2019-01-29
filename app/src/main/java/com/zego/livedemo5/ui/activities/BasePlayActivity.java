@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -181,13 +182,18 @@ public abstract class BasePlayActivity extends BaseLiveActivity {
      * 请求连麦.
      */
     protected void requestJoinLive() {
+        mTvPublisnControl.setEnabled(false);
         mZegoLiveRoom.requestJoinLive(new IZegoResponseCallback() {
             @Override
             public void onResponse(int result, String fromUserID, String fromUserName) {
                 if (result == ZegoConstants.ResultCode.YES) {
+
                     // 连麦请求被通过
                     recordLog(getString(R.string.request_of_broadcast_has_been_allowed, MY_SELF));
-
+                    if(mPublishStreamID!= null && isStreamExisted(mPublishStreamID)){
+                        Toast.makeText(getApplicationContext(),"当前已经是连麦状态",Toast.LENGTH_LONG).show();
+                       return;
+                    }
                     // 推流前
                     beforePublish();
 
@@ -212,6 +218,7 @@ public abstract class BasePlayActivity extends BaseLiveActivity {
                                     }).create();
                     dialogNotify.show();
                 }
+                mTvPublisnControl.setEnabled(true);
             }
         });
     }

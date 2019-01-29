@@ -1,28 +1,34 @@
 package com.zego.livedemo5;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-
+import com.pgyersdk.update.PgyUpdateManager;
 import com.tencent.tauth.Tencent;
 import com.zego.livedemo5.ui.activities.AboutZegoActivity;
+import com.zego.livedemo5.ui.activities.SettingActivity;
 import com.zego.livedemo5.ui.activities.base.AbsBaseActivity;
 import com.zego.livedemo5.ui.activities.base.AbsBaseFragment;
 import com.zego.livedemo5.ui.fragments.PublishFragment;
 import com.zego.livedemo5.ui.fragments.RoomListFragment;
 import com.zego.livedemo5.ui.widgets.NavigationBar;
+import com.zego.livedemo5.utils.PreferenceUtil;
+import com.zego.livedemo5.utils.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +39,7 @@ import butterknife.Bind;
  * Copyright © 2016 Zego. All rights reserved.
  * des:
  */
-public class MainActivity extends AbsBaseActivity implements NavigationBar.NavigationBarListener{
+public class MainActivity extends AbsBaseActivity implements NavigationBar.NavigationBarListener {
 
     private List<AbsBaseFragment> mFragments;
 
@@ -44,8 +50,6 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
     @Bind(R.id.toolbar)
     public Toolbar toolBar;
 
-    @Bind(R.id.drawerlayout)
-    public DrawerLayout drawerLayout;
 
     private OnSetConfigsCallback mSetConfigsCallback;
 
@@ -67,11 +71,22 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        updateTitle();
+    }
+
+    private RoomListFragment roomListFragment;
+    private PublishFragment publishFragment;
+
+    @Override
     protected void initVariables(Bundle savedInstanceState) {
         mTabSelected = 0;
         mFragments = new ArrayList<>();
-        mFragments.add(RoomListFragment.newInstance());
-        mFragments.add(PublishFragment.newInstance());
+        roomListFragment = RoomListFragment.newInstance();
+        mFragments.add(roomListFragment);
+        publishFragment = PublishFragment.newInstance();
+        mFragments.add(publishFragment);
 
         mPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
@@ -87,73 +102,24 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
 
         mSetConfigsCallback = (OnSetConfigsCallback) getSupportFragmentManager().findFragmentById(R.id.setting_fragment);
 
-        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-
-            private CharSequence oldTitle;
-
-            private Runnable updateTitleTask = new Runnable() {
-                @Override
-                public void run() {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateTitle();
-
-                            for (int position = 0; position < mPagerAdapter.getCount(); position++) {
-                                Fragment fragment = mPagerAdapter.getItem(position);
-                                ((OnReInitSDKCallback)fragment).onReInitSDK();
-                            }
-                        }
-                    });
-                }
-            };
-
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                oldTitle = toolBar.getTitle();
-                toolBar.setTitle(getString(R.string.action_settings));
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                // 当侧边栏关闭时, set配置
-                if(mSetConfigsCallback == null) return;
-
-                int errorCode = mSetConfigsCallback.onSetConfig();
-                if (errorCode < 0) {
-                    drawerLayout.openDrawer(Gravity.LEFT);
-                } else if (errorCode > 0) {
-                    if (updateTitleTask != null) {
-                        ZegoAppHelper.removeTask(updateTitleTask);
-                    }
-                    ZegoAppHelper.postTask(updateTitleTask);
-                } else {
-                    toolBar.setTitle(oldTitle);
-                }
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-
-            }
-        });
 
         setSupportActionBar(toolBar);
         toolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
-                    drawerLayout.closeDrawer(Gravity.LEFT);
-                } else {
-                    drawerLayout.openDrawer(Gravity.LEFT);
-                }
+                Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+                startActivity(intent);
             }
         });
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+        }
     }
 
     @Override
@@ -180,12 +146,67 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
             }
         });
 
-        updateTitle();
+
     }
+
+    private final int CHECK_PERMISSIONS = 102;
 
     @Override
     protected void loadData(Bundle savedInstanceState) {
 
+        if (checkOrRequestPermission(CHECK_PERMISSIONS)) {
+            checkApkUpdate();
+        }
+    }
+
+    private void checkApkUpdate() {
+        if (checkOrRequestPermission(1002) && !SystemUtil.isDebugVersion(this)) {
+            /** 可选配置集成方式 **/
+            new PgyUpdateManager.Builder()
+                    .setForced(false)                // 设置是否强制更新
+                    .setUserCanRetry(false)         // 失败后是否提示重新下载
+                    .setDeleteHistroyApk(false)     // 检查更新前是否删除本地历史 Apk， 默认为true
+                    .register();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case CHECK_PERMISSIONS: {
+                boolean allPermissionGranted = true;
+                for (int i = 0; i < grantResults.length; i++) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                        allPermissionGranted = false;
+                        Toast.makeText(this, String.format("获取%s权限失败 ", permissions[i]), Toast.LENGTH_LONG).show();
+                    }
+                }
+                if (allPermissionGranted) {
+                    checkApkUpdate();
+                } else {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setData(Uri.parse("package:" + this.getPackageName()));
+                    startActivity(intent);
+                }
+                break;
+            }
+        }
+    }
+
+    private static String[] PERMISSIONS_STORAGE = {
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE"};
+
+
+    private boolean checkOrRequestPermission(int code) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(this, "android.permission.WRITE_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED) {
+                this.requestPermissions(PERMISSIONS_STORAGE, code);
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -204,8 +225,8 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
     }
 
     private void updateTitle() {
-        long currentAppId = ZegoApiManager.getInstance().getAppID();
-        String title = ZegoAppHelper.getAppTitle(currentAppId, MainActivity.this);
+        long currentAppFlavor = PreferenceUtil.getInstance().getCurrentAppFlavor();
+        String title = ZegoAppHelper.getAppTitle(currentAppFlavor, MainActivity.this);
         toolBar.setTitle(title);
     }
 
@@ -246,7 +267,7 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id == R.id.action_contact_us){
+        if (id == R.id.action_contact_us) {
             Tencent.createInstance("", MainActivity.this).startWPAConversation(MainActivity.this, "84328558", "");
             return true;
         }
@@ -273,6 +294,8 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
          * @return < 0: 数据格式非法; 0: 无修改或者不需要重新初始化SDK; > 0: 需要重新初始化 SDK
          */
         int onSetConfig();
+
+
     }
 
     public interface OnReInitSDKCallback {

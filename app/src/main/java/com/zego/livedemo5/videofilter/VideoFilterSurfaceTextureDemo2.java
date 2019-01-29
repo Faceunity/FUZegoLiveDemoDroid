@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.view.Surface;
 
+
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase14;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
@@ -34,6 +35,7 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
     private int mOutputHeight = 0;
     private SurfaceTexture mInputSurfaceTexture = null;
     private int mInputTextureId = 0;
+    private int mCopyTextureId = 0;
     private Surface mOutputSurface = null;
     private boolean mIsEgl14 = false;
 
@@ -72,13 +74,10 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
                 mInputTextureId = GlUtil.generateTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
                 mInputSurfaceTexture = new SurfaceTexture(mInputTextureId);
                 mInputSurfaceTexture.setOnFrameAvailableListener(VideoFilterSurfaceTextureDemo2.this);
+                mInputSurfaceTexture.detachFromGLContext();
 
                 mEglContext = EglBase.create(mDummyContext.getEglBaseContext(), EglBase.CONFIG_RECORDABLE);
                 mIsEgl14 = EglBase14.isEGL14Supported();
-
-                if (mDrawer == null) {
-                    mDrawer = new GlRectDrawer();
-                }
 
                 barrier.countDown();
             }
@@ -174,13 +173,20 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        mDummyContext.makeCurrent();
+        mEglContext.makeCurrent();
+        if (mDrawer == null) {
+            mDrawer = new GlRectDrawer();
+        }
+
+        if (mCopyTextureId == 0) {
+            mCopyTextureId = GlUtil.generateTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
+            surfaceTexture.attachToGLContext(mCopyTextureId);
+        }
         surfaceTexture.updateTexImage();
         long timestampNs = surfaceTexture.getTimestamp();
 
-        mEglContext.makeCurrent();
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        mDrawer.drawOes(mInputTextureId, transformationMatrix,
+        mDrawer.drawOes(mCopyTextureId, transformationMatrix,
                         mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
 
         if (mIsEgl14) {
@@ -188,11 +194,28 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
         } else {
             mEglContext.swapBuffers();
         }
+
+        mEglContext.detachCurrent();
     }
 
     private void setOutputSurface(SurfaceTexture surfaceTexture, int width, int height) {
-        if (mOutputSurface != null) {
+        if (mEglContext.hasSurface()) {
+            mEglContext.makeCurrent();
+            if (mDrawer != null) {
+                mDrawer.release();
+                mDrawer = null;
+            }
+
+            if (mCopyTextureId != 0) {
+                int[] textures = new int[] {mCopyTextureId};
+                GLES20.glDeleteTextures(1, textures, 0);
+                mCopyTextureId = 0;
+            }
+
             mEglContext.releaseSurface();
+        }
+
+        if (mOutputSurface != null) {
             mOutputSurface.release();
             mOutputSurface = null;
         }
@@ -220,13 +243,22 @@ public class VideoFilterSurfaceTextureDemo2 extends ZegoVideoFilter implements S
         mDummyContext.release();
         mDummyContext = null;
 
-        if (mDrawer != null) {
-            mDrawer.release();
-            mDrawer = null;
-        }
+        if (mEglContext.hasSurface()) {
+            mEglContext.makeCurrent();
+            if (mDrawer != null) {
+                mDrawer.release();
+                mDrawer = null;
+            }
 
+            if (mCopyTextureId != 0) {
+                int[] textures = new int[] {mCopyTextureId};
+                GLES20.glDeleteTextures(1, textures, 0);
+                mCopyTextureId = 0;
+            }
+        }
         mEglContext.release();
         mEglContext = null;
+
         if (mOutputSurface != null) {
             mOutputSurface.release();
             mOutputSurface = null;

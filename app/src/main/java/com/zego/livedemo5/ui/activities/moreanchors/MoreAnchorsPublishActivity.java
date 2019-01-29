@@ -151,7 +151,7 @@ public class MoreAnchorsPublishActivity extends BasePublishActivity {
         });
 
         mRoomID = ZegoRoomUtil.getRoomID(ZegoRoomUtil.ROOM_TYPE_MORE);
-
+        mZegoLiveRoom.setRoomConfig(false, true);
         mZegoLiveRoom.loginRoom(mRoomID, mPublishTitle, ZegoConstants.RoomRole.Anchor, new IZegoLoginCompletionCallback() {
             @Override
             public void onLoginCompletion(int errorCode, ZegoStreamInfo[] zegoStreamInfos) {
@@ -166,6 +166,9 @@ public class MoreAnchorsPublishActivity extends BasePublishActivity {
         mZegoLiveRoom.setZegoLivePublisherCallback(new IZegoLivePublisherCallback() {
             @Override
             public void onPublishStateUpdate(int stateCode, String streamID, HashMap<String, Object> streamInfo) {
+
+                //按钮允许点击
+                setEnabled(true);
                 //推流状态更新
                 if(stateCode == 0){
                     if (!TextUtils.isEmpty(streamID) && streamID.equals(mAuxPublishStreamID)){
@@ -224,7 +227,7 @@ public class MoreAnchorsPublishActivity extends BasePublishActivity {
             @Override
             public void onPlayQualityUpdate(String streamID, ZegoStreamQuality streamQuality) {
                 // 拉流质量回调
-                handlePlayQualityUpdate(streamID, streamQuality.quality, streamQuality.videoFPS, streamQuality.videoBitrate);
+              handlePlayQualityUpdate(streamID, streamQuality.quality, streamQuality.videoFPS, streamQuality.videoBitrate);
             }
 
             @Override
@@ -234,6 +237,8 @@ public class MoreAnchorsPublishActivity extends BasePublishActivity {
 
             @Override
             public void onRecvEndJoinLiveCommand(String fromUserId, String fromUserName, String roomId) {
+
+
             }
 
             @Override

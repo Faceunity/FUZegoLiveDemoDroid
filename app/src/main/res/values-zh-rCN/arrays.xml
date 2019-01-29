@@ -58,7 +58,6 @@
 
     <string-array name="app_flavors">
         <item>UDP版</item>
-        <item>RTMP版</item>
         <item>国际版</item>
         <item>自定义</item>
     </string-array>

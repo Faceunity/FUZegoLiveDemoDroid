@@ -82,6 +82,7 @@ public abstract class AbsBaseLiveActivity extends AppCompatActivity {
 
         initViews(savedInstanceState);
         doBusiness(savedInstanceState);
+
     }
 
 

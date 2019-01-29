@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
+
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
@@ -18,7 +19,6 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by robotding on 17/2/9.
  */
-
 public class VideoFilterHybridDemo extends ZegoVideoFilter {
     private ZegoVideoFilter.Client mClient = null;
     private HandlerThread mThread = null;
@@ -86,6 +86,9 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                mClient.destroy();
+                mClient = null;
+
                 release();
                 barrier.countDown();
             }
@@ -99,28 +102,22 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
 
         mThread.quit();
         mThread = null;
-
-        mClient.destroy();
-        mClient = null;
     }
 
     @Override
     protected int supportBufferType() {
-        // buffer类型, 必填
         return BUFFER_TYPE_HYBRID_MEM_GL_TEXTURE_2D;
     }
 
     @Override
     protected synchronized int dequeueInputBuffer(int width, int height, int stride) {
-
-        // 创建buffer队列, 用于获取原始视频数据
         if (stride * height > mMaxBufferSize) {
             if (mMaxBufferSize != 0) {
                 mProduceQueue.clear();
             }
 
             mMaxBufferSize = stride * height;
-            createPixelBufferPool(4);
+            createPixelBufferPool(3);
         }
 
         if (mWriteRemain == 0) {
@@ -138,8 +135,6 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
         }
         ByteBuffer buffer = mProduceQueue.get(index).buffer;
         buffer.position(0);
-
-        // 将buffer传递给zego引擎, 引擎将原始视频数据写到buffer
         return buffer;
     }
 
@@ -171,17 +166,14 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
 
                 captureEglBase.makeCurrent();
 
-                // 将原始数据加载到GPU缓冲区
                 GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
 
                 pixelBuffer.buffer.position(0);
                 GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, pixelBuffer.width, pixelBuffer.height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, pixelBuffer.buffer);
 
-                //ToDo: 做美颜处理
-
-                // 将处理后的数据回传到zego引擎
                 mClient.onProcessCallback(mTextureId, pixelBuffer.width, pixelBuffer.height, pixelBuffer.timestamp_100n);
+                captureEglBase.detachCurrent();
 
                 long end = System.currentTimeMillis();
 
@@ -234,10 +226,10 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
                 GLES20.glDeleteTextures(1, textures, 0);
                 mTextureId = 0;
             }
-
-            captureEglBase.releaseSurface();
-            captureEglBase.detachCurrent();
         }
+
+        captureEglBase.release();
+        captureEglBase = null;
     }
 
 }

@@ -13,7 +13,7 @@
         android:layout_marginRight="@dimen/dimen_5"
         android:layout_marginTop="@dimen/dimen_5"
         android:textIsSelectable="true"
-        tools:text="xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"/>
+        tools:text=""/>
 
     <View
         style="@style/HorizontalDivider"

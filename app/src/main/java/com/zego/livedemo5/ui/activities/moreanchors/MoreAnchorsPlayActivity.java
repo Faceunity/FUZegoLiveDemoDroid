@@ -10,9 +10,11 @@ import android.view.View;
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.constants.IntentExtra;
 import com.zego.livedemo5.presenters.RoomInfo;
-import com.zego.livedemo5.presenters.StreamInfo;
 import com.zego.livedemo5.ui.activities.BasePlayActivity;
 import com.zego.livedemo5.ui.widgets.ViewLive;
+import com.zego.zegoavkit2.soundlevel.IZegoSoundLevelCallback;
+import com.zego.zegoavkit2.soundlevel.ZegoSoundLevelInfo;
+import com.zego.zegoavkit2.soundlevel.ZegoSoundLevelMonitor;
 import com.zego.zegoliveroom.callback.IZegoLivePlayerCallback;
 import com.zego.zegoliveroom.callback.IZegoLivePublisherCallback;
 import com.zego.zegoliveroom.callback.IZegoLoginCompletionCallback;
@@ -59,7 +61,7 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
     @Override
     protected void doBusiness(Bundle savedInstanceState) {
         super.doBusiness(savedInstanceState);
-
+        mZegoLiveRoom.setRoomConfig(false, true);
         mZegoLiveRoom.loginRoom(mRoomID, ZegoConstants.RoomRole.Audience, new IZegoLoginCompletionCallback() {
             @Override
             public void onLoginCompletion(int errorCode, ZegoStreamInfo[] zegoStreamInfos) {
@@ -122,7 +124,7 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
             @Override
             public void onPlayQualityUpdate(String streamID, ZegoStreamQuality streamQuality) {
                 // 拉流质量回调
-                handlePlayQualityUpdate(streamID, streamQuality.quality, streamQuality.videoFPS, streamQuality.videoBitrate);
+               handlePlayQualityUpdate(streamID, streamQuality.quality, streamQuality.videoFPS, streamQuality.videoBitrate);
             }
 
             @Override
@@ -218,6 +220,23 @@ public class MoreAnchorsPlayActivity extends BasePlayActivity {
             for (String streamId : mOldSavedStreamList) {
                 Log.w("MoreAnchorsPlayA", "Quick play: " + streamId);
                 startPlay(streamId);
+
+                ZegoSoundLevelMonitor.getInstance().setCycle(2000);
+                ZegoSoundLevelMonitor.getInstance().setCallback(new IZegoSoundLevelCallback() {
+                    @Override
+                    public void onSoundLevelUpdate(ZegoSoundLevelInfo[] zegoSoundLevelInfos) {
+                        Log.w("RUEI", "onSoundLevelUpdate");
+                        for (ZegoSoundLevelInfo info : zegoSoundLevelInfos) {
+                            Log.w("RUEI", "   --streamId: " + info.streamID + "; level: " + info.soundLevel);
+                        }
+                    }
+
+                    @Override
+                    public void onCaptureSoundLevelUpdate(ZegoSoundLevelInfo zegoSoundLevelInfo) {
+                        Log.w("RUEI", "onCaptureSoundLevelUpdate, zegoSoundLevelInfo.soundLevel: " + zegoSoundLevelInfo.soundLevel);
+                    }
+                });
+                ZegoSoundLevelMonitor.getInstance().start();
             }
         }
     }

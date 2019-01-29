@@ -27,7 +27,6 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         } else if (mode == 4) {
             mDevice = new FUVideoCaptureFromCamera2(mContext);
         }
-
         return mDevice;
     }
 

@@ -168,7 +168,7 @@ public final class EglBase10 extends EglBase {
 
     @Override
     public EglBase.Context getEglBaseContext() {
-        return new EglBase10.Context(eglContext);
+        return new Context(eglContext);
     }
 
     @Override
@@ -224,6 +224,12 @@ public final class EglBase10 extends EglBase {
             throw new RuntimeException("No EGLSurface - can't make current");
         }
         synchronized (EglBase.lock) {
+            EGLContext oldContext = egl.eglGetCurrentContext();
+            EGLSurface oldSurface = egl.eglGetCurrentSurface(EGL10.EGL_DRAW);
+            if (oldContext == eglContext && oldSurface == eglSurface) {
+                return ;
+            }
+
             if (!egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)) {
                 throw new RuntimeException(
                         "eglMakeCurrent failed: 0x" + Integer.toHexString(egl.eglGetError()));

@@ -113,7 +113,6 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
             } else {
                 roomName = publishTitle;
             }
-//            appOrientation = intent.getIntExtra(IntentExtra.APP_ORIENTATION, Surface.ROTATION_0);
         }
     }
 
@@ -233,7 +232,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
     }
 
     private void onSpeakingButtonClick() {
-        if (isSpeaking) {
+        if (mBtnSpeaking.getText().equals(getString(R.string.end_speaking))) {
             mHandler.removeMessages(MsgIds.STOP_SPEAKING_FOR_ME);
             stopTalking();
         } else {
@@ -250,7 +249,6 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
             zegoLiveRoom.stopPublishing();
         }
 
-        isSpeaking = false;
     }
 
     private void stopPlay(String streamId) {
@@ -429,6 +427,7 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         zegoLiveRoom.setZegoLivePlayerCallback(new ZegoLivePlayerCallback());
         zegoLiveRoom.setZegoRoomCallback(new ZegoRoomCallback());
         zegoLiveRoom.setZegoIMCallback(new ZegoIMCallback());
+        zegoLiveRoom.setRoomConfig(false, true);
         zegoLiveRoom.loginRoom(roomId, roomName, ZegoConstants.RoomRole.Anchor, new IZegoLoginCompletionCallback() {
             @Override
             public void onLoginCompletion(int errorCode, ZegoStreamInfo[] zegoStreamInfos) {
@@ -706,13 +705,14 @@ public class WolvesGameHostActivity extends WolvesGameBaseActivity {
         @Override
         public void onPublishStateUpdate(int stateCode, String streamId, HashMap<String, Object> streamInfo) {
             recordLog("推流状态更新, stateCode: %d; streamId: %s; Stream: %s", stateCode, streamId, streamInfo);
+           
+
             if (stateCode == 0) {
                 if (dontPreviewWhenPublishSuccess) {
                     dontPreviewWhenPublishSuccess = false;
                     return;
                 }
 
-                isSpeaking = true;
                 if (currentSpeakingIndex == SpeakingMode.FreeSpeakingMode) {
                     mTextTips.setText(R.string.mode_update_system_success);
                 } else {

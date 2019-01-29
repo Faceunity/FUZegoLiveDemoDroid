@@ -73,7 +73,7 @@ public class MixStreamPublishActivity extends BasePublishActivity {
     protected void doBusiness(Bundle savedInstanceState) {
         super.doBusiness(savedInstanceState);
         mRoomID = ZegoRoomUtil.getRoomID(ZegoRoomUtil.ROOM_TYPE_MIX);
-
+        mZegoLiveRoom.setRoomConfig(false, true);
         // 登录房间
         mZegoLiveRoom.loginRoom(mRoomID, mPublishTitle, ZegoConstants.RoomRole.Anchor, new IZegoLoginCompletionCallback() {
             @Override
@@ -90,6 +90,8 @@ public class MixStreamPublishActivity extends BasePublishActivity {
         mZegoLiveRoom.setZegoLivePublisherCallback(new IZegoLivePublisherCallback() {
             @Override
             public void onPublishStateUpdate(int stateCode, String streamID, HashMap<String, Object> streamInfo) {
+                //按钮允许点击
+                setEnabled(true);
                 //推流状态更新
                 if (stateCode == 0) {
                     handlePublishSuccMix(streamID, streamInfo);
@@ -142,7 +144,7 @@ public class MixStreamPublishActivity extends BasePublishActivity {
             @Override
             public void onPlayQualityUpdate(String streamID, ZegoStreamQuality streamQuality) {
                 // 拉流质量回调
-                handlePlayQualityUpdate(streamID, streamQuality.quality, streamQuality.videoFPS, streamQuality.videoBitrate);
+              handlePlayQualityUpdate(streamID, streamQuality.quality, streamQuality.videoFPS, streamQuality.videoBitrate);
             }
 
             @Override
@@ -325,7 +327,6 @@ public class MixStreamPublishActivity extends BasePublishActivity {
         for (int i = 0; i < size; i++) {
             inputStreamList[i] = mMixStreamInfos.get(i);
         }
-
         ZegoCompleteMixStreamInfo mixStreamConfig = new ZegoCompleteMixStreamInfo();
         mixStreamConfig.inputStreamList = inputStreamList;
         mixStreamConfig.outputStreamId = mMixStreamID;
@@ -338,6 +339,7 @@ public class MixStreamPublishActivity extends BasePublishActivity {
 //        mZegoLiveRoom.mixStream(mixStreamConfig, mixStreamRequestSeq++);
 
         mStreamMixer.mixStream(mixStreamConfig, mixStreamRequestSeq++);
+
     }
 
     protected void handleMixStreamStateUpdate(int errorCode, String mixStreamID, HashMap<String, Object> streamInfo) {
@@ -352,6 +354,8 @@ public class MixStreamPublishActivity extends BasePublishActivity {
 
             if(listUrls.size() == 0){
                 recordLog("混流失败...errorCode: %d, seq: %d", errorCode, seq);
+            }else{
+                recordLog("混流成功 地址: %s; seq: %d", listUrls.get(0), seq);
             }
 
             if(viewLivePublish != null && listUrls.size() >= 2){
@@ -393,10 +397,12 @@ public class MixStreamPublishActivity extends BasePublishActivity {
 
     @Override
     protected void hidePlayBackground() {
+
     }
 
     @Override
     protected void initPublishConfigs() {
+        mMixStreamInfos.clear();
         // 混流模式
         mPublishFlag = ZegoConstants.PublishFlag.MixStream;
         mMixStreamID = "mix-" + mPublishStreamID;

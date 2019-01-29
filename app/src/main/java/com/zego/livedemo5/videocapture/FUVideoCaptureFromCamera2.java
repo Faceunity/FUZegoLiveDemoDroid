@@ -702,7 +702,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         }
 
         if (!previewEglBase.hasSurface()) {
-            return ;
+            return;
         }
 
         if (previewDrawer == null) {
@@ -727,8 +727,8 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 } else {
                     scaleWidth = mViewHeight * width / height;
                 }
-                float fWidthScale = (float)mViewWidth / (float)scaleWidth;
-                float fHeightScale = (float)mViewHeight / (float)scaleHeight;
+                float fWidthScale = (float) mViewWidth / (float) scaleWidth;
+                float fHeightScale = (float) mViewHeight / (float) scaleHeight;
                 Matrix.scaleM(mPreviewMatrix, 0, fWidthScale, fHeightScale, 1.0f);
                 Matrix.translateM(mPreviewMatrix, 0, (1.0f - fWidthScale) / 2.0f, (1.0f - fHeightScale) / 2.0f, 1.0f);
 
@@ -737,7 +737,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
             }
 
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-            previewDrawer.drawRgb(textureId, mPreviewMatrix, (int)width, (int)height,
+            previewDrawer.drawRgb(textureId, mPreviewMatrix, (int) width, (int) height,
                     (mViewWidth - scaleWidth) / 2,
                     (mViewHeight - scaleHeight) / 2,
                     scaleWidth, scaleHeight);
@@ -766,7 +766,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 e.printStackTrace();
                 // Clean up before rethrowing the exception.
                 captureEglBase.releaseSurface();
-                return ;
+                return;
             }
         }
 
@@ -782,8 +782,8 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
             } else {
                 scaleWidth = mCaptureHeight * width / height;
             }
-            float fWidthScale = (float)mCaptureWidth / (float)scaleWidth;
-            float fHeightScale = (float)mCaptureHeight / (float)scaleHeight;
+            float fWidthScale = (float) mCaptureWidth / (float) scaleWidth;
+            float fHeightScale = (float) mCaptureHeight / (float) scaleHeight;
             Matrix.scaleM(mCaptureMatrix, 0, fWidthScale, fHeightScale, 1.0f);
             Matrix.translateM(mCaptureMatrix, 0, (1.0f - fWidthScale) / 2.0f, (1.0f - fHeightScale) / 2.0f, 1.0f);
 
