@@ -2,7 +2,7 @@ package com.zego.livedemo5.videocapture;
 
 import android.content.Context;
 
-import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
+import com.zego.livedemo5.ZegoApiManager;
 import com.zego.zegoavkit2.ZegoVideoCaptureDevice;
 import com.zego.zegoavkit2.ZegoVideoCaptureFactory;
 
@@ -11,11 +11,18 @@ import com.zego.zegoavkit2.ZegoVideoCaptureFactory;
  * Created by robotding on 16/6/5.
  */
 public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
-    private int mode = 4;
+    private int mode = 4;//默认1
     private ZegoVideoCaptureDevice mDevice = null;
     private Context mContext = null;
+    public ZegoApiManager.FURendererCompleteListener fuRendererCompleteListener;
 
     public ZegoVideoCaptureDevice create(String device_id) {
+        String isOpen = ZegoApiManager.getInstance().getIsOpen();
+        if (isOpen.equals("true")) {
+            mode = 4;
+        } else {
+            mode = 1;
+        }
         if (mode == 0) {
             mDevice = new VideoCaptureFromCamera();
         } else if (mode == 1) {
@@ -25,7 +32,7 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         } else if (mode == 3) {
             mDevice = new VideoCaptureFromCamera2();
         } else if (mode == 4) {
-            mDevice = new FUVideoCaptureFromCamera2(mContext);
+            mDevice = new FUVideoCaptureFromCamera2(mContext, fuRendererCompleteListener);
         }
         return mDevice;
     }
@@ -38,10 +45,7 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         mContext = context;
     }
 
-    public OnFaceUnityControlListener getFaceunityController() {
-        if (mDevice instanceof FUVideoCaptureFromCamera2) {
-            return ((FUVideoCaptureFromCamera2) mDevice).getFaceunityController();
-        }
-        return null;
+    public void setFuRendererCompleteListener(ZegoApiManager.FURendererCompleteListener listener) {
+        this.fuRendererCompleteListener = listener;
     }
 }

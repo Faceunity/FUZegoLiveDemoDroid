@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+
 import com.pgyersdk.update.PgyUpdateManager;
 import com.tencent.tauth.Tencent;
 import com.zego.livedemo5.ui.activities.AboutZegoActivity;
@@ -101,7 +102,6 @@ public class MainActivity extends AbsBaseActivity implements NavigationBar.Navig
         };
 
         mSetConfigsCallback = (OnSetConfigsCallback) getSupportFragmentManager().findFragmentById(R.id.setting_fragment);
-
 
         setSupportActionBar(toolBar);
         toolBar.setNavigationOnClickListener(new View.OnClickListener() {

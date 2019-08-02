@@ -23,14 +23,15 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
+
 import com.zego.livedemo5.MainActivity;
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.ZegoApiManager;
 import com.zego.livedemo5.callback.LiveDirectionCallback;
-import com.zego.livedemo5.ui.activities.base.AbsBaseFragment;
 import com.zego.livedemo5.ui.activities.gamelive.GameLiveActivity;
 import com.zego.livedemo5.ui.activities.mixstream.MixStreamPublishActivity;
 import com.zego.livedemo5.ui.activities.moreanchors.MoreAnchorsPublishActivity;
+import com.zego.livedemo5.ui.activities.base.AbsBaseFragment;
 import com.zego.livedemo5.ui.activities.singleanchor.SingleAnchorPublishActivity;
 import com.zego.livedemo5.ui.activities.wolvesgame.WolvesGameHostActivity;
 import com.zego.livedemo5.ui.widgets.DialogSelectPublishMode;
@@ -40,6 +41,7 @@ import com.zego.livedemo5.utils.ZegoRoomUtil;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
 import com.zego.zegoliveroom.constants.ZegoVideoViewMode;
+
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -60,7 +62,6 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
     @Bind(R.id.tb_enable_torch)
     public ToggleButton tbEnableTorch;
 
-
     @Bind(R.id.sp_filters)
     public Spinner spFilters;
 
@@ -72,8 +73,6 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
 
     @Bind(R.id.textureView)
     public TextureView textureView;
-
-    //private VideoRenderer videoRenderer;
 
     private int mSelectedBeauty = 0;
 
@@ -218,7 +217,7 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
                         public void run() {
                             if (isRun) {
                                 stopPreview();
-                                startPreview();
+                                initPreview();
                             }
 
                             int currentOrientation = mParentActivity.getWindowManager().getDefaultDisplay().getRotation();
@@ -257,13 +256,7 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
         isRun = true;
         if (mHasBeenCreated) {
             if (mIsVisibleToUser) {
-                mHandler.removeCallbacksAndMessages(null);
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        startPreview();
-                    }
-                }, 1000);
+                initPreview();
             }
         } else {
             mHasBeenCreated = true;
@@ -296,14 +289,13 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
     public void onStop() {
         super.onStop();
         isRun = false;
-        if (SystemUtil.isAppBackground()) {
-//            stopPreview();
-            Log.i("Foreground", "Foreground");
-        } else {
-            Log.i("Foreground", "Background");
-            // app进入后台, 停止预览
-            stopPreview();
-        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        stopPreview();
     }
 
     final DialogSelectPublishMode dialog = new DialogSelectPublishMode();
@@ -402,19 +394,7 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
         mIsVisibleToUser = isVisibleToUser;
         if (mHasBeenCreated) {
             if (isVisibleToUser) {
-
-                // 6.0及以上的系统需要在运行时申请CAMERA RECORD_AUDIO权限
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (ContextCompat.checkSelfPermission(mParentActivity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                            || ContextCompat.checkSelfPermission(mParentActivity, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(mParentActivity, new String[]{
-                                Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, 101);
-                    } else {
-                        startPreview();
-                    }
-                } else {
-                    startPreview();
-                }
+                startPreview();
             } else {
                 stopPreview();
             }
@@ -422,7 +402,23 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
     }
 
 
-    private void startPreview() {
+    private void startPreview(){
+        // 6.0及以上的系统需要在运行时申请CAMERA RECORD_AUDIO权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(mParentActivity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(mParentActivity, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(mParentActivity, new String[]{
+                        Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, 102);
+            } else {
+                initPreview();
+            }
+        } else {
+            initPreview();
+        }
+    }
+
+
+    private void initPreview() {
 
         ZegoAvConfig config = ZegoApiManager.getInstance().getZegoAvConfig();
         // 获取屏幕比例
@@ -451,20 +447,6 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
 
         textureView.setVisibility(View.VISIBLE);
 
-        //        if (PreferenceUtil.getInstance().getUseExternalRender(false)) {
-        //            if (videoRenderer == null) {
-        //                videoRenderer = new VideoRenderer();
-        //                videoRenderer.init();
-        //                videoRenderer.setRendererView(textureView);
-        //                // 开启外部渲染
-        //            }
-        //            mZegoLiveRoom.setZegoExternalRenderCallback(videoRenderer);
-        //        } else {
-        //            if(videoRenderer != null){
-        //                videoRenderer.uninit();
-        //                videoRenderer = null;
-        //            }
-        // }
         mZegoLiveRoom.setPreviewView(textureView);
 
         mZegoLiveRoom.startPreview();
@@ -483,7 +465,6 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
         mZegoLiveRoom.stopPreview();
         mZegoLiveRoom.setPreviewView(null);
 
-        //mZegoLiveRoom.setZegoExternalRenderCallback(null);
     }
 
 
@@ -493,7 +474,7 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
         long newAppId = PreferenceUtil.getInstance().getAppId();
         byte[] newSignKey = PreferenceUtil.getInstance().getAppKey();
         ZegoApiManager.getInstance().reInitSDK(newAppId, newSignKey);
-        startPreview();
+        initPreview();
     }
 
     /**
@@ -510,7 +491,7 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
                 ActivityCompat.requestPermissions(mParentActivity, new String[]{
                         Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, 101);
             } else {
-                startPreview();
+                initPreview();
             }
         } else {
 

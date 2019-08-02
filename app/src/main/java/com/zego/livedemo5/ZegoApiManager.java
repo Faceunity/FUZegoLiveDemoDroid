@@ -1,20 +1,23 @@
 package com.zego.livedemo5;
 
 
-import android.app.Application;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.app.Activity;
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.faceunity.beautycontrolview.FURenderer;
 import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
 import com.zego.livedemo5.constants.Constants;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.SystemUtil;
 import com.zego.livedemo5.videocapture.VideoCaptureFactoryDemo;
 import com.zego.livedemo5.videofilter.VideoFilterFactoryDemo;
+import com.zego.zegoavkit2.enums.VideoExternalRenderType;
+import com.zego.zegoavkit2.videorender.ZegoExternalVideoRender;
 import com.zego.zegoliveroom.ZegoLiveRoom;
+import com.zego.zegoliveroom.callback.IZegoInitSDKCompletionCallback;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
 import com.zego.zegoliveroom.constants.ZegoConstants;
 
@@ -31,6 +34,16 @@ public class ZegoApiManager {
 
     private ZegoAvConfig zegoAvConfig;
 
+    public long getCurrentAppID() {
+        return currentAppID;
+    }
+
+    public void setCurrentAppID(long currentAppID) {
+        this.currentAppID = currentAppID;
+    }
+
+    // 当前initSDK的appid
+    private long currentAppID;
 
     private final int[][] VIDEO_RESOLUTIONS = new int[][]{{320, 240}, {352, 288}, {640, 360},
             {960, 540}, {1280, 720}, {1920, 1080}};
@@ -38,9 +51,11 @@ public class ZegoApiManager {
 
     private byte[] mSignKey = null;
 
-    private VideoCaptureFactoryDemo mVideoCaptureFactoryDemo;
+    public boolean isAlphaEnv = false;
 
-    private VideoFilterFactoryDemo mVideoFilterFactoryDemo;
+    private VideoFilterFactoryDemo videoFilterFactoryDemo;
+    private VideoCaptureFactoryDemo mVideoCaptureFactoryDemo;
+    private String isOpen;//是否开启faceunity
 
     private ZegoApiManager() {
         mZegoLiveRoom = new ZegoLiveRoom();
@@ -63,15 +78,15 @@ public class ZegoApiManager {
     private void openAdvancedFunctions() {
 
         // 开启测试环境
-        if (PreferenceUtil.getInstance().getTestEnv(true)) {
+        if (PreferenceUtil.getInstance().getTestEnv(false)) {
             ZegoLiveRoom.setTestEnv(true);
         }
 
-        // 外部渲染
-        if (PreferenceUtil.getInstance().getUseExternalRender(false)) {
-            // 开启外部渲染
-            ZegoLiveRoom.enableExternalRender(true);
-        }
+//        // 外部渲染
+//        if (PreferenceUtil.getInstance().getUseExternalRender(false)) {
+//            // 开启外部渲染
+//            ZegoExternalVideoRender.enableExternalRender(true, VideoExternalRenderType.DECODE_RGB_SERIES);
+//        }
 
         // 外部采集
         if (PreferenceUtil.getInstance().getVideoCapture(false)) {
@@ -84,37 +99,9 @@ public class ZegoApiManager {
         // 外部滤镜
         if (PreferenceUtil.getInstance().getVideoFilter(false)) {
             // 外部滤镜
-            mVideoFilterFactoryDemo = new VideoFilterFactoryDemo(ZegoApplication.sApplicationContext);
-            ZegoLiveRoom.setVideoFilterFactory(mVideoFilterFactoryDemo, ZegoConstants.PublishChannelIndex.MAIN);
+            videoFilterFactoryDemo = new VideoFilterFactoryDemo(ZegoApplication.sApplicationContext);
+            ZegoLiveRoom.setVideoFilterFactory(videoFilterFactoryDemo, ZegoConstants.PublishChannelIndex.MAIN);
         }
-    }
-
-    private void setupSDKContext() {
-        // 注意，必须在调用其它 ZegoAPI 之前调用此方法
-        ZegoLiveRoom.setSDKContext(new ZegoLiveRoom.SDKContextEx() {
-            @Override
-            public long getLogFileSize() {
-                return 10 * 1024 * 1024;    // 单个日志文件大小不超过 10M，取值范围为 [5M, 100M]
-            }
-
-            @Nullable
-            @Override
-            public String getSoFullPath() {
-                return null;                // return null 表示使用默认方式加载 libzegoliveroom.so，此处可以返回 so 的绝对路径，用来指定从这个位置加载 libzegoliveroom.so，确保应用具备存取此路径的权限
-            }
-
-            @Nullable
-            @Override
-            public String getLogPath() {
-                return null;        // return null 表示日志文件会存储到默认位置，如果返回非空，则将日志文件存储到该路径下，注意应用必须具备存取该目录的权限
-            }
-
-            @NonNull
-            @Override
-            public Application getAppContext() {
-                return (ZegoApplication) ZegoApplication.sApplicationContext;    // 必须返回当前应用的 Application 实例
-            }
-        });
     }
 
     private void initUserInfo() {
@@ -136,9 +123,17 @@ public class ZegoApiManager {
 
     }
 
+    public void setAlphaEnv(boolean env) {
+        isAlphaEnv = env;
+        releaseSDK();
+        ZegoApplication.zgAppSupportApi.api().setUseAlphaEnv(env);
+        initSDK();
+
+    }
+
+    private IZegoInitSDKCompletionCallback iZegoInitSDKCompletionCallback;
 
     private void init(long appID, byte[] signKey, boolean isConfig) {
-        setupSDKContext();
 
         initUserInfo();
 
@@ -147,9 +142,12 @@ public class ZegoApiManager {
 
         // 设置视频通话类型
         ZegoLiveRoom.setBusinessType(PreferenceUtil.getInstance().getBusinessType());
-        // 初始化sdk
-        boolean ret = mZegoLiveRoom.initSDK(appID, signKey);
 
+        // 当前appId
+        currentAppID = appID;
+
+        // 初始化sdk
+        boolean ret = mZegoLiveRoom.initSDK(appID, signKey, iZegoInitSDKCompletionCallback);
 
         if (!ret) {
             // sdk初始化失败
@@ -193,8 +191,9 @@ public class ZegoApiManager {
             // 码率控制
             setUseRateControl(PreferenceUtil.getInstance().getEnableRateControl(false));
 
-
         }
+
+
     }
 
     /**
@@ -217,9 +216,7 @@ public class ZegoApiManager {
         }
 
         zegoAvConfig = ZegoApiManager.getInstance().getZegoAvConfig();
-        if (zegoAvConfig == null) {
-            zegoAvConfig = new ZegoAvConfig(ZegoAvConfig.Level.High);
-        }
+
         int progress = PreferenceUtil.getInstance().getVideoResolutions(0);
         if (liveQualityLevel != 6) {
             progress = liveQualityLevel;
@@ -251,12 +248,17 @@ public class ZegoApiManager {
         initSDK(true);
     }
 
+    public void setZegoInitSDKCompletionCallback(IZegoInitSDKCompletionCallback iZegoInitSDKCompletionCallback) {
+        this.iZegoInitSDKCompletionCallback = iZegoInitSDKCompletionCallback;
+    }
+
     /**
      * 初始化sdk.
      *
      * @param isConfig 是否加载分辨率配置
      */
     public void initSDK(boolean isConfig) {
+        isOpen = PreferenceUtil.getInstance().getStringValue(PreferenceUtil.KEY_FACEUNITY_ISON, "");
 
         long appId;
         byte[] signKey;
@@ -285,12 +287,13 @@ public class ZegoApiManager {
     public void releaseSDK() {
         // 清空高级设置
         ZegoLiveRoom.setTestEnv(false);
-        ZegoLiveRoom.enableExternalRender(false);
 
         // 先置空factory后unintSDK, 或者调换顺序，factory中的destroy方法都会被回调
         ZegoLiveRoom.setVideoCaptureFactory(null);
         ZegoLiveRoom.setVideoFilterFactory(null);
         mZegoLiveRoom.unInitSDK();
+
+        ZegoApplication.setupSDKContext();
     }
 
     public ZegoLiveRoom getZegoLiveRoom() {
@@ -304,6 +307,13 @@ public class ZegoApiManager {
 
 
     public ZegoAvConfig getZegoAvConfig() {
+        if (zegoAvConfig == null) {
+            synchronized (ZegoApiManager.class) {
+                if (zegoAvConfig == null) {
+                    zegoAvConfig = new ZegoAvConfig(ZegoAvConfig.Level.High);
+                }
+            }
+        }
         return zegoAvConfig;
     }
 
@@ -383,11 +393,23 @@ public class ZegoApiManager {
     }
 
     public OnFaceUnityControlListener getFaceunityController() {
-        if (isUseVideoCapture() && mVideoCaptureFactoryDemo != null) {
-            return mVideoCaptureFactoryDemo.getFaceunityController();
-        } else if (isUseVideoFilter() && mVideoFilterFactoryDemo != null) {
-            return mVideoFilterFactoryDemo.getFaceunityController();
+        if (isUseVideoFilter() && videoFilterFactoryDemo != null) {
+            return videoFilterFactoryDemo.getFaceunityController();
         }
         return null;
+    }
+
+    public void setFuRendererCompleteListener(FURendererCompleteListener fuRendererCompleteListener) {
+        if (isUseVideoCapture() && mVideoCaptureFactoryDemo != null) {
+            mVideoCaptureFactoryDemo.setFuRendererCompleteListener(fuRendererCompleteListener);
+        }
+    }
+
+    public String getIsOpen() {
+        return isOpen;
+    }
+
+    public interface FURendererCompleteListener {
+        void loadEnd(FURenderer mFURenderer);
     }
 }

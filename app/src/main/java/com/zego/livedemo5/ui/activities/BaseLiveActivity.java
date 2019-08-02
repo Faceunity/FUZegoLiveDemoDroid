@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.support.v7.widget.RecyclerView;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -37,10 +39,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.faceunity.beautycontrolview.BeautyControlView;
+import com.faceunity.beautycontrolview.FURenderer;
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.ZegoApiManager;
+import com.zego.livedemo5.constants.IntentExtra;
 import com.zego.livedemo5.ui.activities.base.AbsBaseLiveActivity;
 import com.zego.livedemo5.ui.adapters.CommentsAdapter;
+import com.zego.livedemo5.ui.widgets.BottomEditTextDialog;
 import com.zego.livedemo5.ui.widgets.PublishSettingsPannel;
 import com.zego.livedemo5.ui.widgets.ViewLive;
 import com.zego.livedemo5.utils.LiveQualityLogger;
@@ -50,8 +55,8 @@ import com.zego.zegoavkit2.ZegoMixEnginePlayout;
 import com.zego.zegoavkit2.audioprocessing.ZegoAudioProcessing;
 import com.zego.zegoavkit2.audioprocessing.ZegoAudioReverbMode;
 import com.zego.zegoavkit2.camera.ZegoCamera;
-import com.zego.zegoavkit2.camera.ZegoCameraExposureMode;
 import com.zego.zegoavkit2.camera.ZegoCameraFocusMode;
+import com.zego.zegoavkit2.camera.ZegoCameraExposureMode;
 import com.zego.zegoavkit2.soundlevel.ZegoSoundLevelMonitor;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.callback.im.IZegoRoomMessageCallback;
@@ -82,21 +87,17 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
 
     public static final String MY_SELF = "MySelf";
 
-    protected BeautyControlView mFaceunityControlView;
-
     protected InputStream mIsBackgroundMusic = null;
 
     protected LinkedList<ViewLive> mListViewLive = new LinkedList<>();
 
     protected TextView mTvPublisnControl = null;
 
-    //protected VideoRenderer videoRenderer = null;
-
     protected TextView mTvPublishSetting = null;
 
     protected TextView mTvSpeaker = null;
 
-    protected EditText mEdtMessage = null;
+    protected TextView mTvMessage = null;
 
     protected TextView mTvSendRoomMsg = null;
 
@@ -111,6 +112,8 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
     protected String mPublishStreamID = null;
 
     protected LinearLayout mllytHeader = null;
+
+    protected TextView mTvMediaSideInfo = null;
 
     protected boolean mIsPublishing = false;
 
@@ -211,10 +214,6 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
         // 初始化电话监听器
         initPhoneCallingListener();
 
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) findViewById(R.id.textureView).getLayoutParams();
-        layoutParams.height = getWindowManager().getDefaultDisplay().getHeight();
-        layoutParams.width = getWindowManager().getDefaultDisplay().getWidth();
-        findViewById(R.id.zego_scrollview).setLayoutParams(layoutParams);
     }
 
     /**
@@ -224,7 +223,6 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
 
         mSettingsPannel = (PublishSettingsPannel) findViewById(R.id.publishSettingsPannel);
 
-        mSettingsPannel.initPublishSettings(mEnableCamera, mEnableFrontCam, mEnableMic, mEnableTorch, mEnableBackgroundMusic, mEnableLoopback, mSelectedBeauty, mSelectedFilter, mEnableMixEngine, mEnableVirtualStereo, mEnableReverb, mEnableCustomFocus, mEnableCustomExposure);
         mSettingsPannel.setPublishSettingsCallback(new PublishSettingsPannel.PublishSettingsCallback() {
             @Override
             public void onEnableCamera(boolean isEnable) {
@@ -336,6 +334,8 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
             }
         });
 
+        mSettingsPannel.initPublishSettings(mEnableCamera, mEnableFrontCam, mEnableMic, mEnableTorch, mEnableBackgroundMusic, mEnableLoopback, mSelectedBeauty, mSelectedFilter, mEnableMixEngine, mEnableVirtualStereo, mEnableReverb, mEnableCustomFocus, mEnableCustomExposure);
+
         mBehavior = BottomSheetBehavior.from(mSettingsPannel);
         flytMainContent = (FrameLayout) findViewById(R.id.main_content);
         if (flytMainContent != null) {
@@ -352,6 +352,9 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
 
     FrameLayout flytMainContent;
 
+    protected BeautyControlView mFaceunityControlView;
+    private FURenderer mFURender;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void initViews(Bundle savedInstanceState) {
@@ -360,10 +363,23 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
         if (!(ZegoApiManager.getInstance().isUseVideoCapture() || ZegoApiManager.getInstance().isUseVideoFilter()) || !(this instanceof BasePublishActivity)) {
             mFaceunityControlView.setVisibility(View.GONE);
         } else {
-            mFaceunityControlView.setVisibility(View.VISIBLE);
+            String isOpen = ZegoApiManager.getInstance().getIsOpen();
+            if (isOpen.equals("true")) {
+                mFaceunityControlView.setVisibility(View.VISIBLE);
+                if (ZegoApiManager.getInstance().isUseVideoCapture()) {
+                    ZegoApiManager.getInstance().setFuRendererCompleteListener(new ZegoApiManager.FURendererCompleteListener() {
+                        @Override
+                        public void loadEnd(FURenderer mFURenderer) {
+                            mFaceunityControlView.setOnFaceUnityControlListener(mFURenderer);
+                        }
+                    });
+                } else {
+                    mFaceunityControlView.setOnFaceUnityControlListener(ZegoApiManager.getInstance().getFaceunityController());
+                }
+            } else {
+                mFaceunityControlView.setVisibility(View.GONE);
+            }
         }
-
-        mFaceunityControlView.setOnFaceUnityControlListener(ZegoApiManager.getInstance().getFaceunityController());
 
         mTvSpeaker = (TextView) findViewById(R.id.tv_speaker);
         mllytHeader = (LinearLayout) findViewById(R.id.llyt_header);
@@ -426,8 +442,22 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
             }
         });
 
-        mEdtMessage = (EditText) findViewById(R.id.et_msg);
-        mEdtMessage.setSelection(mEdtMessage.getText().length());
+        mTvMessage = (TextView) findViewById(R.id.et_msg);
+
+
+        mTvMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final BottomEditTextDialog bottomEditTextDialog = new BottomEditTextDialog(mTvMessage.getText().toString(), v.getContext(), true, true);
+                bottomEditTextDialog.show();
+                bottomEditTextDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        mTvMessage.setText(bottomEditTextDialog.getMsg());
+                    }
+                });
+            }
+        });
 
         mLvComments = (RecyclerView) findViewById(R.id.lv_comments);
         mCommentsAdapter = new CommentsAdapter(this, new ArrayList<ZegoRoomMessage>());
@@ -443,6 +473,10 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
         mRlytControlHeader.bringToFront();
 
         mTvPublisnControl.setEnabled(false);
+
+        mTvMediaSideInfo = (TextView) findViewById(R.id.tv_media_side_info);
+        mTvMediaSideInfo.setVisibility(View.GONE);
+        mTvMediaSideInfo.setText("");
     }
 
     ViewLive vlBigView;
@@ -683,19 +717,11 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
         //开启双声道
         mZegoLiveRoom.setAudioChannelCount(2);
 
-        // 开始播放
-        //if(PreferenceUtil.getInstance().getUseExternalRender(false)){
-        //  if(videoRenderer == null){
-        //      videoRenderer = new VideoRenderer();
-        //  }
-        // 开启外部渲染
-        // videoRenderer.init();
-        // videoRenderer.setRendererView(freeViewLive.getTextureView());
-        // mZegoLiveRoom.setZegoExternalRenderCallback(videoRenderer);
-        //}else{
-        // }
         mZegoLiveRoom.setPreviewView(freeViewLive.getTextureView());
         mZegoLiveRoom.startPreview();
+        if (!mEnableFrontCam) {
+            mZegoLiveRoom.enableTorch(mEnableTorch);
+        }
 
 
         if (PreferenceUtil.getInstance().getVideoFilter(false)) {
@@ -737,12 +763,6 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
             mZegoLiveRoom.stopPublishing();
             mZegoLiveRoom.stopPreview();
             mZegoLiveRoom.setPreviewView(null);
-
-//            mZegoLiveRoom.setZegoExternalRenderCallback(null);
-//            if(videoRenderer != null){
-//                videoRenderer.uninit();
-//
-//            }
         }
     }
 
@@ -805,7 +825,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
 
         // 播放
         mZegoLiveRoom.startPlayingStream(streamID, freeViewLive.getTextureView());
-        mZegoLiveRoom.setViewMode(ZegoVideoViewMode.ScaleAspectFill, streamID);
+        mZegoLiveRoom.setViewMode(ZegoVideoViewMode.ScaleAspectFit, streamID);
     }
 
     protected void logout() {
@@ -1056,7 +1076,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
                     mZegoLiveRoom.setViewMode(ZegoVideoViewMode.ScaleAspectFit, streamID);
                 } else {
                     viewLivePlay.setZegoVideoViewMode(true, ZegoVideoViewMode.ScaleAspectFill);
-                    mZegoLiveRoom.setViewMode(ZegoVideoViewMode.ScaleAspectFill, streamID);
+                    mZegoLiveRoom.setViewMode(ZegoVideoViewMode.ScaleAspectFit, streamID);
                 }
             }
         }
@@ -1125,7 +1145,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
         new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(mMessage)
-
+                .setCancelable(false)
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -1192,7 +1212,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
             @Override
             public void onSendRoomMessage(int errorCode, String roomID, long messageID) {
                 if (errorCode == 0) {
-                    mEdtMessage.setText("");
+                    mTvMessage.setText("");
                     recordLog(MY_SELF + ": 发送房间消息成功, roomID:" + roomID);
                 } else {
                     recordLog(MY_SELF + ": 发送房间消息失败, roomID:" + roomID + ", messageID:" + messageID);
@@ -1217,6 +1237,10 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
         TelephonyManager tm = (TelephonyManager) getSystemService(Service.TELEPHONY_SERVICE);
         tm.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
         mPhoneStateListener = null;
+    }
+
+    @Override
+    public void finish() {
         // 清空回调, 避免内存泄漏
         mZegoLiveRoom.setZegoLivePublisherCallback(null);
         mZegoLiveRoom.setZegoLivePlayerCallback(null);
@@ -1230,8 +1254,8 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
             viewLive.destroy();
         }
 
+        super.finish();
     }
-
 
     /**
      * 设置推流朝向.

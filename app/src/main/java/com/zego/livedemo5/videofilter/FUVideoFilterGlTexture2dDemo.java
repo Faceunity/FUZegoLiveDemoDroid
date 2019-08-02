@@ -2,12 +2,10 @@ package com.zego.livedemo5.videofilter;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
 import android.opengl.GLES20;
 
 import com.faceunity.beautycontrolview.FURenderer;
 import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
-import com.faceunity.wrapper.faceunity;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
@@ -39,7 +37,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
 
     public FUVideoFilterGlTexture2dDemo(Context context) {
         mContext = context;
-        mFURenderer = new FURenderer.Builder(context).build();
+        mFURenderer = new FURenderer.Builder(mContext).build();
     }
 
     @Override
@@ -70,7 +68,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
             mDrawer.release();
             mDrawer = null;
         }
-        mFURenderer.destroyItems();
+        mFURenderer.destroyItems2();
         mClient.destroy();
         mClient = null;
     }
@@ -129,7 +127,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferId);
         }
 
-        int texture = mFURenderer.onDrawFrame(textureId, width, height);
+        int texture = mFURenderer.onDrawFrameSingleInputTex(textureId, width, height);
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         mDrawer.drawRgb(texture, transformationMatrix,

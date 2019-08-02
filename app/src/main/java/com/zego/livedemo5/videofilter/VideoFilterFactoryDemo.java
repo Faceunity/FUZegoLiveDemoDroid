@@ -3,6 +3,7 @@ package com.zego.livedemo5.videofilter;
 import android.content.Context;
 
 import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
+import com.zego.livedemo5.ZegoApiManager;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilterFactory;
 
@@ -11,7 +12,7 @@ import com.zego.zegoavkit2.videofilter.ZegoVideoFilterFactory;
  */
 
 public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
-    private int mode = 6;
+    private int mode = 6;//默认1
     private ZegoVideoFilter mFilter = null;
 
     private Context mContext;
@@ -21,6 +22,12 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
     }
 
     public ZegoVideoFilter create() {
+        String isOpen = ZegoApiManager.getInstance().getIsOpen();
+        if (isOpen.equals("true")) {
+            mode = 6;
+        } else {
+            mode = 1;
+        }
         switch (mode) {
             case 0:
                 mFilter = new VideoFilterMemDemo();

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
+import com.zego.livedemo5.ZegoApplication;
+
 import butterknife.ButterKnife;
 
 

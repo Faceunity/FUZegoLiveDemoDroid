@@ -62,6 +62,7 @@ public class PreferenceUtil {
     static private String ZEGO_APP_INTERNATIONAL = "zego_app_international";
 
     private SharedPreferences mSharedPreferences;
+    public static final String KEY_FACEUNITY_ISON = "faceunity_ison";
 
     private PreferenceUtil() {
         mSharedPreferences = ZegoApplication.sApplicationContext.getSharedPreferences(SHARE_PREFERENCE_NAME, AppCompatActivity.MODE_PRIVATE);
