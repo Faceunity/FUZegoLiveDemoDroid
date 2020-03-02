@@ -1,8 +1,9 @@
 package com.zego.livedemo5.videofilter;
 
 import android.content.Context;
+import android.util.Log;
 
-import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
+import com.faceunity.nama.OnFaceUnityControlListener;
 import com.zego.livedemo5.ZegoApiManager;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilterFactory;
@@ -12,7 +13,8 @@ import com.zego.zegoavkit2.videofilter.ZegoVideoFilterFactory;
  */
 
 public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
-    private int mode = 6;//默认1
+    private static final String TAG = "VideoFilterFactoryDemo";
+    private int mode = 3;
     private ZegoVideoFilter mFilter = null;
 
     private Context mContext;
@@ -21,13 +23,15 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
         mContext = context;
     }
 
+    @Override
     public ZegoVideoFilter create() {
         String isOpen = ZegoApiManager.getInstance().getIsOpen();
-        if (isOpen.equals("true")) {
+        if ("true".equals(isOpen)) {
             mode = 6;
         } else {
             mode = 1;
         }
+        Log.d(TAG, "create ZegoVideoFilter, mode:" + mode);
         switch (mode) {
             case 0:
                 mFilter = new VideoFilterMemDemo();
@@ -45,16 +49,17 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
                 mFilter = new VideoFilterSurfaceTextureDemo2();
                 break;
             case 5:
-                mFilter = new VideoFilterI420MemDemo();
+                mFilter = new VideoFilterI420MemDemo(mContext);
                 break;
             case 6:
                 mFilter = new FUVideoFilterGlTexture2dDemo(mContext);
                 break;
+            default:
         }
-
         return mFilter;
     }
 
+    @Override
     public void destroy(ZegoVideoFilter vf) {
         mFilter = null;
     }
@@ -62,7 +67,13 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
     public OnFaceUnityControlListener getFaceunityController() {
         if (mFilter instanceof FUVideoFilterGlTexture2dDemo) {
             return ((FUVideoFilterGlTexture2dDemo) mFilter).getFaceunityController();
+        } else if (mFilter instanceof VideoFilterI420MemDemo) {
+            return ((VideoFilterI420MemDemo) mFilter).getFaceunityController();
         }
         return null;
+    }
+
+    public ZegoVideoFilter getFilter() {
+        return mFilter;
     }
 }

@@ -388,7 +388,7 @@
 
             </com.zego.livedemo5.ui.widgets.ZegoRecyclerView>
 
-            <com.faceunity.beautycontrolview.BeautyControlView
+            <com.faceunity.nama.ui.BeautyControlView
                 android:id="@+id/faceunity_control"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

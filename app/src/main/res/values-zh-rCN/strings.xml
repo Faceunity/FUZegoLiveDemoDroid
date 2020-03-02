@@ -1,5 +1,5 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
-    <string name="app_name">LiveDemo5</string>
+    <string name="app_name">ZegoLiveDemo</string>
     <string name="app_title">Zego(%1$s)</string>
     <string name="action_settings">Settings</string>
 

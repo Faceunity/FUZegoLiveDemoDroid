@@ -31,18 +31,17 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.faceunity.beautycontrolview.BeautyControlView;
-import com.faceunity.beautycontrolview.FURenderer;
+import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.OnFaceUnityControlListener;
+import com.faceunity.nama.ui.BeautyControlView;
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.ZegoApiManager;
-import com.zego.livedemo5.constants.IntentExtra;
 import com.zego.livedemo5.ui.activities.base.AbsBaseLiveActivity;
 import com.zego.livedemo5.ui.adapters.CommentsAdapter;
 import com.zego.livedemo5.ui.widgets.BottomEditTextDialog;
@@ -55,8 +54,8 @@ import com.zego.zegoavkit2.ZegoMixEnginePlayout;
 import com.zego.zegoavkit2.audioprocessing.ZegoAudioProcessing;
 import com.zego.zegoavkit2.audioprocessing.ZegoAudioReverbMode;
 import com.zego.zegoavkit2.camera.ZegoCamera;
-import com.zego.zegoavkit2.camera.ZegoCameraFocusMode;
 import com.zego.zegoavkit2.camera.ZegoCameraExposureMode;
+import com.zego.zegoavkit2.camera.ZegoCameraFocusMode;
 import com.zego.zegoavkit2.soundlevel.ZegoSoundLevelMonitor;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.callback.im.IZegoRoomMessageCallback;
@@ -234,6 +233,12 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
             public void onEnableFrontCamera(boolean isEnable) {
                 mEnableFrontCam = isEnable;
                 mZegoLiveRoom.setFrontCam(isEnable);
+                OnFaceUnityControlListener faceunityController = ZegoApiManager.getInstance().getFaceunityController();
+                if (faceunityController != null) {
+                    int cameraType = isEnable ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK;
+                    ((FURenderer) faceunityController).onCameraChange(cameraType,
+                            FURenderer.getCameraOrientation(cameraType));
+                }
             }
 
             @Override
@@ -352,32 +357,30 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
 
     FrameLayout flytMainContent;
 
-    protected BeautyControlView mFaceunityControlView;
-    private FURenderer mFURender;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void initViews(Bundle savedInstanceState) {
-        mFaceunityControlView = (BeautyControlView) findViewById(R.id.faceunity_control);
+        BeautyControlView beautyControlView = (BeautyControlView) findViewById(R.id.faceunity_control);
 
         if (!(ZegoApiManager.getInstance().isUseVideoCapture() || ZegoApiManager.getInstance().isUseVideoFilter()) || !(this instanceof BasePublishActivity)) {
-            mFaceunityControlView.setVisibility(View.GONE);
+            beautyControlView.setVisibility(View.GONE);
         } else {
             String isOpen = ZegoApiManager.getInstance().getIsOpen();
-            if (isOpen.equals("true")) {
-                mFaceunityControlView.setVisibility(View.VISIBLE);
+            if ("true".equals(isOpen)) {
+                beautyControlView.setVisibility(View.VISIBLE);
                 if (ZegoApiManager.getInstance().isUseVideoCapture()) {
-                    ZegoApiManager.getInstance().setFuRendererCompleteListener(new ZegoApiManager.FURendererCompleteListener() {
+                    ZegoApiManager.getInstance().setOnFURendererCreatedListener(new ZegoApiManager.OnFURendererCreatedListener() {
                         @Override
-                        public void loadEnd(FURenderer mFURenderer) {
-                            mFaceunityControlView.setOnFaceUnityControlListener(mFURenderer);
+                        public void onCreated(FURenderer fuRenderer) {
+                            beautyControlView.setOnFaceUnityControlListener(fuRenderer);
                         }
                     });
                 } else {
-                    mFaceunityControlView.setOnFaceUnityControlListener(ZegoApiManager.getInstance().getFaceunityController());
+                    beautyControlView.setOnFaceUnityControlListener(ZegoApiManager.getInstance().getFaceunityController());
                 }
             } else {
-                mFaceunityControlView.setVisibility(View.GONE);
+                beautyControlView.setVisibility(View.GONE);
             }
         }
 

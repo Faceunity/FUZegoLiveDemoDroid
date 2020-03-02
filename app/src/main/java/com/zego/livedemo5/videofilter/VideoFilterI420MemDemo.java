@@ -1,11 +1,15 @@
 package com.zego.livedemo5.videofilter;
 
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
+import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.OnFaceUnityControlListener;
+import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;
@@ -18,19 +22,16 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class VideoFilterI420MemDemo extends ZegoVideoFilter {
-    private static final String TAG = "VideoFilterMemDemo";
+    private static final String TAG = "VideoFilterI420MemDemo";
+    // faceunity 美颜处理类
+    private FURenderer mFURenderer;
 
+    // SDK 内部实现 ZegoVideoFilter.Client 协议的对象
     private ZegoVideoFilter.Client mClient = null;
+
     private HandlerThread mThread = null;
     private volatile Handler mHandler = null;
-
-    static class PixelBuffer {
-        public int width;
-        public int height;
-        public int stride;
-        public long timestamp_100n;
-        public ByteBuffer buffer;
-    }
+    private EglBase captureEglBase;
     private ArrayList<PixelBuffer> mProduceQueue = new ArrayList<PixelBuffer>();
     private int mWriteIndex = 0;
     private int mWriteRemain = 0;
@@ -38,14 +39,87 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
     private int mMaxBufferSize = 0;
 
     private boolean mIsRunning = false;
+    // 输入的视频数据
+    private byte[] mI420Buffer;
 
+    public VideoFilterI420MemDemo(Context context) {
+        mFURenderer = new FURenderer.Builder(context)
+                .setInputTextureType(FURenderer.INPUT_2D_TEXTURE)
+                .build();
+    }
+
+    /**
+     * I420转nv21
+     *
+     * @param data
+     * @param width
+     * @param height
+     * @return
+     */
+    public static byte[] i420Tonv21(byte[] data, int width, int height) {
+        byte[] ret = new byte[data.length];
+        int total = width * height;
+
+        ByteBuffer bufferY = ByteBuffer.wrap(ret, 0, total);
+        ByteBuffer bufferV = ByteBuffer.wrap(ret, total, total / 4);
+        ByteBuffer bufferU = ByteBuffer.wrap(ret, total + total / 4, total / 4);
+
+        bufferY.put(data, 0, total);
+        for (int i = 0; i < total / 4; i += 1) {
+            bufferV.put(data[total + i]);
+            bufferU.put(data[i + total + total / 4]);
+        }
+        return ret;
+    }
+
+    public OnFaceUnityControlListener getFaceunityController() {
+        return mFURenderer;
+    }
+
+    /**
+     * 初始化资源，比如图像绘制（openGL）、美颜组件等
+     *
+     * @param client SDK 内部实现 ZegoVideoFilter.Client 协议的对象
+     *               <p>
+     *               注意：client 必须保存为强引用对象，在 stopAndDeAllocate 被调用前必须一直被保存。
+     *               SDK 不负责管理 client 的生命周期。
+     */
     @Override
     protected void allocateAndStart(Client client) {
+        Log.d(TAG, "allocateAndStart() called with: tid:" + Thread.currentThread().getId());
         mClient = client;
         mThread = new HandlerThread("video-filter");
         mThread.start();
         mHandler = new Handler(mThread.getLooper());
         mIsRunning = true;
+
+        final CountDownLatch barrier = new CountDownLatch(1);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                //faceunity 的接口调用需要在相同的 openGL 环境中，此处 openGL 相关的调用是为了构建GL环境
+                captureEglBase = EglBase.create(null, EglBase.CONFIG_PIXEL_BUFFER);
+                try {
+                    captureEglBase.createDummyPbufferSurface();
+                    captureEglBase.makeCurrent();
+                } catch (RuntimeException e) {
+                    // Clean up before rethrowing the exception.
+                    captureEglBase.releaseSurface();
+                    throw e;
+                }
+
+                // 创建及初始化 faceunity 相应的资源
+                if (mFURenderer != null) {
+                    mFURenderer.onSurfaceCreated();
+                }
+                barrier.countDown();
+            }
+        });
+        try {
+            barrier.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         mProduceQueue.clear();
         mConsumeQueue.clear();
@@ -54,14 +128,30 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
         mMaxBufferSize = 0;
     }
 
+    /**
+     * 释放资源
+     * 注意：必须调用 client 的 destroy 方法，否则会造成内存泄漏。
+     */
     @Override
     protected void stopAndDeAllocate() {
+        Log.d(TAG, "stopAndDeAllocate() called tid:" + Thread.currentThread().getId());
         mIsRunning = false;
 
         final CountDownLatch barrier = new CountDownLatch(1);
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                // 销毁 faceunity 相关的资源
+                if (mFURenderer != null) {
+                    mFURenderer.onSurfaceDestroyed();
+                }
+
+                // 建议在同步停止滤镜任务后再清理 client 对象，保证 SDK 调用 stopAndDeAllocate 后，没有残留的异步任务导致野指针 crash
+                mClient.destroy();
+                mClient = null;
+
+                release();
+
                 barrier.countDown();
             }
         });
@@ -78,16 +168,25 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
             mThread.quit();
         }
         mThread = null;
-
-        mClient.destroy();
-        mClient = null;
     }
 
+    /**
+     * 指定滤镜的传递数据类型，异步传递 I420 图像数据
+     * SDK 需要根据 supportBufferType 返回的类型值创建不同的 client 对象。
+     * @return
+     */
     @Override
     protected int supportBufferType() {
         return BUFFER_TYPE_ASYNC_I420_MEM;
     }
 
+    /**
+     * SDK 通知外部滤镜当前采集图像的宽高并请求内存池下标
+     * @param width 采集图像宽
+     * @param height 采集图像高
+     * @param stride
+     * @return
+     */
     @Override
     protected synchronized int dequeueInputBuffer(int width, int height, int stride) {
         if (stride * height * 3 / 2 > mMaxBufferSize) {
@@ -107,6 +206,11 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
         return (mWriteIndex + 1) % mProduceQueue.size();
     }
 
+    /**
+     * SDK 请求外部滤镜返回对应内存池下标的 ByteBuffer（ByteBuffer.allocateDirect方式分配的）
+     * @param index dequeueInputBuffer 返回的内存池下标即 SDK 获得的内存池下标
+     * @return
+     */
     @Override
     protected synchronized ByteBuffer getInputBuffer(int index) {
         if (mProduceQueue.isEmpty()) {
@@ -117,11 +221,23 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
         return buffer;
     }
 
+    /**
+     * SDK 抛出图像数据，外部滤镜进行处理
+     *
+     * @param bufferIndex
+     * @param width
+     * @param height
+     * @param stride
+     * @param timestamp_100n
+     */
     @Override
     protected synchronized void queueInputBuffer(int bufferIndex, final int width, int height, int stride, long timestamp_100n) {
         if (bufferIndex == -1) {
-            return ;
+            return;
         }
+//                    Log.v(TAG, "queueInputBuffer() called with: bufferIndex = [" + bufferIndex + "], width = [" + width + "], height = [" + height + "], stride = [" + stride + "], timestamp_100n = [" + timestamp_100n + "]");
+//        queueInputBuffer() called with: bufferIndex = [0], width = [720], height = [1280],
+//        stride = [720], timestamp_100n = [30951320]
 
         PixelBuffer pixelBuffer = mProduceQueue.get(bufferIndex);
         pixelBuffer.width = width;
@@ -133,29 +249,58 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
 
         mWriteIndex = (mWriteIndex + 1) % mProduceQueue.size();
 
+        // 切换线程，异步进行前处理
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 if (!mIsRunning) {
                     Log.e(TAG, "already stopped");
-                    return ;
+                    return;
                 }
 
+                // 取出图像数据
                 PixelBuffer pixelBuffer = getConsumerPixelBuffer();
 
+                // 获取buffer下标
                 int index = mClient.dequeueInputBuffer(pixelBuffer.width, pixelBuffer.height, pixelBuffer.stride);
                 if (index >= 0) {
+                    //faceunity 的接口调用需要在相同的 openGL 环境中，此处 openGL 相关的调用是为了构建同一 openGL 环境
+                    captureEglBase.makeCurrent();
+                    if (mI420Buffer == null) {
+                        mI420Buffer = new byte[pixelBuffer.width * pixelBuffer.height * 3 / 2];
+                    }
+                    pixelBuffer.buffer.position(0);
+                    pixelBuffer.buffer.get(mI420Buffer);
+
+                    // 调用 faceunity 进行美颜，美颜后会将数据回写到 mI420Buffer
+                    mFURenderer.onDrawFrameSingleInput(mI420Buffer, pixelBuffer.width, pixelBuffer.height, FURenderer.INPUT_I420);
+
+                    // 根据获取到的buffer下标写数据到相应的内存中，将美颜后的数据传给 SDK
                     ByteBuffer dst = mClient.getInputBuffer(index);
                     dst.position(0);
-                    pixelBuffer.buffer.position(0);
-                    dst.put(pixelBuffer.buffer);
+                    dst.put(mI420Buffer);
 
+                    // 通知 SDK 取美颜数据
                     mClient.queueInputBuffer(index, pixelBuffer.width, pixelBuffer.height, pixelBuffer.stride, pixelBuffer.timestamp_100n);
+
+                    captureEglBase.detachCurrent();
                 }
 
                 returnProducerPixelBuffer(pixelBuffer);
             }
         });
+    }
+
+    // 创建存放图像数据的 buffer
+    private void createPixelBufferPool(int count) {
+        for (int i = 0; i < count; i++) {
+            PixelBuffer pixelBuffer = new PixelBuffer();
+            pixelBuffer.buffer = ByteBuffer.allocateDirect(mMaxBufferSize);
+            mProduceQueue.add(pixelBuffer);
+        }
+
+        mWriteRemain = count;
+        mWriteIndex = -1;
     }
 
     @Override
@@ -168,15 +313,14 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
 
     }
 
-    private void createPixelBufferPool(int count) {
-        for (int i = 0; i < count; i++) {
-            PixelBuffer pixelBuffer = new PixelBuffer();
-            pixelBuffer.buffer = ByteBuffer.allocateDirect(mMaxBufferSize);
-            mProduceQueue.add(pixelBuffer);
+    // 销毁 openGL
+    private void release() {
+        if (captureEglBase.hasSurface()) {
+            captureEglBase.makeCurrent();
         }
 
-        mWriteRemain = count;
-        mWriteIndex = -1;
+        captureEglBase.release();
+        captureEglBase = null;
     }
 
     private PixelBuffer getConsumerPixelBuffer() {
@@ -190,5 +334,14 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
         if (pixelBuffer.buffer.capacity() == mMaxBufferSize) {
             mWriteRemain++;
         }
+    }
+
+    // 图像数据信息
+    static class PixelBuffer {
+        public int width;
+        public int height;
+        public int stride;
+        public long timestamp_100n;
+        public ByteBuffer buffer;
     }
 }
