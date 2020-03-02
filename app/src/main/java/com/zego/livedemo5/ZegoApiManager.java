@@ -1,21 +1,18 @@
 package com.zego.livedemo5;
 
 
-import android.app.Activity;
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.faceunity.beautycontrolview.FURenderer;
-import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
+import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.OnFaceUnityControlListener;
 import com.zego.livedemo5.constants.Constants;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.SystemUtil;
 import com.zego.livedemo5.videocapture.VideoCaptureFactoryDemo;
 import com.zego.livedemo5.videofilter.VideoFilterFactoryDemo;
-import com.zego.zegoavkit2.enums.VideoExternalRenderType;
-import com.zego.zegoavkit2.videorender.ZegoExternalVideoRender;
+import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.callback.IZegoInitSDKCompletionCallback;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
@@ -259,6 +256,9 @@ public class ZegoApiManager {
      */
     public void initSDK(boolean isConfig) {
         isOpen = PreferenceUtil.getInstance().getStringValue(PreferenceUtil.KEY_FACEUNITY_ISON, "");
+        if ("true".equals(isOpen)) {
+            FURenderer.initFURenderer(ZegoApplication.sApplicationContext);
+        }
 
         long appId;
         byte[] signKey;
@@ -399,9 +399,16 @@ public class ZegoApiManager {
         return null;
     }
 
-    public void setFuRendererCompleteListener(FURendererCompleteListener fuRendererCompleteListener) {
+    public ZegoVideoFilter getVideoFilter() {
+        if (isUseVideoFilter() && videoFilterFactoryDemo != null) {
+            return videoFilterFactoryDemo.getFilter();
+        }
+        return null;
+    }
+
+    public void setOnFURendererCreatedListener(OnFURendererCreatedListener onFURendererCreatedListener) {
         if (isUseVideoCapture() && mVideoCaptureFactoryDemo != null) {
-            mVideoCaptureFactoryDemo.setFuRendererCompleteListener(fuRendererCompleteListener);
+            mVideoCaptureFactoryDemo.setFuRendererCompleteListener(onFURendererCreatedListener);
         }
     }
 
@@ -409,7 +416,12 @@ public class ZegoApiManager {
         return isOpen;
     }
 
-    public interface FURendererCompleteListener {
-        void loadEnd(FURenderer mFURenderer);
+    public interface OnFURendererCreatedListener {
+        /**
+         * FURenderer 创建完成
+         *
+         * @param fuRenderer
+         */
+        void onCreated(FURenderer fuRenderer);
     }
 }

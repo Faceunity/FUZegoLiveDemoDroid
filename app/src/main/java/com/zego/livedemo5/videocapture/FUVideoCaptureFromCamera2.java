@@ -1,6 +1,5 @@
 package com.zego.livedemo5.videocapture;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -15,7 +14,7 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 
-import com.faceunity.beautycontrolview.FURenderer;
+import com.faceunity.nama.FURenderer;
 import com.zego.livedemo5.ZegoApiManager;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase;
 import com.zego.livedemo5.videocapture.ve_gl.EglBase14;
@@ -24,7 +23,6 @@ import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
 import com.zego.zegoavkit2.ZegoVideoCaptureDevice;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -33,17 +31,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by robotding on 17/5/3.
  */
-
 public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         SurfaceTexture.OnFrameAvailableListener,
         TextureView.SurfaceTextureListener,
         Camera.PreviewCallback {
-    private static final String TAG = "VideoCaptureFromCamera2";
+    private static final String TAG = "FUVideoCaptureFromCam2";
     private static final int CAMERA_STOP_TIMEOUT_MS = 7000;
 
     private Camera mCam = null;
     private Camera.CameraInfo mCamInfo = null;
-    private int mFront = 0;
+    private int mFront = 1; // 默认前置相机
     private int mCameraWidth = 640;
     private int mCameraHeight = 480;
     private int mCaptureWidth = 0;
@@ -90,19 +87,20 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     private TextureView mTextureView = null;
 
     private FURenderer mFURenderer;
-    private Context mContext = null;
+    private Context mContext;
+    private ZegoApiManager.OnFURendererCreatedListener fuRendererCompleteListener;
+
 
     public FUVideoCaptureFromCamera2(Context context) {
         this.mContext = context;
-        Log.d(TAG, "FUVideoCaptureFromCamera2");
     }
 
-    public FUVideoCaptureFromCamera2(Context context, ZegoApiManager.FURendererCompleteListener listener) {
+    public FUVideoCaptureFromCamera2(Context context, ZegoApiManager.OnFURendererCreatedListener listener) {
         this.mContext = context;
         this.fuRendererCompleteListener = listener;
-        Log.d(TAG, "FUVideoCaptureFromCamera2:" + (this.fuRendererCompleteListener != null));
     }
 
+    @Override
     protected void allocateAndStart(Client client) {
         Log.d(TAG, "allocateAndStart");
         mClient = client;
@@ -112,9 +110,12 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         cameraThreadHandler = new Handler(mThread.getLooper());
 
         mFURenderer = new FURenderer.Builder(mContext)
-                .inputTextureType(1).build();
+                .setInputTextureType(FURenderer.INPUT_EXTERNAL_OES_TEXTURE)
+                .setInputImageOrientation(FURenderer.getCameraOrientation(
+                        mFront == 1 ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK))
+                .build();
         if (fuRendererCompleteListener != null) {
-            fuRendererCompleteListener.loadEnd(mFURenderer);
+            fuRendererCompleteListener.onCreated(mFURenderer);
         }
 
         Log.e(TAG, "threadId=" + cameraThreadHandler.getLooper().getThread().getId() + "--threadName="
@@ -143,9 +144,8 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 mInputSurfaceTexture.setOnFrameAvailableListener(FUVideoCaptureFromCamera2.this);
 
                 if (mFURenderer != null) {
-                    mFURenderer.loadItems();
+                    mFURenderer.onSurfaceCreated();
                 }
-                Log.e(TAG, (fuRendererCompleteListener != null) + "");
                 barrier.countDown();
             }
         });
@@ -156,6 +156,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         }
     }
 
+    @Override
     protected void stopAndDeAllocate() {
         Log.d(TAG, "stopAndDeAllocate");
         stopCapture();
@@ -166,9 +167,8 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 @Override
                 public void run() {
                     if (mFURenderer != null) {
-                        mFURenderer.destroyItems();
+                        mFURenderer.onSurfaceDestroyed();
                         mFURenderer = null;
-                        Log.e(TAG, "setFURenderer null");
                     }
 
                     releaseCaptureSurface();
@@ -239,6 +239,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         mClient = null;
     }
 
+    @Override
     protected int startCapture() {
         Log.d(TAG, "startCapture");
         mIsCapture = true;
@@ -246,6 +247,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         return 0;
     }
 
+    @Override
     protected int stopCapture() {
         Log.d(TAG, "stopCapture");
         mIsCapture = false;
@@ -306,6 +308,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         return PIXEL_BUFFER_TYPE_SURFACE_TEXTURE;
     }
 
+    @Override
     protected int setFrameRate(final int framerate) {
         mFrameRate = framerate;
 
@@ -321,6 +324,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         return 0;
     }
 
+    @Override
     protected int setResolution(int width, int height) {
         mCaptureWidth = width;
         mCaptureHeight = height;
@@ -328,12 +332,14 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         return 0;
     }
 
+    @Override
     protected int setFrontCam(int bFront) {
         mFront = bFront;
         restartCam();
         return 0;
     }
 
+    @Override
     protected int setView(final View view) {
         if (view instanceof TextureView) {
             setRendererView((TextureView) view);
@@ -342,38 +348,46 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         return 0;
     }
 
+    @Override
     protected int setViewMode(int nMode) {
         mViewMode = nMode;
         return 0;
     }
 
+    @Override
     protected int setViewRotation(int nRotation) {
         return 0;
     }
 
+    @Override
     protected int setCaptureRotation(int nRotation) {
         mDisplayRotation = nRotation;
         return 0;
     }
 
+    @Override
     protected int startPreview() {
         mIsPreview = true;
         return startCamera();
     }
 
+    @Override
     protected int stopPreview() {
         mIsPreview = false;
         return stopCamera();
     }
 
+    @Override
     protected int enableTorch(boolean bEnable) {
         return 0;
     }
 
+    @Override
     protected int takeSnapshot() {
         return 0;
     }
 
+    @Override
     protected int setPowerlineFreq(int nFreq) {
         return 0;
     }
@@ -550,7 +564,6 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
         // reset context here
         mDummyContext.makeCurrent();
-        ;
         Log.d(TAG, "ImageRotation:" + mImageRotation);
         if (mTextureId != 0) {
             int[] textures = new int[]{mTextureId};
@@ -936,8 +949,6 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         // 1. correct DisplayOrientation
         int width = mCameraWidth;
         int height = mCameraHeight;
-        int nv21Width = mCameraWidth;
-        int nv21Height = mCameraHeight;
         if (mImageRotation == 90 || mImageRotation == 270) {
             int temp = width;
             width = height;
@@ -945,30 +956,15 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         }
 
         int fexId = 0;
-        if (mFURenderer != null) {
-            if (mCameraNV21Byte != null) {
-                if (copyByte == null) {
-                    copyByte = new byte[mCameraNV21Byte.length];
-                }
-                System.arraycopy(mCameraNV21Byte, 0, copyByte,
-                        0, mCameraNV21Byte.length);
-            }
-            fexId = mFURenderer.onDrawFrameDoubleInput(copyByte,
-                    mInputTextureId, nv21Width, nv21Height);
+        if (mCameraNV21Byte != null) {
+            fexId = mFURenderer.onDrawFrameDualInput(mCameraNV21Byte, mInputTextureId, mCameraWidth, mCameraHeight);
         }
 
-        createFBO(nv21Width, nv21Height);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        createFBO(width, height);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId[0]);
-        mDummyDrawer.drawRgb(fexId, mInputMatrix, nv21Width, nv21Height,
-                0, 0,
-                nv21Width, nv21Height);
+        mDummyDrawer.drawRgb(fexId, mInputMatrix, width, height, 0, 0, width, height);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-
-//        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-//        mDummyDrawer.drawOes(mInputTextureId, mInputMatrix,
-//                width, height, 0, 0, width, height);
-
-//        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
         // 2. draw to capture
         if (mIsCapture) {
@@ -984,15 +980,12 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     private static final int PREVIEW_BUFFER_COUNT = 3;
     private byte[][] previewCallbackBuffer;
     private byte[] mCameraNV21Byte;
-    private byte[] copyByte;
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         mCameraNV21Byte = data;
         mCam.addCallbackBuffer(data);
     }
-
-    public ZegoApiManager.FURendererCompleteListener fuRendererCompleteListener;
 
     private int fboId[];
     private int fboTex[];

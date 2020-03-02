@@ -14,8 +14,9 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
     private int mode = 4;//默认1
     private ZegoVideoCaptureDevice mDevice = null;
     private Context mContext = null;
-    public ZegoApiManager.FURendererCompleteListener fuRendererCompleteListener;
+    public ZegoApiManager.OnFURendererCreatedListener fuRendererCompleteListener;
 
+    @Override
     public ZegoVideoCaptureDevice create(String device_id) {
         String isOpen = ZegoApiManager.getInstance().getIsOpen();
         if (isOpen.equals("true")) {
@@ -37,6 +38,7 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         return mDevice;
     }
 
+    @Override
     public void destroy(ZegoVideoCaptureDevice vc) {
         mDevice = null;
     }
@@ -45,7 +47,7 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         mContext = context;
     }
 
-    public void setFuRendererCompleteListener(ZegoApiManager.FURendererCompleteListener listener) {
+    public void setFuRendererCompleteListener(ZegoApiManager.OnFURendererCreatedListener listener) {
         this.fuRendererCompleteListener = listener;
     }
 }

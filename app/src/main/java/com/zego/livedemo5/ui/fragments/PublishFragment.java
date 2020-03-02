@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.hardware.Camera;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
@@ -23,25 +24,27 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
-
+import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.OnFaceUnityControlListener;
 import com.zego.livedemo5.MainActivity;
 import com.zego.livedemo5.R;
 import com.zego.livedemo5.ZegoApiManager;
 import com.zego.livedemo5.callback.LiveDirectionCallback;
+import com.zego.livedemo5.ui.activities.base.AbsBaseFragment;
 import com.zego.livedemo5.ui.activities.gamelive.GameLiveActivity;
 import com.zego.livedemo5.ui.activities.mixstream.MixStreamPublishActivity;
 import com.zego.livedemo5.ui.activities.moreanchors.MoreAnchorsPublishActivity;
-import com.zego.livedemo5.ui.activities.base.AbsBaseFragment;
 import com.zego.livedemo5.ui.activities.singleanchor.SingleAnchorPublishActivity;
 import com.zego.livedemo5.ui.activities.wolvesgame.WolvesGameHostActivity;
 import com.zego.livedemo5.ui.widgets.DialogSelectPublishMode;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.SystemUtil;
 import com.zego.livedemo5.utils.ZegoRoomUtil;
+import com.zego.livedemo5.videofilter.FUVideoFilterGlTexture2dDemo;
+import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
 import com.zego.zegoliveroom.constants.ZegoVideoViewMode;
-
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -55,6 +58,7 @@ import static android.view.Surface.ROTATION_270;
  * des:
  */
 public class PublishFragment extends AbsBaseFragment implements MainActivity.OnReInitSDKCallback {
+    private static final String TAG = "PublishFragment";
 
     @Bind(R.id.tb_enable_front_cam)
     public ToggleButton tbEnableFrontCam;
@@ -161,7 +165,18 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
         tbEnableFrontCam.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                ZegoVideoFilter zegoVideoFilter = ZegoApiManager.getInstance().getVideoFilter();
+                if (zegoVideoFilter instanceof FUVideoFilterGlTexture2dDemo) {
+                    FUVideoFilterGlTexture2dDemo videoFilter = (FUVideoFilterGlTexture2dDemo) zegoVideoFilter;
+                    videoFilter.setCameraChanged(true);
+                }
                 mZegoLiveRoom.setFrontCam(isChecked);
+                OnFaceUnityControlListener faceunityController = ZegoApiManager.getInstance().getFaceunityController();
+                if (faceunityController != null) {
+                    int cameraType = isChecked ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK;
+                    ((FURenderer) faceunityController).onCameraChange(cameraType,
+                            FURenderer.getCameraOrientation(cameraType));
+                }
 
                 // 开启前置摄像头时, 手电筒不可用
                 if (isChecked) {

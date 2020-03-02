@@ -3,9 +3,10 @@ package com.zego.livedemo5.videofilter;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
+import android.util.Log;
 
-import com.faceunity.beautycontrolview.FURenderer;
-import com.faceunity.beautycontrolview.OnFaceUnityControlListener;
+import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.OnFaceUnityControlListener;
 import com.zego.livedemo5.videocapture.ve_gl.GlRectDrawer;
 import com.zego.livedemo5.videocapture.ve_gl.GlUtil;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
@@ -15,13 +16,11 @@ import java.nio.ByteBuffer;
 /**
  * Created by robotding on 17/2/23.
  */
-
 public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
+    private static final String TAG = "FUVideoFilterGlTexture2";
 
     private Context mContext;
-
     private Client mClient = null;
-
     private GlRectDrawer mDrawer;
     private int mTextureId = 0;
     private int mFrameBufferId = 0;
@@ -34,24 +33,36 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
     private int mHeight = 0;
 
     private FURenderer mFURenderer;
+    private boolean mIsCameraChanged;
 
     public FUVideoFilterGlTexture2dDemo(Context context) {
         mContext = context;
-        mFURenderer = new FURenderer.Builder(mContext).build();
+        mFURenderer = new FURenderer.Builder(mContext)
+                .setInputTextureType(FURenderer.INPUT_2D_TEXTURE)
+                .build();
+    }
+
+    public void setCameraChanged(boolean cameraChanged) {
+        mIsCameraChanged = cameraChanged;
     }
 
     @Override
     protected void allocateAndStart(Client client) {
+        Log.d(TAG, "allocateAndStart: thread:" + Thread.currentThread().getName());
         mClient = client;
         mWidth = mHeight = 0;
         if (mDrawer == null) {
             mDrawer = new GlRectDrawer();
         }
-        mFURenderer.loadItems();
+        if (!mIsCameraChanged) {
+            mFURenderer.onSurfaceCreated();
+        }
+        mIsCameraChanged = false;
     }
 
     @Override
     protected void stopAndDeAllocate() {
+        Log.d(TAG, "stopAndDeAllocate: thread:" + Thread.currentThread().getName());
         if (mTextureId != 0) {
             int[] textures = new int[]{mTextureId};
             GLES20.glDeleteTextures(1, textures, 0);
@@ -68,7 +79,9 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
             mDrawer.release();
             mDrawer = null;
         }
-        mFURenderer.destroyItems2();
+        if (!mIsCameraChanged) {
+            mFURenderer.onSurfaceDestroyed();
+        }
         mClient.destroy();
         mClient = null;
     }
@@ -100,6 +113,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
 
     @Override
     protected void onProcessCallback(int textureId, int width, int height, long timestamp_100n) {
+//        Log.v(TAG, "onProcessCallback() called with: textureId = [" + textureId + "], width = [" + width + "], height = [" + height + "], timestamp_100n = [" + timestamp_100n + "]");
         if (mWidth != width || mHeight != height) {
             if (mTextureId != 0) {
                 int[] textures = new int[]{mTextureId};
@@ -127,7 +141,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferId);
         }
 
-        int texture = mFURenderer.onDrawFrameSingleInputTex(textureId, width, height);
+        int texture = mFURenderer.onDrawFrameSingleInput(textureId, width, height);
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         mDrawer.drawRgb(texture, transformationMatrix,
