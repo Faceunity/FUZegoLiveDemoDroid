@@ -282,11 +282,6 @@ public class CircleImageView extends ImageView {
     }
 
     @Override
-    public ColorFilter getColorFilter() {
-        return mColorFilter;
-    }
-
-    @Override
     public void setColorFilter(ColorFilter cf) {
         if (cf == mColorFilter) {
             return;
@@ -295,6 +290,11 @@ public class CircleImageView extends ImageView {
         mColorFilter = cf;
         applyColorFilter();
         invalidate();
+    }
+
+    @Override
+    public ColorFilter getColorFilter() {
+        return mColorFilter;
     }
 
     @SuppressWarnings("ConstantConditions")

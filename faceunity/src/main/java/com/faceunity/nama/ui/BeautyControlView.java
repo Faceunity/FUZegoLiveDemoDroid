@@ -599,53 +599,6 @@ public class BeautyControlView extends FrameLayout {
         }
     }
 
-    public float getFaceBeautyFilterLevel(String filterName) {
-        Float level;
-        if (mFilterNameLevelMap.containsKey(filterName)) {
-            level = mFilterNameLevelMap.get(filterName);
-        } else {
-            level = 1.0f;
-        }
-        setFaceBeautyFilterLevel(filterName, level);
-        return level;
-    }
-
-    public void setFaceBeautyFilterLevel(String filterName, float filterLevel) {
-        mFilterNameLevelMap.put(filterName, filterLevel);
-        if (mOnFaceUnityControlListener != null) {
-            mOnFaceUnityControlListener.onFilterLevelSelected(filterLevel);
-        }
-    }
-
-    private void changeBottomLayoutAnimator() {
-        if (mBottomLayoutAnimator != null && mBottomLayoutAnimator.isRunning()) {
-            mBottomLayoutAnimator.end();
-        }
-        final int startHeight = getHeight();
-        measure(0, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-        final int endHeight = getMeasuredHeight();
-        if (startHeight == endHeight) {
-            return;
-        }
-        mBottomLayoutAnimator = ValueAnimator.ofInt(startHeight, endHeight).setDuration(50);
-        mBottomLayoutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int height = (int) animation.getAnimatedValue();
-                ViewGroup.LayoutParams params = getLayoutParams();
-                params.height = height;
-                setLayoutParams(params);
-            }
-        });
-        mBottomLayoutAnimator.start();
-    }
-
-    private void setDescriptionShowStr(String str) {
-        Toast.makeText(mContext, str, Toast.LENGTH_SHORT).show();
-    }
-
-    private ValueAnimator mBottomLayoutAnimator;
-
     private class EffectRecyclerAdapter extends RecyclerView.Adapter<EffectRecyclerAdapter.EffectRecyclerHolder> {
         private int mSelectedEffectPosition = -1;
 
@@ -692,6 +645,25 @@ public class BeautyControlView extends FrameLayout {
         }
     }
 
+    public float getFaceBeautyFilterLevel(String filterName) {
+        Float level;
+        if (mFilterNameLevelMap.containsKey(filterName)) {
+            level = mFilterNameLevelMap.get(filterName);
+        } else {
+            level = 1.0f;
+        }
+        setFaceBeautyFilterLevel(filterName, level);
+        return level;
+    }
+
+    public void setFaceBeautyFilterLevel(String filterName, float filterLevel) {
+        mFilterNameLevelMap.put(filterName, filterLevel);
+        if (mOnFaceUnityControlListener != null) {
+            mOnFaceUnityControlListener.onFilterLevelSelected(filterLevel);
+        }
+    }
+
+
     private class FilterRecyclerAdapter extends RecyclerView.Adapter<FilterRecyclerAdapter.FilterRecyclerHolder> {
         private int mSelectedFilterPosition = 6;
 
@@ -705,7 +677,7 @@ public class BeautyControlView extends FrameLayout {
         public void onBindViewHolder(FilterRecyclerHolder holder, final int position) {
             int iconId = mFilters.get(position).getIconId();
             holder.filterImg.setBackgroundResource(iconId);
-            String desc = mFilters.get(position).getDesc();
+            String desc = mFilters.get(position).getDescription();
             holder.filterName.setText(desc);
             int selResId = mSelectedFilterPosition == position ? R.drawable.control_filter_select : android.R.color.transparent;
             holder.filterImg.setImageResource(selResId);
@@ -750,6 +722,35 @@ public class BeautyControlView extends FrameLayout {
                 filterName = (TextView) itemView.findViewById(R.id.control_recycler_text);
             }
         }
+    }
+
+    private ValueAnimator mBottomLayoutAnimator;
+
+    private void changeBottomLayoutAnimator() {
+        if (mBottomLayoutAnimator != null && mBottomLayoutAnimator.isRunning()) {
+            mBottomLayoutAnimator.end();
+        }
+        final int startHeight = getHeight();
+        measure(0, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+        final int endHeight = getMeasuredHeight();
+        if (startHeight == endHeight) {
+            return;
+        }
+        mBottomLayoutAnimator = ValueAnimator.ofInt(startHeight, endHeight).setDuration(50);
+        mBottomLayoutAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int height = (int) animation.getAnimatedValue();
+                ViewGroup.LayoutParams params = getLayoutParams();
+                params.height = height;
+                setLayoutParams(params);
+            }
+        });
+        mBottomLayoutAnimator.start();
+    }
+
+    private void setDescriptionShowStr(String str) {
+        Toast.makeText(mContext, str, Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -2,6 +2,7 @@ package com.zego.livedemo5.videofilter;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.util.Log;
 
@@ -19,7 +20,6 @@ import java.nio.ByteBuffer;
 public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
     private static final String TAG = "FUVideoFilterGlTexture2";
 
-    private Context mContext;
     private Client mClient = null;
     private GlRectDrawer mDrawer;
     private int mTextureId = 0;
@@ -33,17 +33,13 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
     private int mHeight = 0;
 
     private FURenderer mFURenderer;
-    private boolean mIsCameraChanged;
 
     public FUVideoFilterGlTexture2dDemo(Context context) {
-        mContext = context;
-        mFURenderer = new FURenderer.Builder(mContext)
+        mFURenderer = new FURenderer.Builder(context)
                 .setInputTextureType(FURenderer.INPUT_2D_TEXTURE)
+                .setCameraType(Camera.CameraInfo.CAMERA_FACING_FRONT)
+                .setInputImageOrientation(FURenderer.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_FRONT))
                 .build();
-    }
-
-    public void setCameraChanged(boolean cameraChanged) {
-        mIsCameraChanged = cameraChanged;
     }
 
     @Override
@@ -54,10 +50,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         if (mDrawer == null) {
             mDrawer = new GlRectDrawer();
         }
-        if (!mIsCameraChanged) {
-            mFURenderer.onSurfaceCreated();
-        }
-        mIsCameraChanged = false;
+        mFURenderer.onSurfaceCreated();
     }
 
     @Override
@@ -79,9 +72,7 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
             mDrawer.release();
             mDrawer = null;
         }
-        if (!mIsCameraChanged) {
-            mFURenderer.onSurfaceDestroyed();
-        }
+        mFURenderer.onSurfaceDestroyed();
         mClient.destroy();
         mClient = null;
     }
@@ -111,9 +102,11 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         return null;
     }
 
+    private long mSumCost;
+    private int mSumFrame;
+
     @Override
     protected void onProcessCallback(int textureId, int width, int height, long timestamp_100n) {
-//        Log.v(TAG, "onProcessCallback() called with: textureId = [" + textureId + "], width = [" + width + "], height = [" + height + "], timestamp_100n = [" + timestamp_100n + "]");
         if (mWidth != width || mHeight != height) {
             if (mTextureId != 0) {
                 int[] textures = new int[]{mTextureId};
@@ -140,8 +133,16 @@ public class FUVideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         } else {
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferId);
         }
-
+        long start = System.currentTimeMillis();
         int texture = mFURenderer.onDrawFrameSingleInput(textureId, width, height);
+        long cost = System.currentTimeMillis() - start;
+        mSumCost += cost;
+        if (++mSumFrame % 100 == 0) {
+            int avgCost = (int) (mSumCost / mSumFrame);
+            mSumFrame = 0;
+            mSumCost = 0;
+            Log.d(TAG, "onDrawFrameSingleInput: 100 frame avg cost " + avgCost + "ms");
+        }
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         mDrawer.drawRgb(texture, transformationMatrix,

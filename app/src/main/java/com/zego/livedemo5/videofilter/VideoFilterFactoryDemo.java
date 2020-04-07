@@ -29,7 +29,7 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
         if ("true".equals(isOpen)) {
             mode = 6;
         } else {
-            mode = 1;
+            mode = 2;
         }
         Log.d(TAG, "create ZegoVideoFilter, mode:" + mode);
         switch (mode) {
@@ -52,7 +52,9 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
                 mFilter = new VideoFilterI420MemDemo(mContext);
                 break;
             case 6:
+//                mFilter = new FUVideoFilterHybridDemo(mContext);
                 mFilter = new FUVideoFilterGlTexture2dDemo(mContext);
+//                mFilter = new FUVideoFilterMemDemo(mContext);
                 break;
             default:
         }
@@ -67,8 +69,12 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
     public OnFaceUnityControlListener getFaceunityController() {
         if (mFilter instanceof FUVideoFilterGlTexture2dDemo) {
             return ((FUVideoFilterGlTexture2dDemo) mFilter).getFaceunityController();
+        } else if (mFilter instanceof FUVideoFilterHybridDemo) {
+            return ((FUVideoFilterHybridDemo) mFilter).getFaceunityController();
         } else if (mFilter instanceof VideoFilterI420MemDemo) {
             return ((VideoFilterI420MemDemo) mFilter).getFaceunityController();
+        } else if (mFilter instanceof FUVideoFilterMemDemo) {
+            return ((FUVideoFilterMemDemo) mFilter).getFaceunityController();
         }
         return null;
     }

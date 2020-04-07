@@ -26,7 +26,6 @@ import android.support.v7.widget.RecyclerView;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -236,7 +235,7 @@ public abstract class BaseLiveActivity extends AbsBaseLiveActivity {
                 OnFaceUnityControlListener faceunityController = ZegoApiManager.getInstance().getFaceunityController();
                 if (faceunityController != null) {
                     int cameraType = isEnable ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK;
-                    ((FURenderer) faceunityController).onCameraChange(cameraType,
+                    ((FURenderer) faceunityController).onCameraChanged(cameraType,
                             FURenderer.getCameraOrientation(cameraType));
                 }
             }

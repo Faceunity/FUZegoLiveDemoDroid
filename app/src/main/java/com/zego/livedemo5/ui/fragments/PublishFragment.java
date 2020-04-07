@@ -11,7 +11,6 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.TextureView;
@@ -40,8 +39,6 @@ import com.zego.livedemo5.ui.widgets.DialogSelectPublishMode;
 import com.zego.livedemo5.utils.PreferenceUtil;
 import com.zego.livedemo5.utils.SystemUtil;
 import com.zego.livedemo5.utils.ZegoRoomUtil;
-import com.zego.livedemo5.videofilter.FUVideoFilterGlTexture2dDemo;
-import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
 import com.zego.zegoliveroom.constants.ZegoVideoViewMode;
@@ -165,16 +162,11 @@ public class PublishFragment extends AbsBaseFragment implements MainActivity.OnR
         tbEnableFrontCam.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ZegoVideoFilter zegoVideoFilter = ZegoApiManager.getInstance().getVideoFilter();
-                if (zegoVideoFilter instanceof FUVideoFilterGlTexture2dDemo) {
-                    FUVideoFilterGlTexture2dDemo videoFilter = (FUVideoFilterGlTexture2dDemo) zegoVideoFilter;
-                    videoFilter.setCameraChanged(true);
-                }
                 mZegoLiveRoom.setFrontCam(isChecked);
                 OnFaceUnityControlListener faceunityController = ZegoApiManager.getInstance().getFaceunityController();
                 if (faceunityController != null) {
                     int cameraType = isChecked ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK;
-                    ((FURenderer) faceunityController).onCameraChange(cameraType,
+                    ((FURenderer) faceunityController).onCameraChanged(cameraType,
                             FURenderer.getCameraOrientation(cameraType));
                 }
 

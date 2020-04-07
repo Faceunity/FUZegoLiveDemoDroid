@@ -2,8 +2,6 @@ package com.faceunity.nama;
 
 import android.content.Context;
 import android.hardware.Camera;
-import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -12,8 +10,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.faceunity.nama.entity.Effect;
-import com.faceunity.nama.gles.FullFrameRect;
-import com.faceunity.nama.gles.Texture2dProgram;
 import com.faceunity.wrapper.faceunity;
 
 import java.io.FileInputStream;
@@ -22,47 +18,32 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.faceunity.wrapper.faceunity.FU_ADM_FLAG_FLIP_X;
-
 /**
- * 一个基于Faceunity Nama SDK的简单封装，方便简单集成，理论上简单需求的步骤：
+ * 基于 Nama SDK 封装，方便集成，使用步骤：
  * <p>
- * 1.通过 OnFaceUnityControlListener 在UI上进行交互
- * 2.合理调用FURenderer构造函数
- * 3.对应的时机调用onSurfaceCreated和onSurfaceDestroyed
- * 4.处理图像时调用onDrawFrame
- * <p>
+ * 1. OnFaceUnityControlListener 定义了 UI 上的交互接口
+ * 2. FURenderer.Builder 构造器设置相应的参数，
+ * 3. SurfaceView 创建和销毁时，分别调用 onSurfaceCreated 和 onSurfaceDestroyed
+ * 4. 相机朝向变化和设备方向变化时，分别调用 onCameraChanged 和 onDeviceOrientationChanged
+ * 4. 处理图像时调用 onDrawFrame，针对不同数据类型，提供了纹理和 buffer 输入多种方案
+ * </p>
  */
 public class FURenderer implements OnFaceUnityControlListener {
+    private static final String TAG = "FURenderer";
     /**
-     * 输入的纹理类型，OES 或 2D
+     * 输入的 texture 类型，OES 或 2D
      */
     public static final int INPUT_EXTERNAL_OES_TEXTURE = faceunity.FU_ADM_FLAG_EXTERNAL_OES_TEXTURE;
     public static final int INPUT_2D_TEXTURE = 0;
     /**
-     * 输入的数据类型，NV21、I420 或 RGBA
+     * 输入的 buffer 格式，NV21、I420 或 RGBA
      */
-    public static final int INPUT_NV21 = 0;
-    public static final int INPUT_I420 = 1;
-    public static final int INPUT_RGBA = 2;
-    private static final String TAG = "FURenderer";
-    /* 句柄数组下标，分别代表美颜和贴纸 */
-    private static final int ITEM_ARRAYS_FACE_BEAUTY = 0;
-    private static final int ITEM_ARRAYS_EFFECT = 1;
-    /* 句柄数组长度 2 */
-    private static final int ITEM_ARRAYS_COUNT = 2;
-    private static final int NANO_IN_ONE_MILLI_SECOND = 1_000_000;
-    private static final int NANO_IN_ONE_SECOND = 1_000_000_000;
-    private static final int FRAME_COUNT = 10;
-    /* 是否已经全局初始化 */
-    private static boolean sIsInited;
-    /* 存放美颜和贴纸句柄的数组 */
-    private final int[] mItemsArray = new int[ITEM_ARRAYS_COUNT];
-    /* 事件队列*/
-    private final ArrayList<Runnable> mEventQueue = new ArrayList<>(16);
-    private final Object mLock = new Object();
+    public static final int INPUT_FORMAT_NV21 = faceunity.FU_FORMAT_NV21_BUFFER;
+    public static final int INPUT_FORMAT_I420 = faceunity.FU_FORMAT_I420_BUFFER;
+    public static final int INPUT_FORMAT_RGBA = faceunity.FU_FORMAT_RGBA_BUFFER;
+    /* 更新美颜参数标记 */
     private volatile boolean mIsNeedUpdateFaceBeauty = true;
-    /* 美颜和滤镜的默认参数 */
+    /* 美颜和滤镜的默认参数，具体的参数定义，请看 BeautificationParam 和 FilterParam 类 */
     private float mFilterLevel = 1.0f;//滤镜强度
     private String mFilterName = "ziran";//滤镜名称：自然
     private int mSkinDetect = 1;//肤色检测：开启
@@ -79,7 +60,15 @@ public class FURenderer implements OnFaceUnityControlListener {
     private float mForeheadLevel = 0.3f;//额头
     private float mThinNoseLevel = 0.5f;//瘦鼻
     private float mMouthShapeLevel = 0.4f;//嘴形
-    private Context mContext;
+
+    /* 句柄数组下标，分别代表美颜和贴纸 */
+    private static final int ITEM_ARRAYS_FACE_BEAUTY = 0;
+    private static final int ITEM_ARRAYS_EFFECT = 1;
+    /* 句柄数组长度 2 */
+    private static final int ITEM_ARRAYS_COUNT = 2;
+    /* 存放美颜和贴纸句柄的数组 */
+    private final int[] mItemsArray = new int[ITEM_ARRAYS_COUNT];
+    private final Context mContext;
     /* IO 线程 Handler */
     private Handler mFuItemHandler;
     /* 递增的帧 ID */
@@ -90,45 +79,35 @@ public class FURenderer implements OnFaceUnityControlListener {
     private Effect mEffect;
     /* 同时识别的最大人脸数，默认 4 */
     private int mMaxFaces = 4;
-    /* 是否需要手动创建 EGLContext */
+    /* 是否手动创建 EGLContext，默认不创建 */
     private boolean mIsCreateEGLContext = false;
     /* 输入图像的纹理类型，默认 OES */
     private int mInputTextureType = INPUT_EXTERNAL_OES_TEXTURE;
-    /* 输入图像的数据类型，一般不用改 */
+    /* 输入图像的 buffer 类型，此项一般不用改 */
     private int mInputImageFormat = 0;
     /* 输入图像的方向，默认前置相机 270 */
     private int mInputImageOrientation = 270;
     /* 设备方向，默认竖屏 */
     private int mDeviceOrientation = 90;
-    /* 人脸识别方向，默认 1，通过 calculateRotationMode 方法求得 */
+    /* 人脸识别方向，默认 1，通过 createRotationMode 方法获得 */
     private int mRotationMode = faceunity.FU_ROTATION_MODE_90;
     /* 相机前后方向，默认前置相机  */
     private int mCameraType = Camera.CameraInfo.CAMERA_FACING_FRONT;
-    private int mTrackingStatus = -1;
-    private OnTrackingStatusChangedListener mOnTrackingStatusChangedListener;
-    private OnSystemErrorListener mOnSystemErrorListener;
-    private boolean mIsRunBenchmark = false;
-    private int mCurrentFrameCount;
-    private long mLastFrameTimestamp;
-    private long mSumRenderTime;
-    private long mCallStartTime;
-    private OnDebugListener mOnDebugListener;
-
-    private FURenderer(Context context) {
-        mContext = context;
-
-        Log.d(TAG, "FURenderer fields. isCreateEGLContext: " + mIsCreateEGLContext + ", maxFaces: "
-                + mMaxFaces + ", inputTextureType: " + mInputTextureType + ", inputImageFormat: "
-                + mInputImageFormat + ", inputImageOrientation: " + mInputImageOrientation
-                + ", deviceOrientation: " + mDeviceOrientation + ", rotationMode: " + mRotationMode
-                + ", cameraType: " + mCameraType + ", isNeedFaceBeauty: " + mIsNeedFaceBeauty
-                + ", effect: " + mEffect);
-    }
+    /* 事件队列 */
+    private final ArrayList<Runnable> mEventQueue = new ArrayList<>(16);
+    /* 事件队列操作锁 */
+    private final Object mLock = new Object();
+    /* GL 线程 ID */
+    private long mGlThreadId;
+    /* 是否已经全局初始化，确保只初始化一次 */
+    private static boolean sIsInited;
 
     /**
      * 初始化系统环境，加载底层数据，并进行网络鉴权。
      * 应用使用期间只需要初始化一次，无需释放数据。
-     * 必须在SDK其他接口前调用，否则会引起应用崩溃。
+     * 不需要 GL 环境，但必须在SDK其他接口前调用，否则会引起应用崩溃。
+     *
+     * @param context
      */
     public static void initFURenderer(Context context) {
         if (sIsInited) {
@@ -136,26 +115,37 @@ public class FURenderer implements OnFaceUnityControlListener {
         }
         // 获取 Nama SDK 版本信息
         Log.e(TAG, "fu sdk version " + faceunity.fuGetVersion());
-        fuSetup(context, "AI_model/ai_face_processor.bundle", authpack.A());
-        sIsInited = true;
-    }
-
-    /**
-     * 初始化 SDK，进行联网鉴权，必须在其他函数之前调用。
-     *
-     * @param context
-     * @param bundlePath ai_face_processor.bundle 人脸识别数据包
-     * @param authpack   authpack.java 鉴权证书
-     */
-    private static void fuSetup(Context context, String bundlePath, byte[] authpack) {
-        // v3 bundle 不再使用，第一个参数传空字节数组即可
-        int isSetup = faceunity.fuSetup(new byte[]{}, authpack);
+        // v3 不再使用，第一个参数传空字节数组即可
+        int isSetup = faceunity.fuSetup(new byte[0], authpack.A());
         Log.d(TAG, "fuSetup. isSetup: " + (isSetup == 0 ? "no" : "yes"));
-        loadAiModel(context, bundlePath, faceunity.FUAITYPE_FACEPROCESSOR);
+        // ai_face_processor 是人脸识别数据包
+        loadAiModel(context, "AI_model/ai_face_processor.bundle", faceunity.FUAITYPE_FACEPROCESSOR);
+        sIsInited = isLibInit();
+        Log.d(TAG, "initFURenderer finish. isLibraryInit: " + (sIsInited ? "yes" : "no"));
     }
 
     /**
-     * 加载 AI 模型资源，一般在 onSurfaceCreated 方法调用，耗时操作，可以异步执行
+     * 释放鉴权数据占用的内存。如需再次使用，需要调用 fuSetup
+     */
+    public static void destroyLibData() {
+        if (sIsInited) {
+            faceunity.fuDestroyLibData();
+            sIsInited = isLibInit();
+            Log.d(TAG, "destroyLibData. isLibraryInit: " + (sIsInited ? "yes" : "no"));
+        }
+    }
+
+    /**
+     * SDK 是否初始化
+     *
+     * @return
+     */
+    public static boolean isLibInit() {
+        return faceunity.fuIsLibraryInit() == 1;
+    }
+
+    /**
+     * 加载 AI 模型资源，一般在 onSurfaceCreated 方法调用，不需要 EGL Context，耗时操作，可以异步执行
      *
      * @param context
      * @param bundlePath ai_model.bundle
@@ -170,7 +160,7 @@ public class FURenderer implements OnFaceUnityControlListener {
     }
 
     /**
-     * 释放 AI 模型资源，一般在 onSurfaceDestroyed 方法调用
+     * 释放 AI 模型资源，一般在 onSurfaceDestroyed 方法调用，不需要 EGL Context，对应 loadAiModel 方法
      *
      * @param type
      */
@@ -234,15 +224,6 @@ public class FURenderer implements OnFaceUnityControlListener {
     }
 
     /**
-     * 获取 Nama sdk 版本号
-     *
-     * @return version
-     */
-    public static String getVersion() {
-        return faceunity.fuGetVersion();
-    }
-
-    /**
      * 获取相机方向
      *
      * @param cameraFacing
@@ -268,10 +249,35 @@ public class FURenderer implements OnFaceUnityControlListener {
     }
 
     /**
-     * 创建及初始化 SDK 相关资源
+     * 获取 Nama SDK 完整版本号，例如 6.7.0_tf_phy-f1e36a93-b9e3359-b5f220d
+     *
+     * @return full version
+     */
+    public static String getFullVersion() {
+        return faceunity.fuGetVersion();
+    }
+
+    /**
+     * 获取 Nama SDK 主版本号，例如 6.7.0
+     *
+     * @return major version
+     */
+    public static String getMajorVersion() {
+        String version = faceunity.fuGetVersion();
+        String majorVersion = version.substring(0, version.indexOf('_'));
+        return majorVersion;
+    }
+
+    private FURenderer(Context context) {
+        mContext = context;
+    }
+
+    /**
+     * 创建及初始化 SDK 相关资源，必须在 GL 线程调用。如果没有 GL 环境，请把 mIsCreateEGLContext 设置为 true。
      */
     public void onSurfaceCreated() {
         Log.e(TAG, "onSurfaceCreated");
+        mGlThreadId = Thread.currentThread().getId();
         HandlerThread handlerThread = new HandlerThread("FUItemHandlerThread");
         handlerThread.start();
         mFuItemHandler = new FUItemHandler(handlerThread.getLooper());
@@ -286,8 +292,8 @@ public class FURenderer implements OnFaceUnityControlListener {
         if (mIsCreateEGLContext) {
             faceunity.fuCreateEGLContext();
         }
+        mRotationMode = createRotationMode();
         // 设置人脸识别的方向，能够提高首次识别速度
-        mRotationMode = calculateRotationMode();
         faceunity.fuSetDefaultRotationMode(mRotationMode);
         // 设置同时识别的人脸数量，目前最多支持 8 人
         faceunity.fuSetMaxFaces(mMaxFaces);
@@ -301,10 +307,8 @@ public class FURenderer implements OnFaceUnityControlListener {
         }
     }
 
-    //--------------------------------------美颜参数与道具回调----------------------------------------
-
     /**
-     * 单 texture 输入接口
+     * 单 texture 输入接口，必须在具有 GL 环境的线程调用
      *
      * @param tex
      * @param w
@@ -317,11 +321,7 @@ public class FURenderer implements OnFaceUnityControlListener {
             return 0;
         }
         prepareDrawFrame();
-
-        int flags = mInputTextureType;
-        if (mCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            flags |= FU_ADM_FLAG_FLIP_X;
-        }
+        int flags = createFlags();
         if (mIsRunBenchmark) {
             mCallStartTime = System.nanoTime();
         }
@@ -333,37 +333,76 @@ public class FURenderer implements OnFaceUnityControlListener {
     }
 
     /**
-     * 单 buffer 输入接口
+     * 单 texture 输入接口，支持数据回写，必须在具有 GL 环境的线程调用
+     *
+     * @param tex
+     * @param w
+     * @param h
+     * @param readBackImg    数据回写到的 buffer
+     * @param readBackW
+     * @param readBackH
+     * @param readBackFormat buffer 格式: nv21, i420, rgba
+     * @return
+     */
+    public int onDrawFrameSingleInput(int tex, int w, int h, byte[] readBackImg, int readBackW, int readBackH, int readBackFormat) {
+        if (tex <= 0 || w <= 0 || h <= 0 || readBackImg == null || readBackW <= 0 || readBackH <= 0) {
+            Log.e(TAG, "onDrawFrame data is invalid");
+            return 0;
+        }
+        prepareDrawFrame();
+        int flags = createFlags();
+        if (mIsRunBenchmark) {
+            mCallStartTime = System.nanoTime();
+        }
+        switch (readBackFormat) {
+            case INPUT_FORMAT_I420:
+                flags |= faceunity.FU_ADM_FLAG_I420_TEXTURE;
+                break;
+            case INPUT_FORMAT_RGBA:
+                flags |= faceunity.FU_ADM_FLAG_RGBA_BUFFER;
+                break;
+            case INPUT_FORMAT_NV21:
+            default:
+                flags |= faceunity.FU_ADM_FLAG_NV21_TEXTURE;
+                break;
+        }
+
+        int fuTex = faceunity.fuRenderToTexture(tex, w, h, mFrameId++, mItemsArray, flags, readBackImg, readBackW, readBackH);
+        if (mIsRunBenchmark) {
+            mSumRenderTime += System.nanoTime() - mCallStartTime;
+        }
+        return fuTex;
+    }
+
+    /**
+     * 单 buffer 输入接口，必须在具有 GL 环境的线程调用
      *
      * @param img
      * @param w
      * @param h
-     * @param type buffer类型: nv21, i420, rgba
+     * @param format buffer 格式: nv21, i420, rgba
      * @return
      */
-    public int onDrawFrameSingleInput(byte[] img, int w, int h, int type) {
+    public int onDrawFrameSingleInput(byte[] img, int w, int h, int format) {
         if (img == null || w <= 0 || h <= 0) {
             Log.e(TAG, "onDrawFrame data is invalid");
             return 0;
         }
         prepareDrawFrame();
-
-        int flags = mInputImageFormat;
-        if (mCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            flags |= FU_ADM_FLAG_FLIP_X;
-        }
+        int flags = createFlags();
+        flags ^= mInputTextureType;
         if (mIsRunBenchmark) {
             mCallStartTime = System.nanoTime();
         }
         int fuTex;
-        switch (type) {
-            case INPUT_I420:
+        switch (format) {
+            case INPUT_FORMAT_I420:
                 fuTex = faceunity.fuRenderToI420Image(img, w, h, mFrameId++, mItemsArray, flags);
                 break;
-            case INPUT_RGBA:
+            case INPUT_FORMAT_RGBA:
                 fuTex = faceunity.fuRenderToRgbaImage(img, w, h, mFrameId++, mItemsArray, flags);
                 break;
-            case INPUT_NV21:
+            case INPUT_FORMAT_NV21:
             default:
                 fuTex = faceunity.fuRenderToNV21Image(img, w, h, mFrameId++, mItemsArray, flags);
                 break;
@@ -375,7 +414,7 @@ public class FURenderer implements OnFaceUnityControlListener {
     }
 
     /**
-     * 单buffer输入接口，支持数据回写
+     * 单 buffer 输入接口，支持数据回写，必须在具有 GL 环境的线程调用
      *
      * @param img
      * @param w
@@ -383,34 +422,31 @@ public class FURenderer implements OnFaceUnityControlListener {
      * @param readBackImg 数据回写到的 buffer
      * @param readBackW
      * @param readBackH
-     * @param type        buffer类型: nv21, i420, rgba
+     * @param format      buffer 格式: nv21, i420, rgba
      * @return
      */
-    public int onDrawFrameSingleInput(byte[] img, int w, int h, byte[] readBackImg, int readBackW, int readBackH, int type) {
+    public int onDrawFrameSingleInput(byte[] img, int w, int h, byte[] readBackImg, int readBackW, int readBackH, int format) {
         if (img == null || w <= 0 || h <= 0 || readBackImg == null || readBackW <= 0 || readBackH <= 0) {
             Log.e(TAG, "onDrawFrame data is invalid");
             return 0;
         }
         prepareDrawFrame();
-
-        int flags = mInputImageFormat;
-        if (mCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            flags |= FU_ADM_FLAG_FLIP_X;
-        }
+        int flags = createFlags();
+        flags ^= mInputTextureType;
         if (mIsRunBenchmark) {
             mCallStartTime = System.nanoTime();
         }
         int fuTex;
-        switch (type) {
-            case INPUT_I420:
+        switch (format) {
+            case INPUT_FORMAT_I420:
                 fuTex = faceunity.fuRenderToI420Image(img, w, h, mFrameId++, mItemsArray, flags,
                         readBackW, readBackH, readBackImg);
                 break;
-            case INPUT_RGBA:
+            case INPUT_FORMAT_RGBA:
                 fuTex = faceunity.fuRenderToRgbaImage(img, w, h, mFrameId++, mItemsArray, flags,
                         readBackW, readBackH, readBackImg);
                 break;
-            case INPUT_NV21:
+            case INPUT_FORMAT_NV21:
             default:
                 fuTex = faceunity.fuRenderToNV21Image(img, w, h, mFrameId++, mItemsArray, flags,
                         readBackW, readBackH, readBackImg);
@@ -423,11 +459,11 @@ public class FURenderer implements OnFaceUnityControlListener {
     }
 
     /**
-     * 双输入接口，输入 buffer 和 texture，处理后的数据不会回写到 buffer
+     * 双输入接口，输入 buffer 和 texture，必须在具有 GL 环境的线程调用
      * 由于省去数据拷贝，性能相对最优，优先推荐使用。
      *
      * @param img NV21 数据
-     * @param tex 纹理ID
+     * @param tex 纹理 ID
      * @param w
      * @param h
      * @return
@@ -438,11 +474,7 @@ public class FURenderer implements OnFaceUnityControlListener {
             return 0;
         }
         prepareDrawFrame();
-
-        int flags = mInputTextureType | mInputImageFormat;
-        if (mCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            flags |= FU_ADM_FLAG_FLIP_X;
-        }
+        int flags = createFlags();
         if (mIsRunBenchmark) {
             mCallStartTime = System.nanoTime();
         }
@@ -454,13 +486,13 @@ public class FURenderer implements OnFaceUnityControlListener {
     }
 
     /**
-     * 双输入接口，输入 buffer 和 texture，支持自定义数据回写到 buffer
+     * 双输入接口，输入 buffer 和 texture，支持数据回写到 buffer，必须在具有 GL 环境的线程调用
      *
      * @param img         NV21数据
-     * @param tex         纹理ID
+     * @param tex         纹理 ID
      * @param w
      * @param h
-     * @param readBackImg 数据回写的 buffer
+     * @param readBackImg 数据回写到的 buffer
      * @param readBackW
      * @param readBackH
      * @return
@@ -471,11 +503,7 @@ public class FURenderer implements OnFaceUnityControlListener {
             return 0;
         }
         prepareDrawFrame();
-
-        int flags = mInputTextureType | mInputImageFormat;
-        if (mCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            flags |= FU_ADM_FLAG_FLIP_X;
-        }
+        int flags = createFlags();
         if (mIsRunBenchmark) {
             mCallStartTime = System.nanoTime();
         }
@@ -488,12 +516,14 @@ public class FURenderer implements OnFaceUnityControlListener {
     }
 
     /**
-     * 销毁faceunity相关的资源
+     * 销毁 SDK 相关资源，必须在 GL 线程调用。如果没有 GL 环境，请把 mIsCreateEGLContext 设置为 true。
      */
     public void onSurfaceDestroyed() {
         Log.e(TAG, "onSurfaceDestroyed");
-        mFuItemHandler.removeCallbacksAndMessages(null);
-        mFuItemHandler.getLooper().quit();
+        if (mFuItemHandler != null) {
+            mFuItemHandler.removeCallbacksAndMessages(null);
+            mFuItemHandler.getLooper().quit();
+        }
         mFrameId = 0;
         synchronized (mLock) {
             mEventQueue.clear();
@@ -588,8 +618,12 @@ public class FURenderer implements OnFaceUnityControlListener {
      */
     public void queueEvent(Runnable r) {
         if (r != null) {
-            synchronized (mLock) {
-                mEventQueue.add(r);
+            if (mGlThreadId == Thread.currentThread().getId()) {
+                r.run();
+            } else {
+                synchronized (mLock) {
+                    mEventQueue.add(r);
+                }
             }
         }
     }
@@ -603,12 +637,12 @@ public class FURenderer implements OnFaceUnityControlListener {
         if (mDeviceOrientation == deviceOrientation) {
             return;
         }
-        Log.d(TAG, "onDeviceOrientationChanged() deviceOrientation" + deviceOrientation);
+        Log.d(TAG, "onDeviceOrientationChanged() called with: deviceOrientation = [" + deviceOrientation + "]");
+        mDeviceOrientation = deviceOrientation;
+        mRotationMode = createRotationMode();
         queueEvent(new Runnable() {
             @Override
             public void run() {
-                mDeviceOrientation = deviceOrientation;
-                mRotationMode = calculateRotationMode();
                 faceunity.fuSetDefaultRotationMode(mRotationMode);
                 setEffectItemParams(mItemsArray[ITEM_ARRAYS_EFFECT]);
                 faceunity.fuOnCameraChange();
@@ -622,19 +656,19 @@ public class FURenderer implements OnFaceUnityControlListener {
      * @param cameraType            前后置相机 ID
      * @param inputImageOrientation 相机方向
      */
-    public void onCameraChange(final int cameraType, final int inputImageOrientation) {
+    public void onCameraChanged(final int cameraType, final int inputImageOrientation) {
         if (mCameraType == cameraType && mInputImageOrientation == inputImageOrientation) {
             return;
         }
-        Log.d(TAG, "onCameraChange() called with: cameraType = [" + cameraType + "], inputImageOrientation = ["
-                + inputImageOrientation + "]");
+        Log.d(TAG, "onCameraChanged() called with: cameraType = [" + cameraType
+                + "], inputImageOrientation = [" + inputImageOrientation + "]");
+        mCameraType = cameraType;
+        mInputImageOrientation = inputImageOrientation;
         queueEvent(new Runnable() {
             @Override
             public void run() {
                 mFrameId = 0;
-                mCameraType = cameraType;
-                mInputImageOrientation = inputImageOrientation;
-                mRotationMode = calculateRotationMode();
+                mRotationMode = createRotationMode();
                 faceunity.fuSetDefaultRotationMode(mRotationMode);
                 setEffectItemParams(mItemsArray[ITEM_ARRAYS_EFFECT]);
                 faceunity.fuOnCameraChange();
@@ -642,15 +676,9 @@ public class FURenderer implements OnFaceUnityControlListener {
         });
     }
 
-    /**
-     * 计算 RotationMode
-     * 相机方向和 RotationMode 参数对照：
-     * - 前置 270：home 下 1，home 右 0，home 上 3，home 左 2
-     * - 后置 90： home 下 3，home 右 0，home 上 1，home 左 2
-     */
-    private int calculateRotationMode() {
+    private int createRotationMode() {
         if (mInputTextureType == FURenderer.INPUT_2D_TEXTURE) {
-            return 0;
+            return faceunity.FU_ROTATION_MODE_0;
         }
         int rotMode = faceunity.FU_ROTATION_MODE_0;
         if (mInputImageOrientation == 270) {
@@ -689,6 +717,14 @@ public class FURenderer implements OnFaceUnityControlListener {
         return rotMode;
     }
 
+    private int createFlags() {
+        int flags = mInputTextureType | mInputImageFormat;
+        if (mCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            flags |= faceunity.FU_ADM_FLAG_FLIP_X;
+        }
+        return flags;
+    }
+
     /**
      * 对道具贴纸设置相应的参数
      *
@@ -698,15 +734,19 @@ public class FURenderer implements OnFaceUnityControlListener {
         if (itemHandle <= 0) {
             return;
         }
-        faceunity.fuItemSetParam(itemHandle, "isAndroid", 1.0);
+        double isAndroid;
+        if (mInputTextureType == INPUT_EXTERNAL_OES_TEXTURE) {
+            isAndroid = 1.0;
+        } else {
+            isAndroid = 0.0;
+        }
+        faceunity.fuItemSetParam(itemHandle, "isAndroid", isAndroid);
         // rotationAngle 参数是用于旋转普通道具
         faceunity.fuItemSetParam(itemHandle, "rotationAngle", mRotationMode * 90);
-        //is3DFlipH 参数是用于对3D道具的镜像
-        double flipX = mInputTextureType == INPUT_2D_TEXTURE ? 0.0
-                : (mCameraType == Camera.CameraInfo.CAMERA_FACING_BACK ? 1.0 : 0.0);
-        faceunity.fuItemSetParam(itemHandle, "is3DFlipH", flipX);
-        Log.d(TAG, "setEffectItemParams: rotationMode:" + mRotationMode + ", flipX:" + flipX);
+        Log.d(TAG, "setEffectItemParams. rotationMode: " + mRotationMode + ", isAndroid: " + isAndroid);
     }
+
+    //--------------------------------------美颜参数与道具回调----------------------------------------
 
     @Override
     public void onEffectSelected(Effect effect) {
@@ -741,8 +781,6 @@ public class FURenderer implements OnFaceUnityControlListener {
         mIsNeedUpdateFaceBeauty = true;
     }
 
-    //-----------------------------人脸识别回调相关定义-----------------------------------
-
     @Override
     public void onBlurLevelSelected(float level) {
         mBlurLevel = level;
@@ -761,8 +799,6 @@ public class FURenderer implements OnFaceUnityControlListener {
         mIsNeedUpdateFaceBeauty = true;
     }
 
-    //-------------------------错误信息回调相关定义---------------------------------
-
     @Override
     public void onBrightEyesSelected(float level) {
         mBrightEyesLevel = level;
@@ -774,8 +810,6 @@ public class FURenderer implements OnFaceUnityControlListener {
         mBeautyTeethLevel = level;
         mIsNeedUpdateFaceBeauty = true;
     }
-
-    //------------------------------FPS 渲染时长回调相关定义------------------------------------
 
     @Override
     public void onFaceShapeTypeSelected(int faceShapeType) {
@@ -819,6 +853,56 @@ public class FURenderer implements OnFaceUnityControlListener {
         mIsNeedUpdateFaceBeauty = true;
     }
 
+    //-----------------------------人脸识别回调相关定义-----------------------------------
+
+    private int mTrackingStatus = -1;
+
+    public interface OnTrackingStatusChangedListener {
+        /**
+         * 识别到的人脸数量发生变化时调用
+         *
+         * @param status 人脸数量
+         */
+        void onTrackingStatusChanged(int status);
+    }
+
+    private OnTrackingStatusChangedListener mOnTrackingStatusChangedListener;
+
+    //-------------------------错误信息回调相关定义---------------------------------
+
+    public interface OnSystemErrorListener {
+        /**
+         * SDK 发生错误时调用
+         *
+         * @param error 错误消息
+         */
+        void onSystemError(String error);
+    }
+
+    private OnSystemErrorListener mOnSystemErrorListener;
+
+    //------------------------------FPS 渲染时长回调相关定义------------------------------------
+
+    private static final int NANO_IN_ONE_MILLI_SECOND = 1_000_000;
+    private static final int NANO_IN_ONE_SECOND = 1_000_000_000;
+    private static final int FRAME_COUNT = 10;
+    private boolean mIsRunBenchmark = false;
+    private int mCurrentFrameCount;
+    private long mLastFrameTimestamp;
+    private long mSumRenderTime;
+    private long mCallStartTime;
+    private OnDebugListener mOnDebugListener;
+
+    public interface OnDebugListener {
+        /**
+         * 统计每 10 帧的平均值，FPS 和渲染时间
+         *
+         * @param fps        FPS
+         * @param renderTime 渲染时间
+         */
+        void onFpsChanged(double fps, double renderTime);
+    }
+
     private void benchmarkFPS() {
         if (!mIsRunBenchmark) {
             return;
@@ -837,35 +921,62 @@ public class FURenderer implements OnFaceUnityControlListener {
         }
     }
 
-    public interface OnTrackingStatusChangedListener {
-        /**
-         * 识别的人脸数量发生变化时调用
-         *
-         * @param status 人脸数量
-         */
-        void onTrackingStatusChanged(int status);
-    }
-
-    public interface OnSystemErrorListener {
-        /**
-         * 发生系统错误时调用
-         *
-         * @param error 错误消息
-         */
-        void onSystemError(String error);
-    }
-
-    public interface OnDebugListener {
-        /**
-         * 统计每 10 帧的平均值，FPS 和渲染时间
-         *
-         * @param fps        FPS
-         * @param renderTime 渲染时间
-         */
-        void onFpsChanged(double fps, double renderTime);
-    }
-
     //--------------------------------------IO handler 线程异步加载道具-------------------------------------
+
+    private class FUItemHandler extends Handler {
+
+        FUItemHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                // 加载贴纸道具
+                case ITEM_ARRAYS_EFFECT: {
+                    final Effect effect = (Effect) msg.obj;
+                    if (effect == null) {
+                        return;
+                    }
+                    final int itemEffect = loadItem(mContext, effect.getFilePath());
+                    queueEvent(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mItemsArray[ITEM_ARRAYS_EFFECT] > 0) {
+                                faceunity.fuDestroyItem(mItemsArray[ITEM_ARRAYS_EFFECT]);
+                                mItemsArray[ITEM_ARRAYS_EFFECT] = 0;
+                            }
+                            if (itemEffect > 0) {
+                                setEffectItemParams(itemEffect);
+                                mItemsArray[ITEM_ARRAYS_EFFECT] = itemEffect;
+                            }
+                        }
+                    });
+                }
+                break;
+                // 加载美颜道具
+                case ITEM_ARRAYS_FACE_BEAUTY: {
+                    final int itemFaceBeauty = loadItem(mContext, "face_beautification.bundle");
+                    if (itemFaceBeauty <= 0) {
+                        Log.w(TAG, "load face beauty item failed");
+                        break;
+                    }
+                    queueEvent(new Runnable() {
+                        @Override
+                        public void run() {
+                            mItemsArray[ITEM_ARRAYS_FACE_BEAUTY] = itemFaceBeauty;
+                            mIsNeedUpdateFaceBeauty = true;
+                        }
+                    });
+                }
+                break;
+                default:
+            }
+        }
+    }
+
+    //--------------------------------------Builder----------------------------------------
 
     /**
      * FURenderer Builder
@@ -891,7 +1002,7 @@ public class FURenderer implements OnFaceUnityControlListener {
         }
 
         /**
-         * 是否需要手动创建 EGLContext
+         * 是否手动创建 EGLContext
          *
          * @param isCreateEGLContext
          * @return
@@ -903,12 +1014,12 @@ public class FURenderer implements OnFaceUnityControlListener {
         }
 
         /**
-         * 设置默认贴纸道具
+         * 默认贴纸道具
          *
          * @param effect
          * @return
          */
-        public Builder setDefaultEffect(Effect effect) {
+        public Builder setEffect(Effect effect) {
             this.effect = effect;
             return this;
         }
@@ -925,7 +1036,7 @@ public class FURenderer implements OnFaceUnityControlListener {
         }
 
         /**
-         * 设置设备方向
+         * 设备方向
          *
          * @param deviceOrientation
          * @return
@@ -947,7 +1058,7 @@ public class FURenderer implements OnFaceUnityControlListener {
         }
 
         /**
-         * 输入图像的数据类型，一般不用修改此项
+         * 输入图像的 buffer 类型，一般不用修改此项
          *
          * @param inputImageFormat
          * @return
@@ -1024,7 +1135,7 @@ public class FURenderer implements OnFaceUnityControlListener {
         }
 
         /**
-         * 系统错误信息回调
+         * SDK 错误信息回调
          *
          * @param onSystemErrorListener
          * @return
@@ -1049,60 +1160,14 @@ public class FURenderer implements OnFaceUnityControlListener {
             fuRenderer.mOnDebugListener = onDebugListener;
             fuRenderer.mOnTrackingStatusChangedListener = onTrackingStatusChangedListener;
             fuRenderer.mOnSystemErrorListener = onSystemErrorListener;
+
+            Log.d(TAG, "FURenderer fields. isCreateEGLContext: " + isCreateEGLContext + ", maxFaces: "
+                    + maxFaces + ", inputTextureType: " + inputTextureType + ", inputImageFormat: "
+                    + inputImageFormat + ", inputImageOrientation: " + inputImageOrientation
+                    + ", deviceOrientation: " + deviceOrientation + ", cameraType: " + cameraType
+                    + ", isRunBenchmark: " + isRunBenchmark + ", isNeedFaceBeauty: " + isNeedFaceBeauty
+                    + ", effect: " + effect);
             return fuRenderer;
-        }
-
-    }
-
-    //--------------------------------------Builder----------------------------------------
-
-    private class FUItemHandler extends Handler {
-
-        FUItemHandler(Looper looper) {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                //加载贴纸道具
-                case ITEM_ARRAYS_EFFECT: {
-                    final Effect effect = (Effect) msg.obj;
-                    final int itemEffect = loadItem(mContext, effect.getFilePath());
-                    queueEvent(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mItemsArray[ITEM_ARRAYS_EFFECT] > 0) {
-                                faceunity.fuDestroyItem(mItemsArray[ITEM_ARRAYS_EFFECT]);
-                                mItemsArray[ITEM_ARRAYS_EFFECT] = 0;
-                            }
-                            if (itemEffect > 0) {
-                                setEffectItemParams(itemEffect);
-                                mItemsArray[ITEM_ARRAYS_EFFECT] = itemEffect;
-                            }
-                        }
-                    });
-                }
-                break;
-                //加载美颜道具
-                case ITEM_ARRAYS_FACE_BEAUTY: {
-                    final int itemFaceBeauty = loadItem(mContext, "face_beautification.bundle");
-                    if (itemFaceBeauty <= 0) {
-                        Log.w(TAG, "load face beauty item failed");
-                        break;
-                    }
-                    queueEvent(new Runnable() {
-                        @Override
-                        public void run() {
-                            mItemsArray[ITEM_ARRAYS_FACE_BEAUTY] = itemFaceBeauty;
-                            mIsNeedUpdateFaceBeauty = true;
-                        }
-                    });
-                }
-                break;
-                default:
-            }
         }
     }
 

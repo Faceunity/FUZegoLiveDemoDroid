@@ -13,26 +13,28 @@ public enum EffectEnum {
     /**
      * 道具贴纸
      */
-    Effect_none("none", R.drawable.ic_delete_all, "", ""),
+    Effect_none(R.drawable.ic_delete_all, "", "none"),
 
-    Effect_sdlu("sdlu", R.drawable.sdlu, "normal/sdlu.bundle", ""),
-    Effect_daisypig("daisypig", R.drawable.daisypig, "normal/daisypig.bundle", ""),
-    Effect_fashi("fashi", R.drawable.fashi, "normal/fashi.bundle", ""),
-    Effect_chri("chri", R.drawable.chri1, "normal/chri1.bundle", ""),
-    Effect_xueqiu("xueqiu", R.drawable.xueqiu_lm_fu, "normal/xueqiu_lm_fu.bundle", ""),
-    Effect_wobushi("wobushi", R.drawable.wobushi, "normal/wobushi.bundle", ""),
-    Effect_gaoshiqing("gaoshiqing", R.drawable.gaoshiqing, "normal/gaoshiqing.bundle", "");
+    Effect_sdlu(R.drawable.sdlu, "normal/sdlu.bundle", "sdlu"),
+    Effect_daisypig(R.drawable.daisypig, "normal/daisypig.bundle", "daisypig"),
+    Effect_fashi(R.drawable.fashi, "normal/fashi.bundle", "fashi"),
+    //    Effect_chri1(R.drawable.chri1, "normal/chri1.bundle", "chri1"),
+    Effect_xueqiu_lm_fu(R.drawable.xueqiu_lm_fu, "normal/xueqiu_lm_fu.bundle", "xueqiu_lm_fu");
+//    Effect_wobushi(R.drawable.wobushi, "normal/wobushi.bundle", "wobushi"),
+//    Effect_gaoshiqing(R.drawable.gaoshiqing, "normal/gaoshiqing.bundle", "gaoshiqing");
 
-    private String bundleName;
     private int iconId;
     private String filePath;
-    private String desc;
+    private String description;
 
-    EffectEnum(String bundleName, int iconId, String filePath, String desc) {
-        this.bundleName = bundleName;
+    EffectEnum(int iconId, String filePath, String description) {
         this.iconId = iconId;
         this.filePath = filePath;
-        this.desc = desc;
+        this.description = description;
+    }
+
+    public Effect effect() {
+        return new Effect(iconId, filePath, description);
     }
 
     public static ArrayList<Effect> getEffects() {
@@ -42,9 +44,5 @@ public enum EffectEnum {
             effects.add(e.effect());
         }
         return effects;
-    }
-
-    public Effect effect() {
-        return new Effect(bundleName, iconId, filePath, desc);
     }
 }

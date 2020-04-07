@@ -580,7 +580,7 @@ public class FUVideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         releaseCaptureSurface();
 
         if (mFURenderer != null) {
-            mFURenderer.onCameraChange(mCamInfo.facing, mCamInfo.orientation);
+            mFURenderer.onCameraChanged(mCamInfo.facing, mCamInfo.orientation);
         }
         return 0;
     }

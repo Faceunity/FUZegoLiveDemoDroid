@@ -54,7 +54,19 @@ public class DiscreteSeekBar extends View {
         public void onStopTrackingTouch(DiscreteSeekBar seekBar);
     }
 
-    private TrackRectDrawable mTrackBase;
+    public static class OnSimpleProgressChangeListener implements OnProgressChangeListener {
+        public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+
+        }
+
+        public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+        }
+
+        public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+
+        }
+    }
 
     /**
      * Interface to transform the current internal value of this DiscreteSeekBar to anther one for the visualization.
@@ -120,11 +132,50 @@ public class DiscreteSeekBar extends View {
     private static final int SEPARATION_DP = 5;
     private ThumbDrawable mThumb;
     private TrackRectDrawable mTrack;
-    private int mTrackBaseHeight;
+    private TrackRectDrawable mTrackBase;
     private TrackRectDrawable mScrubber;
     private Drawable mRipple;
 
     private int mTrackHeight;
+    private int mTrackBaseHeight;
+    private int mScrubberHeight;
+    private final int mAddedTouchBounds;
+
+    private int mMax;
+    private int mMin;
+    private int mValue;
+    private int mKeyProgressIncrement = 1;
+    private boolean mMirrorForRtl = false;
+    private boolean mAllowTrackClick = true;
+    private boolean mIndicatorPopupEnabled = true;
+    //We use our own Formatter to avoid creating new instances on every progress change
+    Formatter mFormatter;
+    private String mIndicatorFormatter;
+    private NumericTransformer mNumericTransformer;
+    private StringBuilder mFormatBuilder;
+    private OnProgressChangeListener mPublicChangeListener;
+    private boolean mIsDragging;
+    private int mDragOffset;
+
+    private Rect mInvalidateRect = new Rect();
+    private Rect mTempRect = new Rect();
+    private PopupIndicator mIndicator;
+    private AnimatorCompat mPositionAnimator;
+    private float mAnimationPosition;
+    private int mAnimationTarget;
+    private float mDownX;
+    private float mTouchSlop;
+
+    private int mValueBase;
+
+    public DiscreteSeekBar(Context context) {
+        this(context, null);
+    }
+
+    public DiscreteSeekBar(Context context, AttributeSet attrs) {
+        this(context, attrs, R.attr.discreteSeekBarStyle);
+    }
+
     public DiscreteSeekBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setFocusable(true);
@@ -233,71 +284,6 @@ public class DiscreteSeekBar extends View {
 
     }
 
-    private int mScrubberHeight;
-    private final int mAddedTouchBounds;
-
-    private int mMax;
-    private int mMin;
-    private int mValue;
-    private int mKeyProgressIncrement = 1;
-    private boolean mMirrorForRtl = false;
-    private boolean mAllowTrackClick = true;
-    private boolean mIndicatorPopupEnabled = true;
-    //We use our own Formatter to avoid creating new instances on every progress change
-    Formatter mFormatter;
-    private String mIndicatorFormatter;
-    private NumericTransformer mNumericTransformer;
-    private StringBuilder mFormatBuilder;
-    private OnProgressChangeListener mPublicChangeListener;
-    private boolean mIsDragging;
-    private int mDragOffset;
-
-    private Rect mInvalidateRect = new Rect();
-    private Rect mTempRect = new Rect();
-    private PopupIndicator mIndicator;
-    private AnimatorCompat mPositionAnimator;
-    private float mAnimationPosition;
-    private int mAnimationTarget;
-    private float mDownX;
-    private float mTouchSlop;
-
-    private int mValueBase;
-
-    public DiscreteSeekBar(Context context) {
-        this(context, null);
-    }
-
-    public DiscreteSeekBar(Context context, AttributeSet attrs) {
-        this(context, attrs, R.attr.discreteSeekBarStyle);
-    }
-
-    /**
-     * Sets the maximum value for this DiscreteSeekBar
-     * if the supplied argument is smaller than the Current MIN value,
-     * the MIN value will be set to MAX-1
-     * <p/>
-     * <p>
-     * Also if the current progress is out of the new range, it will be set to MIN
-     * </p>
-     *
-     * @param max
-     * @see #setMin(int)
-     * @see #setProgress(int)
-     */
-    public void setMax(int max) {
-        if (mMax == max) {
-            return;
-        }
-        mMax = max;
-        if (mMax < mMin) {
-            setMin(mMax - 1);
-        }
-        updateKeyboardRange();
-
-        //We need to refresh the PopupIndicator view
-        updateIndicatorSizes();
-    }
-
     /**
      * Sets the current Indicator formatter string
      *
@@ -334,6 +320,37 @@ public class DiscreteSeekBar extends View {
     }
 
     /**
+     * Sets the maximum value for this DiscreteSeekBar
+     * if the supplied argument is smaller than the Current MIN value,
+     * the MIN value will be set to MAX-1
+     * <p/>
+     * <p>
+     * Also if the current progress is out of the new range, it will be set to MIN
+     * </p>
+     *
+     * @param max
+     * @see #setMin(int)
+     * @see #setProgress(int)
+     */
+    public void setMax(int max) {
+        if (mMax == max) {
+            return;
+        }
+        mMax = max;
+        if (mMax < mMin) {
+            setMin(mMax - 1);
+        }
+        updateKeyboardRange();
+
+        //We need to refresh the PopupIndicator view
+        updateIndicatorSizes();
+    }
+
+    public int getMax() {
+        return mMax;
+    }
+
+    /**
      * Sets the minimum value for this DiscreteSeekBar
      * if the supplied argument is bigger than the Current MAX value,
      * the MAX value will be set to MIN+1
@@ -353,37 +370,6 @@ public class DiscreteSeekBar extends View {
             setMax(mMin + 1);
         }
         updateKeyboardRange();
-    }
-
-    public int getMax() {
-        return mMax;
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        int thumbWidth = mThumb.getIntrinsicWidth();
-        int thumbHeight = mThumb.getIntrinsicHeight();
-        int addedThumb = mAddedTouchBounds;
-        int halfThumb = thumbWidth / 2;
-        int paddingLeft = getPaddingLeft() + addedThumb;
-        int paddingRight = getPaddingRight();
-        int bottom = getHeight() - getPaddingBottom() - addedThumb;
-        mThumb.setBounds(paddingLeft, bottom - thumbHeight, paddingLeft + thumbWidth, bottom);
-        int trackHeight = Math.max(mTrackHeight / 2, 1);
-        mTrack.setBounds(paddingLeft + halfThumb, bottom - halfThumb - trackHeight,
-                getWidth() - halfThumb - paddingRight - addedThumb, bottom - halfThumb + trackHeight);
-        int available = getWidth() - paddingRight - addedThumb - paddingLeft - thumbWidth;
-        float scaleDrawBase = (mValueBase - mMin) / (float) (mMax - mMin);
-        final int thumbPosBase = (int) (scaleDrawBase * available + 0.5f);
-        mTrackBase.setBounds(paddingLeft + halfThumb + thumbPosBase - mTrackBaseHeight / 8, bottom - halfThumb - mTrackBaseHeight / 2,
-                paddingLeft + halfThumb + thumbPosBase + mTrackBaseHeight / 8, bottom - halfThumb + mTrackBaseHeight / 2);
-        int scrubberHeight = Math.max(mScrubberHeight / 2, 2);
-        mScrubber.setBounds(paddingLeft + halfThumb, bottom - halfThumb - scrubberHeight,
-                paddingLeft + halfThumb, bottom - halfThumb + scrubberHeight);
-
-        //Update the thumb position after size changed
-        updateThumbPosFromCurrentProgress();
     }
 
     public int getMin() {
@@ -616,6 +602,33 @@ public class DiscreteSeekBar extends View {
     }
 
     @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        int thumbWidth = mThumb.getIntrinsicWidth();
+        int thumbHeight = mThumb.getIntrinsicHeight();
+        int addedThumb = mAddedTouchBounds;
+        int halfThumb = thumbWidth / 2;
+        int paddingLeft = getPaddingLeft() + addedThumb;
+        int paddingRight = getPaddingRight();
+        int bottom = getHeight() - getPaddingBottom() - addedThumb;
+        mThumb.setBounds(paddingLeft, bottom - thumbHeight, paddingLeft + thumbWidth, bottom);
+        int trackHeight = Math.max(mTrackHeight / 2, 1);
+        mTrack.setBounds(paddingLeft + halfThumb, bottom - halfThumb - trackHeight,
+                getWidth() - halfThumb - paddingRight - addedThumb, bottom - halfThumb + trackHeight);
+        int available = getWidth() - paddingRight - addedThumb - paddingLeft - thumbWidth;
+        float scaleDrawBase = (mValueBase - mMin) / (float) (mMax - mMin);
+        final int thumbPosBase = (int) (scaleDrawBase * available + 0.5f);
+        mTrackBase.setBounds(paddingLeft + halfThumb + thumbPosBase - mTrackBaseHeight / 8, bottom - halfThumb - mTrackBaseHeight / 2,
+                paddingLeft + halfThumb + thumbPosBase + mTrackBaseHeight / 8, bottom - halfThumb + mTrackBaseHeight / 2);
+        int scrubberHeight = Math.max(mScrubberHeight / 2, 2);
+        mScrubber.setBounds(paddingLeft + halfThumb, bottom - halfThumb - scrubberHeight,
+                paddingLeft + halfThumb, bottom - halfThumb + scrubberHeight);
+
+        //Update the thumb position after size changed
+        updateThumbPosFromCurrentProgress();
+    }
+
+    @Override
     protected synchronized void onDraw(Canvas canvas) {
         if (!isLollipopOrGreater) {
             mRipple.draw(canvas);
@@ -627,31 +640,6 @@ public class DiscreteSeekBar extends View {
             mTrackBase.draw(canvas);
         }
         mThumb.draw(canvas);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        //TODO: Should we reverse the keys for RTL? The framework's SeekBar does NOT....
-        boolean handled = false;
-        if (isEnabled()) {
-            int progress = getAnimatedProgress();
-            switch (keyCode) {
-                case KeyEvent.KEYCODE_DPAD_LEFT:
-                    handled = true;
-                    if (progress <= mMin)
-                        break;
-                    animateSetProgress(progress - mKeyProgressIncrement);
-                    break;
-                case KeyEvent.KEYCODE_DPAD_RIGHT:
-                    handled = true;
-                    if (progress >= mMax)
-                        break;
-                    animateSetProgress(progress + mKeyProgressIncrement);
-                    break;
-            }
-        }
-
-        return handled || super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -797,30 +785,29 @@ public class DiscreteSeekBar extends View {
         setPressed(false);
     }
 
-    private void updateThumbPos(int base, int value) {
-        base += getPaddingLeft() + mAddedTouchBounds;
-        value += getPaddingLeft() + mAddedTouchBounds;
-        int start = Math.min(base, value);
-        int end = Math.max(base, value);
-
-        int thumbWidth = mThumb.getIntrinsicWidth();
-        int halfThumb = thumbWidth / 2;
-        mThumb.copyBounds(mInvalidateRect);
-        mThumb.setBounds(value, mInvalidateRect.top, value + thumbWidth, mInvalidateRect.bottom);
-        mScrubber.getBounds().left = start + halfThumb;
-        mScrubber.getBounds().right = end + halfThumb;
-        final Rect finalBounds = mTempRect;
-        mThumb.copyBounds(finalBounds);
-        if (!isInEditMode()) {
-            mIndicator.move(finalBounds.centerX());
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //TODO: Should we reverse the keys for RTL? The framework's SeekBar does NOT....
+        boolean handled = false;
+        if (isEnabled()) {
+            int progress = getAnimatedProgress();
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                    handled = true;
+                    if (progress <= mMin)
+                        break;
+                    animateSetProgress(progress - mKeyProgressIncrement);
+                    break;
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                    handled = true;
+                    if (progress >= mMax)
+                        break;
+                    animateSetProgress(progress + mKeyProgressIncrement);
+                    break;
+            }
         }
-        mTrackBase.getBounds().left = base + halfThumb - mTrackBaseHeight / 8;
-        mTrackBase.getBounds().right = base + halfThumb + mTrackBaseHeight / 8;
-        mInvalidateRect.inset(-mAddedTouchBounds, -mAddedTouchBounds);
-        finalBounds.inset(-mAddedTouchBounds, -mAddedTouchBounds);
-        mInvalidateRect.union(finalBounds);
-        SeekBarCompat.setHotspotBounds(mRipple, finalBounds.left, finalBounds.top, finalBounds.right, finalBounds.bottom);
-        invalidate(mInvalidateRect);
+
+        return handled || super.onKeyDown(keyCode, event);
     }
 
     private int getAnimatedProgress() {
@@ -938,18 +925,30 @@ public class DiscreteSeekBar extends View {
         updateThumbPos(thumbPosBase, thumbPos);
     }
 
-    public static class OnSimpleProgressChangeListener implements OnProgressChangeListener {
-        public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+    private void updateThumbPos(int base, int value) {
+        base += getPaddingLeft() + mAddedTouchBounds;
+        value += getPaddingLeft() + mAddedTouchBounds;
+        int start = Math.min(base, value);
+        int end = Math.max(base, value);
 
+        int thumbWidth = mThumb.getIntrinsicWidth();
+        int halfThumb = thumbWidth / 2;
+        mThumb.copyBounds(mInvalidateRect);
+        mThumb.setBounds(value, mInvalidateRect.top, value + thumbWidth, mInvalidateRect.bottom);
+        mScrubber.getBounds().left = start + halfThumb;
+        mScrubber.getBounds().right = end + halfThumb;
+        final Rect finalBounds = mTempRect;
+        mThumb.copyBounds(finalBounds);
+        if (!isInEditMode()) {
+            mIndicator.move(finalBounds.centerX());
         }
-
-        public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
-        }
-
-        public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
-        }
+        mTrackBase.getBounds().left = base + halfThumb - mTrackBaseHeight / 8;
+        mTrackBase.getBounds().right = base + halfThumb + mTrackBaseHeight / 8;
+        mInvalidateRect.inset(-mAddedTouchBounds, -mAddedTouchBounds);
+        finalBounds.inset(-mAddedTouchBounds, -mAddedTouchBounds);
+        mInvalidateRect.union(finalBounds);
+        SeekBarCompat.setHotspotBounds(mRipple, finalBounds.left, finalBounds.top, finalBounds.right, finalBounds.bottom);
+        invalidate(mInvalidateRect);
     }
 
 
