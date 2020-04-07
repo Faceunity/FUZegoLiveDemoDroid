@@ -13,7 +13,7 @@ public enum FilterEnum {
     /**
      * 滤镜
      */
-    origin("origin", R.drawable.nature, "origin"),
+    origin("origin", R.drawable.nature, "原图"),
 
     delta("delta", R.drawable.delta, "delta"),
     electric("electric", R.drawable.electric, "electric"),
@@ -29,12 +29,16 @@ public enum FilterEnum {
 
     private String name;
     private int iconId;
-    private String desc;
+    private String description;
 
-    FilterEnum(String name, int iconId, String desc) {
+    FilterEnum(String name, int iconId, String description) {
         this.name = name;
         this.iconId = iconId;
-        this.desc = desc;
+        this.description = description;
+    }
+
+    public Filter filter() {
+        return new Filter(name, iconId, description);
     }
 
     public static ArrayList<Filter> getFilters() {
@@ -44,9 +48,5 @@ public enum FilterEnum {
             filters.add(f.filter());
         }
         return filters;
-    }
-
-    public Filter filter() {
-        return new Filter(name, iconId, desc);
     }
 }
