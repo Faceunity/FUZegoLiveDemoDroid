@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">BeautyControlView</string>
+
+    <string name="tx_video_filter">自定义前处理</string>
+    <string name="tx_has_no_fu_authpack">faceunity的证书无效，请替换有效的authpack文件</string>
+    <string name="tx_login">登录房间</string>
+    <string name="tx_publishing">推流中</string>
+    <string name="tx_filter_type">请选择前处理传递数据类型:</string>
+    <string name="tx_sync_gl_texture_2d">BUFFER_TYPE_SYNC_GL_TEXTURE_2D</string>
+    <string name="tx_mem_gl_texture_2d">BUFFER_TYPE_HYBRID_MEM_GL_TEXTURE_2D</string>
+    <string name="tx_mem_rgba32">BUFFER_TYPE_MEM</string>
+    <string name="tx_asyn_i420_mem">BUFFER_TYPE_ASYNC_I420_MEM</string>
+    <string name="tx_surface_texture">BUFFER_TYPE_SURFACE_TEXTURE</string>
+
+    <string name="syncTexture2D_describe">同步传递纹理 ID，SDK 会调用此滤镜的 onProcessCallback 方法获取前处理后的纹理 ID </string>
+    <string name="memTexture2D_describe">异步传递纹理 ID，SDK 会抛出 RGBA32 的图像数据，可通过 onProcessCallback 方法传递前处理后的纹理 ID 给 SDK </string>
+    <string name="rgba32Mem_describe">异步传递 RGBA32 的图像数据</string>
+    <string name="i420Mem_describe">异步传递 I420 的图像数据</string>
+    <string name="surfaceTexture_describe">传递 SurfaceTexture，SDK 会调用此滤镜的 getSurfaceTexture 获取 SurfaceTexture 对象</string>
+
+</resources>
