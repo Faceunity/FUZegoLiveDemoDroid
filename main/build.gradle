@@ -1,0 +1,120 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.zego.liveroomplayground"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode getAppVersionCode()
+
+        versionName getAppVersionName()
+
+        
+        ndk {
+            //设置支持的SO库架构
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'
+        }
+
+        multiDexEnabled true
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("../../config/your_app_key.jks")
+            storePassword "your_keystore_password"
+            keyAlias "your_key_alias"
+            keyPassword "your_key_password"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+
+//            //修改生成的apk名字
+//            applicationVariants.all { variant ->
+//                variant.outputs.all { output ->
+//                    def outputFile = output.outputFile
+//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                        def fileName = "LiveRoomPlayground-release-v${defaultConfig.versionName}.apk"
+//                        outputFileName = fileName
+//                    }
+//                }
+//            }
+        }
+    }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
+    dataBinding {
+        enabled = true
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
+    repositories {
+        flatDir {
+            dirs '../common/libs'   // aar目录
+        }
+    }
+}
+
+def static getAppVersionName() {
+
+    String versionName = "1.0.0."
+    if (System.getenv("BUILD_NUMBER") == null) {
+        versionName += "0"
+    } else {
+        versionName += System.getenv("BUILD_NUMBER")
+    }
+    return versionName
+}
+
+def static getAppVersionCode() {
+    int versionCode = 1
+    if (System.getenv("BUILD_NUMBER") != null) {
+        versionCode = Integer.parseInt(System.getenv("BUILD_NUMBER"))
+    }
+
+    return versionCode
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation files('libs/zegoliveroom.jar')
+    implementation project(path: ':common')
+    implementation project(path: ':soundProcessing')
+    implementation project(path: ':play')
+    implementation project(path: ':publish')
+    implementation project(path: ':mediaPlayer')
+    implementation project(path: ':audioPlayer')
+    implementation project(path: ':mediaSideInfo')
+    implementation project(path: ':layeredCoding')
+    implementation project(path: ':frequencySpectrum')
+    implementation project(path: ':mediarecorder')
+    implementation project(path: ':mixing')
+    implementation project(path: ':mixStream')
+    implementation project(path: ':videoExternalRender')
+    implementation project(path: ':videoCapture')
+    implementation project(path: ':videoCommunicaton')
+    implementation project(path: ':joinLive')
+    implementation project(path: ':videoFilter')
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.volley:volley:1.1.1'
+    implementation 'com.google.code.gson:gson:2.8.0'
+
+    implementation 'com.android.support:multidex:1.0.1'
+    
+}

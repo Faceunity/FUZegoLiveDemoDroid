@@ -1,2 +1,17 @@
-include ':app'
-include ':faceunity'
+include ':main', ':audioPlayer',
+        ':joinLive',
+        ':videoFilter',
+        ':videoCommunicaton',
+        ':frequencySpectrum',
+        ':soundProcessing',
+        ':mediaPlayer',
+        ':common',
+        ':mediaSideInfo',
+        ':layeredCoding',
+        ':mediarecorder',
+        ':mixing',
+        ':mixStream',
+        ':videoExternalRender',
+        ':videoCapture',
+        ':play',
+        ':publish'
