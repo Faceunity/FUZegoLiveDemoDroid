@@ -18,10 +18,9 @@ public enum EffectEnum {
     Effect_sdlu(R.drawable.sdlu, "effect/sdlu.bundle", "sdlu"),
     Effect_daisypig(R.drawable.daisypig, "effect/daisypig.bundle", "daisypig"),
     Effect_fashi(R.drawable.fashi, "effect/fashi.bundle", "fashi"),
-    //    Effect_chri1(R.drawable.chri1, "effect/chri1.bundle", "chri1"),
-    Effect_xueqiu_lm_fu(R.drawable.xueqiu_lm_fu, "effect/xueqiu_lm_fu.bundle", "xueqiu_lm_fu");
-//    Effect_wobushi(R.drawable.wobushi, "effect/wobushi.bundle", "wobushi"),
-//    Effect_gaoshiqing(R.drawable.gaoshiqing, "effect/gaoshiqing.bundle", "gaoshiqing");
+    Effect_xueqiu_lm_fu(R.drawable.xueqiu_lm_fu, "effect/xueqiu_lm_fu.bundle", "xueqiu_lm_fu"),
+    Effect_wobushi(R.drawable.wobushi, "effect/wobushi.bundle", "wobushi"),
+    Effect_gaoshiqing(R.drawable.gaoshiqing, "effect/gaoshiqing.bundle", "gaoshiqing");
 
     private int iconId;
     private String filePath;
@@ -33,7 +32,7 @@ public enum EffectEnum {
         this.description = description;
     }
 
-    public Effect effect() {
+    public Effect create() {
         return new Effect(iconId, filePath, description);
     }
 
@@ -41,7 +40,7 @@ public enum EffectEnum {
         EffectEnum[] effectEnums = EffectEnum.values();
         ArrayList<Effect> effects = new ArrayList<>(effectEnums.length);
         for (EffectEnum e : effectEnums) {
-            effects.add(e.effect());
+            effects.add(e.create());
         }
         return effects;
     }

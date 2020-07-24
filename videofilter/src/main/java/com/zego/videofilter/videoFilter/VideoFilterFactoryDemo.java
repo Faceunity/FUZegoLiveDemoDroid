@@ -30,6 +30,7 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
     }
 
     // 创建外部滤镜实例
+    @Override
     public ZegoVideoFilter create() {
         switch (type) {
             case FilterType_Mem:
@@ -47,13 +48,16 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
             case FilterType_ASYNCI420Mem:
                 mFilter = new VideoFilterI420MemDemo(mFunRender);
                 break;
+            default:
         }
 
         return mFilter;
     }
 
     // 销毁外部滤镜实例
+    @Override
     public void destroy(ZegoVideoFilter vf) {
         mFilter = null;
     }
+
 }

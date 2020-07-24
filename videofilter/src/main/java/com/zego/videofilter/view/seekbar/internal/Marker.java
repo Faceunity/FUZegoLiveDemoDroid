@@ -35,7 +35,6 @@ import com.zego.videofilter.R;
 import com.zego.videofilter.view.seekbar.internal.compat.SeekBarCompat;
 import com.zego.videofilter.view.seekbar.internal.drawable.MarkerDrawable;
 
-
 /**
  * {@link ViewGroup} to be used as the real indicator.
  * <p>

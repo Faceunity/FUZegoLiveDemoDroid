@@ -48,7 +48,9 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         mClient = client;
 
         // 创建及初始化 faceunity 相应的资源
-        mFURenderer.onSurfaceCreated();
+        if (mFURenderer != null) {
+            mFURenderer.onSurfaceCreated();
+        }
     }
 
     /**
@@ -59,7 +61,9 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
     protected void stopAndDeAllocate() {
         Log.d(TAG, "stopAndDeAllocate: ");
         // 销毁 faceunity 相关的资源
-        mFURenderer.onSurfaceDestroyed();
+        if (mFURenderer != null) {
+            mFURenderer.onSurfaceDestroyed();
+        }
 
         // 建议在同步停止滤镜任务后再清理 client 对象，保证 SDK 调用 stopAndDeAllocate 后，没有残留的异步任务导致野指针 crash
         mClient.destroy();
@@ -110,11 +114,18 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         // 首帧需要直接使用 ZEGO 显示，但需要将纹理传给FU，保证FU将脏数据处理掉
         if (needDropFrame) {
             mClient.onProcessCallback(zegoTextureId, width, height, timestamp_100n);
-            mFURenderer.onDrawFrameSingleInput(zegoTextureId, width, height);
+            if (mFURenderer != null) {
+                mFURenderer.onDrawFrameSingleInput(zegoTextureId, width, height);
+            }
             needDropFrame = false;
         } else {  // 后续的就可以按照正常的方式进行处理
             // 传入 SDK 抛出的采集数据的纹理 ID 使用 faceunity 进行美颜，返回美颜后数据的纹理 ID
-            int textureId = mFURenderer.onDrawFrameSingleInput(zegoTextureId, width, height);
+            int textureId;
+            if (mFURenderer != null) {
+                textureId = mFURenderer.onDrawFrameSingleInput(zegoTextureId, width, height);
+            } else {
+                textureId = zegoTextureId;
+            }
 
             // 使用此 textureId 用做本地预览的视图渲染
             mClient.onProcessCallback(textureId, width, height, timestamp_100n);

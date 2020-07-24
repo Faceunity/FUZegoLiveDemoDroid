@@ -1,19 +1,15 @@
 package com.zego.videofilter.videoFilter;
 
 import android.graphics.SurfaceTexture;
-import android.os.Build;
-import android.os.Handler;
-import android.os.HandlerThread;
+import android.opengl.EGL14;
 import android.util.Log;
 
 import com.zego.videofilter.faceunity.FURenderer;
-import com.zego.videofilter.videoFilter.ve_gl.EglBase;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * 外部滤镜采用 BUFFER_TYPE_MEM（异步传递 RGBA32 图像数据）方式传递数据给 SDK。
@@ -30,8 +26,8 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
     // SDK 内部实现 ZegoVideoFilter.Client 协议的对象
     private ZegoVideoFilter.Client mClient = null;
 
-    private HandlerThread mThread = null;
-    private volatile Handler mHandler = null;
+//    private HandlerThread mThread = null;
+//    private volatile Handler mHandler = null;
 
     // 图像数据信息
     static class PixelBuffer {
@@ -50,7 +46,7 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
 
     private boolean mIsRunning = false;
 
-    private EglBase captureEglBase;
+//    private EglBase captureEglBase;
 
     public VideoFilterMemDemo(FURenderer fuRenderer) {
         this.mFURenderer = fuRenderer;
@@ -66,37 +62,39 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
      */
     @Override
     protected void allocateAndStart(Client client) {
-        Log.d(TAG, "allocateAndStart: ");
+        Log.d(TAG, "allocateAndStart:  egl " + EGL14.eglGetCurrentContext());
         mClient = client;
-        mThread = new HandlerThread("video-filter");
-        mThread.start();
-        mHandler = new Handler(mThread.getLooper());
+//        mThread = new HandlerThread("video-filter");
+//        mThread.start();
+//        mHandler = new Handler(mThread.getLooper());
         mIsRunning = true;
 
-        final CountDownLatch barrier = new CountDownLatch(1);
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
+//        final CountDownLatch barrier = new CountDownLatch(1);
+//        mHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
                 //faceunity 的接口调用需要在相同的 openGL 环境中，此处 openGL 相关的调用是为了构建GL环境
-                captureEglBase = EglBase.create(null, EglBase.CONFIG_PIXEL_BUFFER);
-                try {
-                    captureEglBase.createDummyPbufferSurface();
-                    captureEglBase.makeCurrent();
-                } catch (RuntimeException e) {
-                    // Clean up before rethrowing the exception.
-                    captureEglBase.releaseSurface();
-                    throw e;
-                }
+//                captureEglBase = EglBase.create(null, EglBase.CONFIG_PIXEL_BUFFER);
+//                try {
+//                    captureEglBase.createDummyPbufferSurface();
+//                    captureEglBase.makeCurrent();
+//                } catch (RuntimeException e) {
+//                    // Clean up before rethrowing the exception.
+//                    captureEglBase.releaseSurface();
+//                    throw e;
+//                }
                 // 创建及初始化 faceunity 相应的资源
-                mFURenderer.onSurfaceCreated();
-                barrier.countDown();
-            }
-        });
-        try {
-            barrier.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (mFURenderer != null) {
+            mFURenderer.onSurfaceCreated();
         }
+//                barrier.countDown();
+//            }
+//        });
+//        try {
+//            barrier.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         mProduceQueue.clear();
         mConsumeQueue.clear();
@@ -111,37 +109,37 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
      */
     @Override
     protected void stopAndDeAllocate() {
-        Log.d(TAG, "stopAndDeAllocate: ");
+        Log.d(TAG, "stopAndDeAllocate:  egl " + EGL14.eglGetCurrentContext());
 
         mIsRunning = false;
-        final CountDownLatch barrier = new CountDownLatch(1);
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
+//        final CountDownLatch barrier = new CountDownLatch(1);
+//        mHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
                 // 销毁 faceunity 相关的资源
-                mFURenderer.onSurfaceDestroyed();
+        if (mFURenderer != null) {
+            mFURenderer.onSurfaceDestroyed();
+        }
                 // 建议在同步停止滤镜任务后再清理 client 对象，保证 SDK 调用 stopAndDeAllocate 后，没有残留的异步任务导致野指针 crash。
                 mClient.destroy();
                 mClient = null;
 
-                release();
-
-                barrier.countDown();
-            }
-        });
-        try {
-            barrier.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        mHandler = null;
-
-        if (Build.VERSION.SDK_INT >= 18) {
-            mThread.quitSafely();
-        } else {
-            mThread.quit();
-        }
-        mThread = null;
+//                release();
+//                barrier.countDown();
+//            }
+//        });
+//        try {
+//            barrier.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        mHandler = null;
+//        if (Build.VERSION.SDK_INT >= 18) {
+//            mThread.quitSafely();
+//        } else {
+//            mThread.quit();
+//        }
+//        mThread = null;
     }
 
     /**
@@ -227,22 +225,22 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
         mWriteIndex = (mWriteIndex + 1) % mProduceQueue.size();
 
         // 切换线程，异步进行前处理
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
+//        mHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
                 if (!mIsRunning) {
                     Log.e(TAG, "already stopped");
                     return;
                 }
 
                 // 取出图像数据
-                PixelBuffer pixelBuffer = getConsumerPixelBuffer();
+        pixelBuffer = getConsumerPixelBuffer();
 
                 // 获取buffer下标
                 int index = mClient.dequeueInputBuffer(pixelBuffer.width, pixelBuffer.height, pixelBuffer.stride);
                 if (index >= 0) {
                     //faceunity 的接口调用需要在相同的 openGL 环境中，此处 openGL 相关的调用是为了构建同一 openGL 环境
-                    captureEglBase.makeCurrent();
+//                    captureEglBase.makeCurrent();
 
                     if (pixelBuffer.buffer.limit() > mModiBuffer.length) {
                         mModiBuffer = null;
@@ -252,8 +250,10 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
                     pixelBuffer.buffer.position(0);
                     pixelBuffer.buffer.get(mModiBuffer);
 
-                    // 调用 faceunity 进行美颜，美颜后会将数据回写到 modiBuffer
-                    mFURenderer.onDrawFrameSingleInput(mModiBuffer, pixelBuffer.width, pixelBuffer.height, FURenderer.INPUT_FORMAT_RGBA);
+                    if (mFURenderer != null) {
+                        // 调用 faceunity 进行美颜，美颜后会将数据回写到 modiBuffer
+                        mFURenderer.onDrawFrameSingleInput(mModiBuffer, pixelBuffer.width, pixelBuffer.height, FURenderer.INPUT_FORMAT_RGBA);
+                    }
 
                     // 根据获取到的buffer下标写数据到相应的内存中，将美颜后的数据传给 SDK
                     ByteBuffer dst = mClient.getInputBuffer(index);
@@ -263,12 +263,12 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
                     // 通知 SDK 取美颜数据
                     mClient.queueInputBuffer(index, pixelBuffer.width, pixelBuffer.height, pixelBuffer.stride, pixelBuffer.timestamp_100n);
 
-                    captureEglBase.detachCurrent();
+//                    captureEglBase.detachCurrent();
                 }
 
                 returnProducerPixelBuffer(pixelBuffer);
-            }
-        });
+//            }
+//        });
     }
 
     @Override
@@ -308,11 +308,11 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
 
     // 销毁 openGL
     private void release() {
-        if (captureEglBase.hasSurface()) {
-            captureEglBase.makeCurrent();
-        }
-
-        captureEglBase.release();
-        captureEglBase = null;
+//        if (captureEglBase.hasSurface()) {
+//            captureEglBase.makeCurrent();
+//        }
+//
+//        captureEglBase.release();
+//        captureEglBase = null;
     }
 }

@@ -1,8 +1,8 @@
 # FUZegoLiveDemoDroid 快速接入文档
 
-FUZegoLiveDemoDroid 是集成了 FaceUnity 美颜道具贴纸功能和 **[即构直播](https://doc.zego.im/CN/693.html)** 的 Demo。
+FUZegoLiveDemoDroid 是集成了 FaceUnity 特效功能和 **[即构直播](https://doc.zego.im/CN/693.html)** 的 Demo。
 
-本文是 FaceUnity Nama SDK 快速对接即构直播的导读说明，SDK 版本为 **6.7.0**。关于 SDK 的详细说明，请参看 **[FULiveDemoDroid](https://github.com/Faceunity/FULiveDemoDroid/)**。
+本文是 FaceUnity Nama SDK 快速对接即构直播的导读说明，SDK 版本为 **7.0.1**。关于 SDK 的详细说明，请参看 **[FULiveDemoDroid](https://github.com/Faceunity/FULiveDemoDroid/)**。
 
 ## 快速集成方法
 
@@ -10,17 +10,19 @@ FUZegoLiveDemoDroid 是集成了 FaceUnity 美颜道具贴纸功能和 **[即构
 
 将 faceunity  模块添加到工程中，下面是一些对文件的说明。
 
-- jniLibs 文件夹下 libnama.so 和 libfuai.so 是人脸跟踪和道具绘制的静态库
-- libs 文件夹下 nama.jar 是供应用层调用的 JNI 接口
-- assets 文件夹下 AI_model/ai_face_processor.bundle 是人脸识别数据包（自 6.6.0 版本起，v3.bundle 不再使用）
-- assets 文件夹下 face_beautification.bundle 是美颜功能数据包
-- assets 文件夹下 effect 中的 \*.bundle 文件是特效贴纸文件，自定义特效贴纸制作的文档和工具，请联系技术支持获取。
+- jniLibs 文件夹下 libCNamaSDK.so 和 libfuai.so 是道具绘制和人脸跟踪的动态库。
+- libs 文件夹下 nama.jar 提供应用层调用的 JNI 接口。
+- assets/graphic 文件夹下 face_beautification.bundle 是美颜道具，body_slim.bundle 是美体道具，face_makeup.bundle 是美妆道具。
+- assets/model 文件夹下 ai_face_processor.bundle 是人脸识别算法模型，ai_human_processor.bundle 是人体识别算法模型。
+- assets/effect 文件夹下 \*.bundle 是特效贴纸文件，自定义特效贴纸制作的文档和工具，请联系技术支持获取。
+- assets/makeup 文件夹下 \*.bundle 是美妆素材文件，自定义美妆制作的文档和工具，请联系技术支持获取。
+- com/faceunity/nama/authpack.java 是证书文件，必须提供有效的证书才能运行 Demo，请联系技术支持获取。
 
 ### 二、使用 SDK
 
 #### 1. 初始化
 
-在 `FURenderer` 类 的  `initFURenderer` 静态方法是对 FaceUnity SDK 一些全局数据初始化的封装，可以在 Application 中调用，也可以在工作线程调用，仅需初始化一次即可。
+在 `FURenderer` 类 的  `initFURenderer` 静态方法是对 FaceUnity SDK 数据初始化的封装，可以在工作线程调用，仅需初始化一次即可。
 
 #### 2.创建
 
@@ -28,7 +30,7 @@ FUZegoLiveDemoDroid 是集成了 FaceUnity 美颜道具贴纸功能和 **[即构
 
 #### 3. 图像处理
 
-在 `FURenderer` 类 的  `onDrawFrame` 方法是对 FaceUnity SDK 图像处理方法的封装，该方法有许多重载方法适用于不同的数据类型需求。
+在 `FURenderer` 类 的  `onDrawFrameXXX` 方法是对 FaceUnity SDK 图像处理方法的封装，该方法有许多重载方法适用于不同的数据类型需求。
 
 #### 4. 销毁
 
@@ -37,6 +39,11 @@ FUZegoLiveDemoDroid 是集成了 FaceUnity 美颜道具贴纸功能和 **[即构
 #### 5. 切换相机
 
 调用 `FURenderer` 类 的  `onCameraChanged` 方法，用于重新为 SDK 设置参数。
+
+#### 6. 旋转手机
+
+调用 `FURenderer` 类 的  `onDeviceOrientationChanged` 方法，用于重新为 SDK 设置参数。
+
 
 上面一系列方法的使用，具体在 demo 中 videofilter 模块的 `com.zego.videofilter.videoFilter` 包中，提供了多种输入输出类型的实现，请参考代码示例接入。
 

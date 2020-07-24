@@ -1,6 +1,7 @@
 package com.zego.videofilter.faceunity;
 
 import com.zego.videofilter.faceunity.entity.Effect;
+import com.zego.videofilter.faceunity.entity.Makeup;
 
 /**
  * FURenderer与界面之间的交互接口
@@ -11,9 +12,43 @@ public interface OnFaceUnityControlListener {
     /**
      * 选择道具贴纸
      *
-     * @param effect 道具贴纸
+     * @param effect
      */
     void onEffectSelected(Effect effect);
+
+    /**
+     * 加载美体模块
+     */
+    void loadBodySlimModule();
+
+    /**
+     * 销毁美体模块
+     */
+    void destroyBodySlimModule();
+
+    /**
+     * 加载美妆模块
+     */
+    void loadMakeupModule();
+
+    /**
+     * 销毁美妆模块
+     */
+    void destroyMakeupModule();
+
+    /**
+     * 选择美妆
+     *
+     * @param makeup
+     */
+    void selectMakeup(Makeup makeup);
+
+    /**
+     * 设置美妆强度
+     *
+     * @param intensity
+     */
+    void setMakeupIntensity(float intensity);
 
     /**
      * 设置滤镜名称
@@ -28,20 +63,6 @@ public interface OnFaceUnityControlListener {
      * @param level 滤镜程度
      */
     void onFilterLevelSelected(float level);
-
-    /**
-     * 精准磨皮
-     *
-     * @param isOn 0:关闭, 1:开启
-     */
-    void onSkinDetectSelected(int isOn);
-
-    /**
-     * 设置美肤类型
-     *
-     * @param skinType 0:清晰美肤, 1:朦胧美肤
-     */
-    void onSkinTypeSelected(int skinType);
 
     /**
      * 调节磨皮
@@ -65,65 +86,192 @@ public interface OnFaceUnityControlListener {
     void onRedLevelSelected(float level);
 
     /**
-     * 调节亮眼
+     * 设置瘦身程度
      *
-     * @param level 亮眼程度
+     * @param intensity
      */
-    void onBrightEyesSelected(float level);
+    void setBodySlimIntensity(float intensity);
 
     /**
-     * 调节美牙
+     * 设置长腿程度
      *
-     * @param level 美牙程度
+     * @param intensity
      */
-    void onBeautyTeethSelected(float level);
+    void setLegSlimIntensity(float intensity);
 
     /**
-     * 选择脸型
+     * 设置细腰程度
      *
-     * @param faceShape 0:女神, 1:网红, 2:自然, 3:默认, 4:精细变形
+     * @param intensity
      */
-    void onFaceShapeTypeSelected(int faceShape);
+    void setWaistSlimIntensity(float intensity);
 
     /**
-     * 调节大眼
+     * 设置美肩程度
      *
-     * @param level 大眼程度
+     * @param intensity
      */
-    void onEnlargeEyeSelected(float level);
+    void setShoulderSlimIntensity(float intensity);
 
     /**
-     * 调节瘦脸
+     * 设置美臀程度
      *
-     * @param level 瘦脸程度
+     * @param intensity
      */
-    void onCheekThinSelected(float level);
+    void setHipSlimIntensity(float intensity);
 
     /**
-     * 调节下巴
+     * 设置小头程度
      *
-     * @param level 下巴程度
+     * @param intensity
      */
-    void onChinLevelSelected(float level);
+    void setHeadSlimIntensity(float intensity);
 
     /**
-     * 调节额头
+     * 设置瘦腿程度
      *
-     * @param level 额头程度
+     * @param intensity
      */
-    void onForeheadLevelSelected(float level);
+    void setLegThinSlimIntensity(float intensity);
 
     /**
-     * 调节瘦鼻
+     * 设置去黑眼圈强度
      *
-     * @param level 瘦鼻程度
+     * @param strength
      */
-    void onThinNoseLevelSelected(float level);
+    void setRemovePouchStrength(float strength);
 
     /**
-     * 调节嘴形
+     * 设置去法令纹强度
      *
-     * @param level 嘴形程度
+     * @param strength
      */
-    void onMouthShapeSelected(float level);
+    void setRemoveNasolabialFoldsStrength(float strength);
+
+    /**
+     * 设置微笑嘴角强度
+     *
+     * @param intensity
+     */
+    void setSmileIntensity(float intensity);
+
+    /**
+     * 设置开眼角强度
+     *
+     * @param intensity
+     */
+    void setCanthusIntensity(float intensity);
+
+    /**
+     * 设置人中长度
+     *
+     * @param intensity
+     */
+    void setPhiltrumIntensity(float intensity);
+
+    /**
+     * 设置鼻子长度
+     *
+     * @param intensity
+     */
+    void setLongNoseIntensity(float intensity);
+
+    /**
+     * 设置眼睛间距
+     *
+     * @param intensity
+     */
+    void setEyeSpaceIntensity(float intensity);
+
+    /**
+     * 设置眼睛角度
+     *
+     * @param intensity
+     */
+    void setEyeRotateIntensity(float intensity);
+
+    /**
+     * 亮眼
+     *
+     * @param level
+     */
+    void onEyeBrightSelected(float level);
+
+    /**
+     * 美牙
+     *
+     * @param level
+     */
+    void onToothWhitenSelected(float level);
+
+    /**
+     * 大眼
+     *
+     * @param level
+     */
+    void onEyeEnlargeSelected(float level);
+
+    /**
+     * 瘦脸
+     *
+     * @param level
+     */
+    void onCheekThinningSelected(float level);
+
+    /**
+     * 下巴
+     *
+     * @param level
+     */
+    void onIntensityChinSelected(float level);
+
+    /**
+     * 额头
+     *
+     * @param level
+     */
+    void onIntensityForeheadSelected(float level);
+
+    /**
+     * 瘦鼻
+     *
+     * @param level
+     */
+    void onIntensityNoseSelected(float level);
+
+    /**
+     * 嘴形
+     *
+     * @param level
+     */
+    void onIntensityMouthSelected(float level);
+
+    /**
+     * 窄脸
+     *
+     * @param level
+     */
+    void onCheekNarrowSelected(float level);
+
+    /**
+     * 小脸
+     *
+     * @param level
+     */
+    void onCheekSmallSelected(float level);
+
+    /**
+     * V脸
+     *
+     * @param level
+     */
+    void onCheekVSelected(float level);
+
+    /**
+     * 美颜效果全局开关
+     *
+     * @param isOn
+     */
+    void setBeautificationOn(boolean isOn);
+
 }
