@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
@@ -19,8 +20,9 @@ import com.zego.videofilter.ZGFilterHelper;
 import com.zego.videofilter.databinding.ActivityFuBaseBinding;
 import com.zego.videofilter.faceunity.FURenderer;
 import com.zego.videofilter.faceunity.utils.LifeCycleSensorManager;
+import com.zego.videofilter.util.PreferenceUtil;
 import com.zego.videofilter.videoFilter.VideoFilterFactoryDemo;
-import com.zego.videofilter.view.BeautyControlView;
+import com.zego.videofilter.view.FaceUnityView;
 import com.zego.zegoavkit2.videofilter.ZegoExternalVideoFilter;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.callback.IZegoInitSDKCompletionCallback;
@@ -77,30 +79,50 @@ public class FUBeautyActivity extends AppCompatActivity {
         mRoomID = getIntent().getStringExtra("roomID");
         chooseFilterType = (VideoFilterFactoryDemo.FilterType) getIntent().getSerializableExtra("FilterType");
         Log.d(TAG, "onCreate: roomID:" + mRoomID + ", filterType:" + chooseFilterType);
-        switch (chooseFilterType) {
-            case FilterType_SurfaceTexture: {
-                mFURenderer = new FURenderer.Builder(this)
-                        .setInputTextureType(FURenderer.INPUT_EXTERNAL_OES_TEXTURE)
-                        .setCameraType(Camera.CameraInfo.CAMERA_FACING_FRONT)
-                        .setInputImageOrientation(FURenderer.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_FRONT))
-                        .build();
+        FaceUnityView faceUnityView = findViewById(R.id.fu_beauty_control);
+        boolean isFuBeautyOpen = TextUtils.equals(PreferenceUtil.VALUE_ON, PreferenceUtil.getString(this, PreferenceUtil.KEY_FACEUNITY_IS_ON));
+        if (isFuBeautyOpen) {
+            FURenderer.initFURenderer(this);
+            switch (chooseFilterType) {
+                case FilterType_SurfaceTexture: {
+                    mFURenderer = new FURenderer.Builder(this)
+                            .setInputTextureType(FURenderer.INPUT_EXTERNAL_OES_TEXTURE)
+                            .setCameraType(Camera.CameraInfo.CAMERA_FACING_FRONT)
+                            .setInputImageOrientation(FURenderer.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_FRONT))
+                            .setRunBenchmark(false)
+                            .setOnDebugListener(new FURenderer.OnDebugListener() {
+                                @Override
+                                public void onFpsChanged(double fps, double renderTime) {
+                                    Log.v(TAG, "onFpsChanged: fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
+                                }
+                            })
+                            .build();
+                }
+                break;
+                case FilterType_Mem:
+                case FilterType_ASYNCI420Mem:
+                case FilterType_HybridMem:
+                case FilterType_SyncTexture: {
+                    mFURenderer = new FURenderer.Builder(this)
+                            .setInputTextureType(FURenderer.INPUT_2D_TEXTURE)
+                            .setCameraType(Camera.CameraInfo.CAMERA_FACING_FRONT)
+                            .setInputImageOrientation(FURenderer.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_FRONT))
+                            .setRunBenchmark(false)
+                            .setOnDebugListener(new FURenderer.OnDebugListener() {
+                                @Override
+                                public void onFpsChanged(double fps, double renderTime) {
+                                    Log.v(TAG, "onFpsChanged: fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
+                                }
+                            })
+                            .build();
+                }
+                break;
+                default:
             }
-            break;
-            case FilterType_Mem:
-            case FilterType_ASYNCI420Mem:
-            case FilterType_HybridMem:
-            case FilterType_SyncTexture: {
-                mFURenderer = new FURenderer.Builder(this)
-                        .setInputTextureType(FURenderer.INPUT_2D_TEXTURE)
-                        .setCameraType(Camera.CameraInfo.CAMERA_FACING_FRONT)
-                        .setInputImageOrientation(FURenderer.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_FRONT))
-                        .build();
-            }
-            break;
-            default:
+            faceUnityView.setOnFaceUnityControlListener(mFURenderer);
+        } else {
+            faceUnityView.setVisibility(View.INVISIBLE);
         }
-        BeautyControlView beautyControlView = findViewById(R.id.fu_beauty_control);
-        beautyControlView.setOnFaceUnityControlListener(mFURenderer);
 
         // 初始化SDK
         initSDK();
@@ -112,11 +134,13 @@ public class FUBeautyActivity extends AppCompatActivity {
         lifeCycleSensorManager.setOnAccelerometerChangedListener(new LifeCycleSensorManager.OnAccelerometerChangedListener() {
             @Override
             public void onAccelerometerChanged(float x, float y, float z) {
-                if (Math.abs(x) > 3 || Math.abs(y) > 3) {
-                    if (Math.abs(x) > Math.abs(y)) {
-                        mFURenderer.onDeviceOrientationChanged(x > 0 ? 0 : 180);
-                    } else {
-                        mFURenderer.onDeviceOrientationChanged(y > 0 ? 90 : 270);
+                if (mFURenderer != null) {
+                    if (Math.abs(x) > 3 || Math.abs(y) > 3) {
+                        if (Math.abs(x) > Math.abs(y)) {
+                            mFURenderer.onDeviceOrientationChanged(x > 0 ? 0 : 180);
+                        } else {
+                            mFURenderer.onDeviceOrientationChanged(y > 0 ? 90 : 270);
+                        }
                     }
                 }
             }

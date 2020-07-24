@@ -12,7 +12,6 @@ import com.zego.common.util.AppLogger;
 import com.zego.common.widgets.CustomPopWindow;
 import com.zego.videofilter.R;
 import com.zego.videofilter.databinding.ActivityVideoFilterMainBinding;
-import com.zego.videofilter.faceunity.FURenderer;
 import com.zego.videofilter.faceunity.authpack;
 import com.zego.videofilter.videoFilter.VideoFilterFactoryDemo;
 
@@ -20,7 +19,7 @@ public class VideoFilterMainUI extends AppCompatActivity implements View.OnClick
 
     private ActivityVideoFilterMainBinding binding;
 
-    private VideoFilterFactoryDemo.FilterType mFilterType = VideoFilterFactoryDemo.FilterType.FilterType_SurfaceTexture;
+    private VideoFilterFactoryDemo.FilterType mFilterType = VideoFilterFactoryDemo.FilterType.FilterType_ASYNCI420Mem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +47,6 @@ public class VideoFilterMainUI extends AppCompatActivity implements View.OnClick
         if (null == authpack.A()) {
             binding.authpack.setText(R.string.tx_has_no_fu_authpack);
             binding.loginBtn.setVisibility(View.INVISIBLE);
-        } else {
-            // 初始化 FaceUnity
-            FURenderer.initFURenderer(this);
         }
     }
 

@@ -230,14 +230,20 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
         mEglContext.makeCurrent();
 
         // 调用 faceunity 进行美颜，美颜后返回纹理 ID
-        int textureID = mFuRender.onDrawFrameSingleInput(mInputTextureId, mOutputWidth, mInputHeight);
+        int textureID = 0;
+        if (mFuRender != null) {
+            textureID = mFuRender.onDrawFrameSingleInput(mInputTextureId, mOutputWidth, mInputHeight);
+        }
 
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         // 绘制美颜数据
-        mDrawer.drawRgb(textureID, transformationMatrix,
-                mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
+        if (textureID > 0) {
+            mDrawer.drawRgb(textureID, transformationMatrix, mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
+        } else {
+            mDrawer.drawOes(mInputTextureId, transformationMatrix, mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
+        }
 
 
         if (mIsEgl14) {
@@ -259,7 +265,9 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
             }
 
             // 销毁 faceunity 相关的资源
-            mFuRender.onSurfaceDestroyed();
+            if (mFuRender != null) {
+                mFuRender.onSurfaceDestroyed();
+            }
 
             mEglContext.releaseSurface();
         }
@@ -281,7 +289,9 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
         mEglContext.makeCurrent();
 
         // 创建及初始化 faceunity 相应的资源
-        mFuRender.onSurfaceCreated();
+        if (mFuRender != null) {
+            mFuRender.onSurfaceCreated();
+        }
     }
 
     // 释放 openGL 相关资源
@@ -306,7 +316,9 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
             }
 
             // 销毁 faceunity 相关的资源
-            mFuRender.onSurfaceDestroyed();
+            if (mFuRender != null) {
+                mFuRender.onSurfaceDestroyed();
+            }
         }
         mEglContext.release();
         mEglContext = null;

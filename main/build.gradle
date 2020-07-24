@@ -7,13 +7,10 @@ android {
         minSdkVersion 15
         targetSdkVersion 28
         versionCode getAppVersionCode()
-
         versionName getAppVersionName()
 
-        
         ndk {
-            //设置支持的SO库架构
-            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'
+            abiFilters 'arm64-v8a', 'armeabi-v7a'
         }
 
         multiDexEnabled true
