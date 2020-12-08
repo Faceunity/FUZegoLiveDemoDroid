@@ -22,7 +22,7 @@ import com.zego.zegoliveroom.constants.ZegoVideoViewMode;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
 
 
-public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublisher.MixStreamPublisherCallback, ZGMixStreamDemo.MixStreamCallback {
+public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublisher.MixStreamPublisherCallback,ZGMixStreamDemo.MixStreamCallback {
 
     private ToggleButton mCameraTog;
     private Button mRequestBtn;
@@ -56,17 +56,17 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
         setContentView(R.layout.activity_mix_audience);
 
         mCameraTog = (ToggleButton) findViewById(R.id.tb_enable_front_cam);
-        mRequestBtn = (Button) findViewById(R.id.conference_btn);
+        mRequestBtn = (Button)findViewById(R.id.conference_btn);
         mRequestBtn.setEnabled(false);
-        mExitBtn = (Button) findViewById(R.id.quit_btn);
+        mExitBtn = (Button)findViewById(R.id.quit_btn);
         mExitBtn.setEnabled(false);
-        mPlayAuxBtn = (Button) findViewById(R.id.playAux_btn);
+        mPlayAuxBtn = (Button)findViewById(R.id.playAux_btn);
         mPlayAuxBtn.setEnabled(false);
-        mPlayview = (TextureView) findViewById(R.id.play_view);
-        mPreview = (TextureView) findViewById(R.id.preview_view);
-        mQualityTxt = (TextView) findViewById(R.id.quality_txt);
-        mErrorTxt = (TextView) findViewById(R.id.error_txt);
-        mSoundInfoTxt = (TextView) findViewById(R.id.soundlevel_txt);
+        mPlayview = (TextureView)findViewById(R.id.play_view);
+        mPreview = (TextureView)findViewById(R.id.preview_view);
+        mQualityTxt = (TextView)findViewById(R.id.quality_txt);
+        mErrorTxt = (TextView)findViewById(R.id.error_txt);
+        mSoundInfoTxt = (TextView)findViewById(R.id.soundlevel_txt);
 
         mCameraTog.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -150,17 +150,17 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
 
     public void RequestBeAnchor(View view) {
         //申请连麦
-        ZGManager.sharedInstance().api().requestJoinLive(new IZegoResponseCallback() {
-            @Override
-            public void onResponse(int result, String fromUserID, String fromUserName) {
+         ZGManager.sharedInstance().api().requestJoinLive(new IZegoResponseCallback() {
+             @Override
+             public void onResponse(int result, String fromUserID, String fromUserName) {
 
-                if (0 == result) {
-                    mPreview.setVisibility(View.VISIBLE);
+                 if (0 == result){
+                     mPreview.setVisibility(View.VISIBLE);
 
-                    ZGMixStreamPublisher.sharedInstance().startPublish(mRoomID, ZegoConstants.PublishFlag.JoinPublish, mPreview);
-                }
-            }
-        });
+                     ZGMixStreamPublisher.sharedInstance().startPublish(mRoomID, ZegoConstants.PublishFlag.JoinPublish, mPreview);
+                 }
+             }
+         });
     }
 
     public void QuitLiveRoom(View view) {
@@ -169,7 +169,7 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
 
         mRequestBtn.setEnabled(true);
         beLinked = false;
-        if (!mixStreamID.equals("")) {
+        if (!mixStreamID.equals("")){
             mPlayAuxBtn.setEnabled(true);
         }
         mPreview.setVisibility(View.INVISIBLE);
@@ -190,7 +190,7 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
             }
 
         } else {
-            if (!playStreamID.equals("")) {
+            if (!playStreamID.equals("")){
 
                 if (bePlayingMixStream) {
                     ZGManager.sharedInstance().api().stopPlayingStream(mixStreamID);
@@ -209,19 +209,19 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
             if (!streamID.equals(playStreamID)) {
                 mRequestBtn.setEnabled(false);
                 bePlayingMixStream = true;
-                runOnUiThread(() -> {
+                runOnUiThread(()->{
                     mPlayAuxBtn.setText("播放主播流");
                 });
             } else {
                 mRequestBtn.setEnabled(true);
                 bePlayingStream = true;
-                runOnUiThread(() -> {
+                runOnUiThread(()->{
                     mPlayAuxBtn.setText("播放混流");
                 });
             }
         } else {
-            runOnUiThread(() -> {
-                mErrorTxt.setText("play fail,err: " + stateCode);
+            runOnUiThread(()->{
+                mErrorTxt.setText("play fail,err: "+stateCode);
             });
         }
     }
@@ -229,7 +229,7 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
     @Override
     public void onPlayQualityUpdate(String quality) {
 
-        runOnUiThread(() -> {
+        runOnUiThread(()->{
             mQualityTxt.setText(quality);
         });
     }
@@ -246,7 +246,7 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
             mRequestBtn.setEnabled(true);
             mExitBtn.setEnabled(false);
             beLinked = false;
-            if (!mixStreamID.equals("")) {
+            if (!mixStreamID.equals("")){
                 mPlayAuxBtn.setEnabled(true);
             }
             mPreview.setVisibility(View.INVISIBLE);
@@ -260,7 +260,7 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
             mExitBtn.setEnabled(true);
             beLinked = true;
         } else {
-            runOnUiThread(() -> {
+            runOnUiThread(()->{
                 mErrorTxt.setText("publish fail,err: " + stateCode);
             });
         }
@@ -291,7 +291,7 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
 
             // 对应于此demo中 只拉一条流，此处只停止拉一条流
             if (bePlayingStream) {
-                for (int i = 0; i < zegoStreamInfos.length; i++) {
+                for (int i = 0; i<zegoStreamInfos.length;i++) {
                     if (playStreamID.equals(zegoStreamInfos[i].streamID)) {
                         ZGManager.sharedInstance().api().stopPlayingStream(zegoStreamInfos[i].streamID);
                         bePlayingStream = false;
@@ -307,7 +307,7 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
     public void onStreamExtraInfoUpdated(ZegoStreamInfo[] zegoStreamInfos, String roomID) {
 
         mixStreamID = ZGMixStreamDemo.sharedInstance().getMixStreamID(zegoStreamInfos);
-        if (!mixStreamID.equals("") && !beLinked) {
+        if (!mixStreamID.equals("") && !beLinked){
             mPlayAuxBtn.setEnabled(true);
         }
     }
@@ -320,8 +320,8 @@ public class ZGMixAudienceUI extends BaseActivity implements ZGMixStreamPublishe
     // 音量回调
     @Override
     public void onSoundLevelInMixStream(long anchorSoundLevel, long audienceSoundLevel) {
-        runOnUiThread(() -> {
-            mSoundInfoTxt.setText("主播音量：" + String.valueOf(anchorSoundLevel) + ", 副主播音量：" + String.valueOf(audienceSoundLevel));
+        runOnUiThread(()->{
+            mSoundInfoTxt.setText("主播音量："+String.valueOf(anchorSoundLevel)+", 副主播音量："+String.valueOf(audienceSoundLevel));
         });
     }
 }

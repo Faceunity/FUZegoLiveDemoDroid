@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+
 import com.zego.liveroomplayground.R;
 import com.zego.liveroomplayground.demo.entity.ModuleInfo;
 

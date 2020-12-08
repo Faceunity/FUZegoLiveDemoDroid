@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.zego.videofilter.view.FaceUnityView
+    <com.faceunity.nama.ui.FaceUnityView
         android:id="@+id/fu_beauty_control"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

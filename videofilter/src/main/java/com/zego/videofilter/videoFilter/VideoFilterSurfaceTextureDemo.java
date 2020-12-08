@@ -1,5 +1,6 @@
 package com.zego.videofilter.videoFilter;
 
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
@@ -9,14 +10,20 @@ import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Surface;
 
-import com.zego.videofilter.faceunity.FURenderer;
+import com.faceunity.nama.FURenderer;
+import com.zego.videofilter.profile.CSVUtils;
+import com.zego.videofilter.profile.Constant;
 import com.zego.videofilter.videoFilter.ve_gl.EglBase;
 import com.zego.videofilter.videoFilter.ve_gl.EglBase14;
 import com.zego.videofilter.videoFilter.ve_gl.GlRectDrawer;
 import com.zego.videofilter.videoFilter.ve_gl.GlUtil;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
+import java.io.File;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -46,6 +53,7 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
     private int mInputTextureId = 0;
     private Surface mOutputSurface = null;
     private boolean mIsEgl14 = false;
+    private int mSkipFrames = 5;
 
     private GlRectDrawer mDrawer = null;
     private float[] transformationMatrix = new float[]{
@@ -55,8 +63,12 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
             0.0f, 0.0f, 0.0f, 1.0f
     };
 
-    public VideoFilterSurfaceTextureDemo(FURenderer fuRenderer) {
+    private CSVUtils mCSVUtils;
+    private Context mContext;
+
+    public VideoFilterSurfaceTextureDemo(Context context, FURenderer fuRenderer) {
         this.mFuRender = fuRenderer;
+        this.mContext = context;
     }
 
     /**
@@ -174,6 +186,7 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
 
             mInputWidth = width;
             mInputHeight = height;
+            Log.e(TAG, "setInputSurface: width " + width + " height " + height);
 
             // 获取 SDK 给出的 SurfaceTexture
             final SurfaceTexture surfaceTexture = mClient.getSurfaceTexture();
@@ -232,20 +245,25 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
         // 调用 faceunity 进行美颜，美颜后返回纹理 ID
         int textureID = 0;
         if (mFuRender != null) {
+            long start = System.nanoTime();
             textureID = mFuRender.onDrawFrameSingleInput(mInputTextureId, mOutputWidth, mInputHeight);
+            long time = System.nanoTime() - start;
+            if (mCSVUtils != null) {
+                mCSVUtils.writeCsv(null, time);
+            }
         }
 
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         // 绘制美颜数据
-        if (textureID > 0) {
-            mDrawer.drawRgb(textureID, transformationMatrix, mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
-        } else {
-            mDrawer.drawOes(mInputTextureId, transformationMatrix, mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
+        if (mSkipFrames-- < 0) {
+            if (textureID > 0) {
+                mDrawer.drawRgb(textureID, transformationMatrix, mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
+            } else {
+                mDrawer.drawOes(mInputTextureId, transformationMatrix, mOutputWidth, mOutputHeight, 0, 0, mOutputWidth, mOutputHeight);
+            }
         }
-
-
         if (mIsEgl14) {
             ((EglBase14) mEglContext).swapBuffers(timestampNs);
         } else {
@@ -255,8 +273,13 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
         mEglContext.detachCurrent();
     }
 
+    public void onCameraChange() {
+        mSkipFrames = 4;
+    }
+
     // 设置 Surface
     private void setOutputSurface(SurfaceTexture surfaceTexture, int width, int height) {
+        Log.e(TAG, "setOutputSurface: width " + width + " height " + height);
         if (mEglContext.hasSurface()) {
             mEglContext.makeCurrent();
             if (mDrawer != null) {
@@ -292,6 +315,7 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
         if (mFuRender != null) {
             mFuRender.onSurfaceCreated();
         }
+        initCsvUtil(mContext);
     }
 
     // 释放 openGL 相关资源
@@ -319,6 +343,9 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
             if (mFuRender != null) {
                 mFuRender.onSurfaceDestroyed();
             }
+            if (mCSVUtils != null) {
+                mCSVUtils.close();
+            }
         }
         mEglContext.release();
         mEglContext = null;
@@ -327,5 +354,22 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
             mOutputSurface.release();
             mOutputSurface = null;
         }
+    }
+
+
+    private void initCsvUtil(Context context) {
+        mCSVUtils = new CSVUtils(context);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
+        String dateStrDir = format.format(new Date(System.currentTimeMillis()));
+        dateStrDir = dateStrDir.replaceAll("-", "").replaceAll("_", "");
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.getDefault());
+        String dateStrFile = df.format(new Date());
+        String filePath = Constant.filePath + dateStrDir + File.separator + "excel-" + dateStrFile + ".csv";
+        Log.d(TAG, "initLog: CSV file path:" + filePath);
+        StringBuilder headerInfo = new StringBuilder();
+        headerInfo.append("version：").append(FURenderer.getVersion()).append(CSVUtils.COMMA)
+                .append("机型：").append(android.os.Build.MANUFACTURER).append(android.os.Build.MODEL)
+                .append("处理方式：单Texture").append(CSVUtils.COMMA);
+        mCSVUtils.initHeader(filePath, headerInfo);
     }
 }

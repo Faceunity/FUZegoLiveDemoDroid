@@ -73,9 +73,9 @@ public class ZGMediaSideInfoDemoHelper implements IZegoLivePublisherCallback, IZ
 
     }
 
-    public void publishAndPlayWithCongfig(Context context, boolean onlyAudioPublish, TextureView view) {
+    public void publishAndPlayWithCongfig(Context context, boolean onlyAudioPublish, TextureView view){
 
-        if (ZGMediaSideTopicStatus.ZGMediaSideTopicStatus_Login_OK != getTopicStatus()) {
+        if (ZGMediaSideTopicStatus.ZGMediaSideTopicStatus_Login_OK != getTopicStatus()){
             return;
         }
         ZGManager.sharedInstance().api().setZegoLivePublisherCallback(this);
@@ -86,9 +86,9 @@ public class ZGMediaSideInfoDemoHelper implements IZegoLivePublisherCallback, IZ
 
         mDeviceID = DeviceInfoManager.generateDeviceId(context);
 
-        if (onlyAudioPublish) {
+        if (onlyAudioPublish){
             ZGManager.sharedInstance().api().enableCamera(false);
-        } else {
+        }else {
             ZGManager.sharedInstance().api().setPreviewView(view);
             ZGManager.sharedInstance().api().enableCamera(true);
             ZGManager.sharedInstance().api().startPreview();
@@ -104,13 +104,13 @@ public class ZGMediaSideInfoDemoHelper implements IZegoLivePublisherCallback, IZ
     }
 
     // 修改登录状态、推拉流状态或者媒体次要信息发送状态
-    public void setTopicStatus(ZGMediaSideTopicStatus status) {
+    public void setTopicStatus(ZGMediaSideTopicStatus status){
         mTopicStatus = status;
 
         if (null != mStatusChangedNotifier) {
             mStatusChangedNotifier.onStatusChanged(status);
         }
-        if (ZGMediaSideTopicStatus.ZGMediaSideTopicStatus_None == mTopicStatus) {
+        if (ZGMediaSideTopicStatus.ZGMediaSideTopicStatus_None == mTopicStatus){
             // 登出房间之前 停止拉流，推流和预览
             ZGManager.sharedInstance().api().stopPlayingStream(mDeviceID);
             ZGManager.sharedInstance().api().stopPreview();
@@ -181,9 +181,9 @@ public class ZGMediaSideInfoDemoHelper implements IZegoLivePublisherCallback, IZ
     @Override
     public void onPlayStateUpdate(int stateCode, String streamID) {
 
-        if (0 == stateCode) {
+        if (0 == stateCode){
 
-            if (ZGMediaSideTopicStatus.ZGMediaSideTopicStatus_Start_Playing != getTopicStatus()) {
+            if (ZGMediaSideTopicStatus.ZGMediaSideTopicStatus_Start_Playing != getTopicStatus()){
                 return;
             }
             setTopicStatus(ZGMediaSideTopicStatus.ZGMediaSideTopicStatus_Ready_For_Messaging);

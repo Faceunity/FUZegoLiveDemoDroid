@@ -5,7 +5,7 @@
     android:layout_height="@dimen/x268"
     android:background="#BD050F14">
 
-    <com.zego.videofilter.view.seekbar.DiscreteSeekBar
+    <com.faceunity.nama.ui.seekbar.DiscreteSeekBar
         android:id="@+id/seek_bar_beauty_body"
         android:layout_width="@dimen/x528"
         android:layout_height="wrap_content"
@@ -70,14 +70,14 @@
         android:layout_marginLeft="@dimen/x150"
         android:scrollbars="none">
 
-        <com.zego.videofilter.view.BeautyBoxGroup
+        <com.faceunity.nama.ui.BeautyBoxGroup
             android:id="@+id/beauty_group_body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal|bottom"
             android:orientation="horizontal">
 
-            <com.zego.videofilter.view.BeautyBox
+            <com.faceunity.nama.ui.BeautyBox
                 android:id="@+id/beauty_box_body_slim"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -88,7 +88,7 @@
                 app:drawable_open_normal="@drawable/demo_icon_slimming_nor_open"
                 app:text_normal="@string/slimming" />
 
-            <com.zego.videofilter.view.BeautyBox
+            <com.faceunity.nama.ui.BeautyBox
                 android:id="@+id/beauty_box_long_leg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
                 app:drawable_open_normal="@drawable/demo_icon_stovepipe_nor_open"
                 app:text_normal="@string/long_legs" />
 
-            <com.zego.videofilter.view.BeautyBox
+            <com.faceunity.nama.ui.BeautyBox
                 android:id="@+id/beauty_box_thin_waist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
                 app:drawable_open_normal="@drawable/demo_icon_thin_waist_nor_open"
                 app:text_normal="@string/thin_waist" />
 
-            <com.zego.videofilter.view.BeautyBox
+            <com.faceunity.nama.ui.BeautyBox
                 android:id="@+id/beauty_box_beauty_shoulder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -118,7 +118,7 @@
                 app:drawable_open_normal="@drawable/demo_icon_shoulder_nor_open"
                 app:text_normal="@string/beautify_shoulder" />
 
-            <com.zego.videofilter.view.BeautyBox
+            <com.faceunity.nama.ui.BeautyBox
                 android:id="@+id/beauty_box_hip_slim"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -128,7 +128,7 @@
                 app:drawable_open_normal="@drawable/demo_icon_hip_nor_open"
                 app:text_normal="@string/beautify_hip_slim" />
 
-            <com.zego.videofilter.view.BeautyBox
+            <com.faceunity.nama.ui.BeautyBox
                 android:id="@+id/beauty_box_head_slim"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
                 app:drawable_open_normal="@drawable/demo_icon_little_head_nor_open"
                 app:text_normal="@string/beautify_head_slim" />
 
-            <com.zego.videofilter.view.BeautyBox
+            <com.faceunity.nama.ui.BeautyBox
                 android:id="@+id/beauty_box_leg_thin_slim"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -148,7 +148,7 @@
                 app:drawable_open_normal="@drawable/demo_icon_thin_leg_nor_open"
                 app:text_normal="@string/beautify_leg_thin_slim" />
 
-        </com.zego.videofilter.view.BeautyBoxGroup>
+        </com.faceunity.nama.ui.BeautyBoxGroup>
 
     </HorizontalScrollView>
 

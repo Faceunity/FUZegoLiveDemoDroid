@@ -9,23 +9,23 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.zego.audioplayer.ui.AudioPlayerMainUI;
-import com.zego.common.ui.BaseActivity;
-import com.zego.common.ui.WebActivity;
 import com.zego.frequency_spectrum.ui.FrequencySpectrumAndSoundLevelMainActivity;
 import com.zego.joinlive.ui.JoinLiveMainActivityUI;
-import com.zego.layeredcoding.ui.ZGRoomListUI;
 import com.zego.liveroomplayground.R;
 import com.zego.liveroomplayground.databinding.ActivityMainBinding;
 import com.zego.liveroomplayground.demo.adapter.MainAdapter;
 import com.zego.liveroomplayground.demo.entity.ModuleInfo;
-import com.zego.mediaplayer.ui.ZGPlayerTypeUI;
 import com.zego.mediarecorder.ZGMediaRecorderRecordUI;
-import com.zego.mediasideinfo.ui.MediaSideInfoDemoUI;
+import com.zego.play.ui.InitSDKPlayActivityUI;
+import com.zego.common.ui.BaseActivity;
+import com.zego.common.ui.WebActivity;
+import com.zego.layeredcoding.ui.ZGRoomListUI;
+import com.zego.mediaplayer.ui.ZGPlayerTypeUI;
 import com.zego.mixing.ui.ZGMixingDemoUI;
 import com.zego.mixstream.ui.ZGMixStreamRoomListUI;
-import com.zego.play.ui.InitSDKPlayActivityUI;
-import com.zego.publish.ui.InitSDKPublishActivityUI;
 import com.zego.sound.processing.ui.SoundProcessMainActivityUI;
+import com.zego.mediasideinfo.ui.MediaSideInfoDemoUI;
+import com.zego.publish.ui.InitSDKPublishActivityUI;
 import com.zego.videocapture.ui.ZGVideoCaptureOriginUI;
 import com.zego.videocommunication.ui.VideoCommunicationMainUI;
 import com.zego.videoexternalrender.ui.ZGVideoRenderTypeUI;
@@ -59,7 +59,7 @@ public class MainActivity extends BaseActivity {
         setTitle("ZegoDemo");
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        binding.setting.setOnClickListener(new View.OnClickListener() {
+        binding.setting.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {

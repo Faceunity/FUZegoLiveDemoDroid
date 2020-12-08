@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -45,7 +46,7 @@ public class ZGVideoCaptureOriginUI extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zgvideo_capture_type);
 
-        mCaptureTypeGroup = (RadioGroup) findViewById(R.id.CaptureTypeGroup);
+        mCaptureTypeGroup = (RadioGroup)findViewById(R.id.CaptureTypeGroup);
         // 获取采集源button id
         final int[] radioCaptureTypeBtns = {R.id.RadioImage, R.id.RadioScreen, R.id.RadioCamera, R.id.RadioCameraYUV/*, R.id.RadioCameraBitStream*/};
 
@@ -63,20 +64,20 @@ public class ZGVideoCaptureOriginUI extends BaseActivity {
                     // 录屏作为采集源
                     captureOrigin = VideoCaptureFactoryDemo.CaptureOrigin.CaptureOrigin_Screen; //录屏
                     // 检测系统版本
-                    if (Build.VERSION.SDK_INT < 21) {
+                    if(Build.VERSION.SDK_INT < 21){
                         Toast.makeText(ZGVideoCaptureOriginUI.this, "录屏功能只能在Android5.0及以上版本的系统中运行", Toast.LENGTH_SHORT).show();
                         finish();
-                    } else {
+                    }else {
 
                         // 1. 请求录屏权限，等待用户授权
-                        mMediaProjectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+                        mMediaProjectionManager =  (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
                         startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_CODE);
                     }
 
-                } else if (radioCaptureTypeBtns[2] == radioGroup.getCheckedRadioButtonId()) {
+                } else if (radioCaptureTypeBtns[2] == radioGroup.getCheckedRadioButtonId()){
                     // camera作为采集源，采用的数据传递类型是Surface_Texture
                     captureOrigin = VideoCaptureFactoryDemo.CaptureOrigin.CaptureOrigin_CameraV2; //摄像头
-                } else if (radioCaptureTypeBtns[3] == radioGroup.getCheckedRadioButtonId()) {
+                } else if (radioCaptureTypeBtns[3] == radioGroup.getCheckedRadioButtonId()){
                     // camera作为采集源，采用的数据传递类型是YUV格式（内存拷贝）
                     captureOrigin = VideoCaptureFactoryDemo.CaptureOrigin.CaptureOrigin_Camera; //摄像头 yuv数据
                 } /*else {
@@ -84,7 +85,7 @@ public class ZGVideoCaptureOriginUI extends BaseActivity {
                     captureOrigin = VideoCaptureFactoryDemo.CaptureOrigin.CaptureOrigin_CameraV3; //摄像头 码流数据
                 }*/
 
-                if (captureOrigin != VideoCaptureFactoryDemo.CaptureOrigin.CaptureOrigin_Screen) {
+                if (captureOrigin != VideoCaptureFactoryDemo.CaptureOrigin.CaptureOrigin_Screen){
                     // 创建外部采集工厂
                     factory = new VideoCaptureFactoryDemo(captureOrigin);
                     // 为外部采集工厂设置上下文
@@ -115,10 +116,10 @@ public class ZGVideoCaptureOriginUI extends BaseActivity {
         }
     }
 
-    public void JumpPublish(View view) {
+    public void JumpPublish(View view){
         Intent intent = new Intent(ZGVideoCaptureOriginUI.this, ZGVideoCaptureDemoUI.class);
-        boolean isScreen = (captureOrigin == VideoCaptureFactoryDemo.CaptureOrigin.CaptureOrigin_Screen) ? true : false;
-        intent.putExtra("IsScreenCapture", isScreen);
+        boolean isScreen = (captureOrigin == VideoCaptureFactoryDemo.CaptureOrigin.CaptureOrigin_Screen)?true:false;
+        intent.putExtra("IsScreenCapture",isScreen);
         ZGVideoCaptureOriginUI.this.startActivity(intent);
     }
 
@@ -128,7 +129,7 @@ public class ZGVideoCaptureOriginUI extends BaseActivity {
 
         // 销毁activity时释放工厂对象
         videoCapture.setVideoCaptureFactory(null, ZegoConstants.PublishChannelIndex.MAIN);
-        if (screenCaptureFactory != null) {
+        if (screenCaptureFactory != null){
             screenCaptureFactory.setMediaProjection(null);
         }
     }

@@ -94,7 +94,6 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
     /**
      * 初始化资源，必须实现
-     *
      * @param client 通知ZEGO SDK采集结果的客户端
      */
     protected void allocateAndStart(ZegoVideoCaptureDevice.Client client) {
@@ -174,7 +173,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
                         captureEglBase = null;
                     }
-                    if (mTextureView != null) {
+                        if (mTextureView != null) {
                         if (mTextureView.getSurfaceTextureListener().equals(VideoCaptureFromCamera2.this)) {
                             mTextureView.setSurfaceTextureListener(null);
                         }
@@ -187,7 +186,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                     // 绑定eglContext、eglDisplay、eglSurface
                     mDummyContext.makeCurrent();
                     if (mInputTextureId != 0) {
-                        int[] textures = new int[]{mInputTextureId};
+                        int[] textures = new int[] {mInputTextureId};
                         GLES20.glDeleteTextures(1, textures, 0);
                         mInputTextureId = 0;
                     }
@@ -268,8 +267,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
         final CountDownLatch barrier = new CountDownLatch(1);
         final boolean didPost = maybePostOnCameraThread(new Runnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 stopCaptureOnCameraThread(true /* stopHandler */);
                 releaseCam();
                 barrier.countDown();
@@ -560,8 +558,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         mImageRotation = result;
 
         // 绑定eglContext、eglDisplay、eglSurface
-        mDummyContext.makeCurrent();
-        ;
+        mDummyContext.makeCurrent();;
         Log.d(TAG, "ImageRotation:" + mImageRotation);
         if (mTextureId != 0) {
             int[] textures = new int[]{mTextureId};
@@ -796,7 +793,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
         }
 
         if (!previewEglBase.hasSurface()) {
-            return;
+            return ;
         }
 
         if (previewDrawer == null) {
@@ -824,8 +821,8 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 } else {
                     scaleWidth = mViewHeight * width / height;
                 }
-                float fWidthScale = (float) mViewWidth / scaleWidth;
-                float fHeightScale = (float) mViewHeight / scaleHeight;
+                float fWidthScale = (float)mViewWidth / scaleWidth;
+                float fHeightScale = (float)mViewHeight / scaleHeight;
                 Matrix.scaleM(mPreviewMatrix, 0, fWidthScale, fHeightScale, 1.0f);
                 Matrix.translateM(mPreviewMatrix, 0, (1.0f - fWidthScale) / 2.0f, (1.0f - fHeightScale) / 2.0f, 1.0f);
 
@@ -837,8 +834,8 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
             // 绘制rgb格式图像
             previewDrawer.drawRgb(textureId, mPreviewMatrix, width, height,
-                    (mViewWidth - scaleWidth) / 2,
-                    (mViewHeight - scaleHeight) / 2,
+                        (mViewWidth - scaleWidth) / 2,
+                        (mViewHeight - scaleHeight) / 2,
                     scaleWidth, scaleHeight);
             // 交换渲染好的buffer 去显示
             previewEglBase.swapBuffers();
@@ -872,7 +869,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 e.printStackTrace();
                 // Clean up before rethrowing the exception.
                 captureEglBase.releaseSurface();
-                return;
+                return ;
             }
         }
 
@@ -895,8 +892,8 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
                 } else {
                     scaleWidth = mCaptureHeight * width / height;
                 }
-                float fWidthScale = (float) mCaptureWidth / scaleWidth;
-                float fHeightScale = (float) mCaptureHeight / scaleHeight;
+                float fWidthScale = (float)mCaptureWidth / scaleWidth;
+                float fHeightScale = (float)mCaptureHeight / scaleHeight;
                 Matrix.scaleM(mCaptureMatrix, 0, fWidthScale, fHeightScale, 1.0f);
                 Matrix.translateM(mCaptureMatrix, 0, (1.0f - fWidthScale) / 2.0f, (1.0f - fHeightScale) / 2.0f, 1.0f);
 
@@ -929,7 +926,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     // 销毁用于屏幕显示的surface（预览）
     private void releasePreviewSurface() {
         if (previewEglBase == null) {
-            return;
+            return ;
         }
 
         if (previewEglBase.hasSurface()) {
@@ -951,7 +948,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
     // 销毁传递给ZEGO SDK的surface
     private void releaseCaptureSurface() {
         if (captureEglBase == null) {
-            return;
+            return ;
         }
 
         if (captureEglBase.hasSurface()) {
@@ -1002,7 +999,7 @@ public class VideoCaptureFromCamera2 extends ZegoVideoCaptureDevice implements
 
             // 创建帧缓冲对象，绘制纹理到帧缓冲区并返回缓冲区索引
             mFrameBufferId = GlUtil.generateFrameBuffer(mTextureId);
-            Log.e("zego", "生成的mFrameBufferId=" + mFrameBufferId);
+            Log.e("zego","生成的mFrameBufferId="+mFrameBufferId);
         } else {
             // 绑定帧缓冲区
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferId);

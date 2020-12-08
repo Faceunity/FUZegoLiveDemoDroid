@@ -25,9 +25,9 @@ public class ZipUtil {
     /**
      * 压缩文件或者文件夹
      *
-     * @param files         待压缩文件列表
+     * @param files 待压缩文件列表
      * @param outputZipFile 待生成的 zip 文件路径
-     * @param comment       文件注解
+     * @param comment 文件注解
      * @throws IOException
      */
     static final public void zipFiles(File[] files, File outputZipFile, String comment) throws IOException {
@@ -51,14 +51,13 @@ public class ZipUtil {
     }
 
     /**
-     *     * 压缩文件
-     *     *
-     *     * @param resFile 需要压缩的文件（夹）
-     *     * @param zipOut 压缩的目的文件
-     *     * @param rootPath 压缩的文件路径
-     *     * @throws IOException 当压缩过程出错时抛出
-     *    
-     */
+     * 压缩文件
+     *
+     * @param resFile 需要压缩的文件（夹）
+     * @param zipOut 压缩的目的文件
+     * @param rootPath 压缩的文件路径
+     * @throws IOException 当压缩过程出错时抛出
+     */
     static final private void zipFile(File resFile, ZipOutputStream zipOut, String rootPath) throws IOException {
         rootPath = rootPath + (rootPath.trim().length() == 0 ? "" : File.separator) + resFile.getName();
 //        rootPath = new String(rootPath.getBytes("8859_1"), "UTF-8");

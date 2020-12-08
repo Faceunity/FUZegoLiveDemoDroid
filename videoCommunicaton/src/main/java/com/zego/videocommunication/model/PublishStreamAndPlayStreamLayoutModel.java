@@ -1,9 +1,13 @@
 package com.zego.videocommunication.model;
 
+import android.util.Log;
 import android.view.TextureView;
 import android.widget.LinearLayout;
 
+import com.zego.common.ZGPlayHelper;
 import com.zego.videocommunication.ui.PublishStreamAndPlayStreamUI;
+import com.zego.videocommunication.ui.VideoCommunicationMainUI;
+import com.zego.videocommunicaton.databinding.PublishStreamAndPlayStreamBinding;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -11,6 +15,7 @@ import java.util.LinkedHashMap;
 
 /**
  * 本类为视频通话的推拉流UI布局Model类，由于与业务强相关，实现方式可不相同，这里仅作为示例参考用，业务应根据自己的需求自己实现
+ *
  */
 public class PublishStreamAndPlayStreamLayoutModel {
 
@@ -24,19 +29,18 @@ public class PublishStreamAndPlayStreamLayoutModel {
     /**
      * 定义一个单个渲染视图模型的内部类
      */
-    class StreamidAndViewFlag {
+    class StreamidAndViewFlag{
         Boolean layoutHasViewFlag;
         String streamid;
         TextureView renderView;
-
-        StreamidAndViewFlag() {
+        StreamidAndViewFlag(){
             this.layoutHasViewFlag = false;
             this.streamid = "";
             this.renderView = null;
         }
     }
 
-    public PublishStreamAndPlayStreamLayoutModel(PublishStreamAndPlayStreamUI publishStreamAndPlayStreamUI) {
+    public PublishStreamAndPlayStreamLayoutModel(PublishStreamAndPlayStreamUI publishStreamAndPlayStreamUI){
 
         mPublishStreamAndPlayStreamUI = publishStreamAndPlayStreamUI;
 
@@ -74,13 +78,13 @@ public class PublishStreamAndPlayStreamLayoutModel {
      * @param streamid
      * @return
      */
-    public TextureView addStreamToViewInLayout(String streamid) {
+    public TextureView addStreamToViewInLayout(String streamid){
 
         TextureView renderView = new TextureView(this.mPublishStreamAndPlayStreamUI);
 
-        for (LinearLayout linearLayout : this.linearLayoutHasViewLinkedHashMap.keySet()) {
+        for(LinearLayout linearLayout : this.linearLayoutHasViewLinkedHashMap.keySet()){
 
-            if (this.linearLayoutHasViewLinkedHashMap.get(linearLayout).layoutHasViewFlag == false) {
+            if(this.linearLayoutHasViewLinkedHashMap.get(linearLayout).layoutHasViewFlag == false){
 
                 this.linearLayoutHasViewLinkedHashMap.get(linearLayout).renderView = renderView;
 
@@ -99,14 +103,13 @@ public class PublishStreamAndPlayStreamLayoutModel {
 
     /**
      * 当有流关闭时，调用此方法释放之前渲染的View
-     *
      * @param streamid
      */
-    public void removeStreamToViewInLayout(String streamid) {
+    public void removeStreamToViewInLayout(String streamid){
 
-        for (LinearLayout linearLayout : this.linearLayoutHasViewLinkedHashMap.keySet()) {
+        for(LinearLayout linearLayout : this.linearLayoutHasViewLinkedHashMap.keySet()){
 
-            if (this.linearLayoutHasViewLinkedHashMap.get(linearLayout).streamid.equals(streamid)) {
+            if(this.linearLayoutHasViewLinkedHashMap.get(linearLayout).streamid.equals(streamid)){
                 linearLayout.removeView(this.linearLayoutHasViewLinkedHashMap.get(linearLayout).renderView);
                 this.linearLayoutHasViewLinkedHashMap.get(linearLayout).renderView = null;
                 this.linearLayoutHasViewLinkedHashMap.get(linearLayout).streamid = "";
@@ -121,9 +124,9 @@ public class PublishStreamAndPlayStreamLayoutModel {
     /**
      * 当退出时，应释放所有渲染的View
      */
-    public void removeAllStreamToViewInLayout() {
+    public void removeAllStreamToViewInLayout(){
 
-        for (LinearLayout linearLayout : this.linearLayoutHasViewLinkedHashMap.keySet()) {
+        for(LinearLayout linearLayout : this.linearLayoutHasViewLinkedHashMap.keySet()) {
 
             if (this.linearLayoutHasViewLinkedHashMap.get(linearLayout).layoutHasViewFlag == true) {
                 linearLayout.removeView(this.linearLayoutHasViewLinkedHashMap.get(linearLayout).renderView);

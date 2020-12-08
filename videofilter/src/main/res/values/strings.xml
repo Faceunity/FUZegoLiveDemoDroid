@@ -60,6 +60,7 @@
     <string name="beautify_head_slim">小头</string>
     <string name="beautify_leg_thin_slim">瘦腿</string>
     <string name="toast_not_detect_body">未检测到人体</string>
+    <string name="toast_not_detect_face">未检测到人脸</string>
 
 
 </resources>

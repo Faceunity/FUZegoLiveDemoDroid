@@ -11,12 +11,12 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:textSize="16sp"
-        android:gravity="center" />
+        android:gravity="center"/>
 
     <View
         android:id="@+id/tab_item_indicator"
         android:layout_width="15dp"
         android:layout_height="2dp"
         android:background="#0d70ff"
-        android:visibility="invisible" />
+        android:visibility="invisible"/>
 </LinearLayout>

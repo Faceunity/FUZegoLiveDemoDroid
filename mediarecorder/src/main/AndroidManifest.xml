@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zego.mediarecorder">
+    package="com.zego.mediarecorder" >
 
     <application>
         <activity android:name="com.zego.mediarecorder.ZGMediaRecorderReplayUI" />

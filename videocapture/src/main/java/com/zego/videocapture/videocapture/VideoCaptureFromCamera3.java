@@ -73,7 +73,6 @@ public class VideoCaptureFromCamera3 extends ZegoVideoCaptureDevice implements C
 
     /**
      * 初始化资源，必须实现
-     *
      * @param client 通知ZEGO SDK采集结果的客户端
      */
     protected void allocateAndStart(Client client) {
@@ -131,8 +130,7 @@ public class VideoCaptureFromCamera3 extends ZegoVideoCaptureDevice implements C
         Log.d(TAG, "stopCapture");
         final CountDownLatch barrier = new CountDownLatch(1);
         final boolean didPost = maybePostOnCameraThread(new Runnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 // 停止camera
                 stopCaptureOnCameraThread(true /* stopHandler */);
                 // 释放camera资源
@@ -566,15 +564,15 @@ public class VideoCaptureFromCamera3 extends ZegoVideoCaptureDevice implements C
         if (mAVCEncoder == null) {
             // 检测设备是否支持编码I420数据
             boolean isSupport = AVCEncoder.isSupportI420();
-            if (isSupport) {
+            if (isSupport){
                 // 创建编码器
                 mAVCEncoder = new AVCEncoder(mWidth, mHeight);
                 // 为编码器分配内存
-                mEncodedBuffer = ByteBuffer.allocateDirect(mWidth * mHeight * 3 / 2);
+                mEncodedBuffer = ByteBuffer.allocateDirect(mWidth*mHeight*3/2);
                 // 启动编码器
                 mAVCEncoder.startEncoder();
             } else {
-                Log.e("Zego", "This demo don't support color formats other than I420.");
+                Log.e("Zego","This demo don't support color formats other than I420.");
             }
         }
 
@@ -613,12 +611,12 @@ public class VideoCaptureFromCamera3 extends ZegoVideoCaptureDevice implements C
                 mEncodedBuffer.put(transferInfo.inOutData, 0, transferInfo.inOutData.length);
 
                 // 将编码后的视频数据传给ZEGO SDK，需要告知SDK当前传递帧是否为视频关键帧，以及当前视频帧的时间戳
-                mClient.onEncodedFrameCaptured(mEncodedBuffer, transferInfo.inOutData.length, config, transferInfo.isKeyFrame, (double) transferInfo.timeStmp);
+                mClient.onEncodedFrameCaptured(mEncodedBuffer, transferInfo.inOutData.length, config, transferInfo.isKeyFrame, (double)transferInfo.timeStmp);
 
                 // 打印第一次传递编码数据给SDK的时间
                 if (printCount == 0) {
                     Date date = new Date(System.currentTimeMillis());
-                    Log.d("Zego", "encode data transfer time: " + simpleDateFormat.format(date));
+                    Log.d("Zego","encode data transfer time: "+simpleDateFormat.format(date));
                     printCount++;
                 }
             }
@@ -660,7 +658,7 @@ public class VideoCaptureFromCamera3 extends ZegoVideoCaptureDevice implements C
 
     // camera采集的是NV21格式的数据，编码器需要I420格式的数据，此处进行一个格式转换
     public static byte[] NV21ToI420(byte[] data, int width, int height) {
-        byte[] ret = new byte[width * height * 3 / 2];
+        byte[] ret = new byte[width*height*3/2];
         int total = width * height;
 
         ByteBuffer bufferY = ByteBuffer.wrap(ret, 0, total);
@@ -668,9 +666,9 @@ public class VideoCaptureFromCamera3 extends ZegoVideoCaptureDevice implements C
         ByteBuffer bufferU = ByteBuffer.wrap(ret, total + total / 4, total / 4);
 
         bufferY.put(data, 7, total);
-        for (int i = total + 7; i < data.length; i += 2) {
+        for (int i=total+7; i<data.length; i+=2) {
             bufferV.put(data[i]);
-            bufferU.put(data[i + 1]);
+            bufferU.put(data[i+1]);
         }
 
         return ret;

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+
 import com.zego.sound.processing.R;
 import com.zego.sound.processing.adapter.SoundEffectViewAdapter;
 
@@ -81,13 +82,13 @@ public class SoundEffectDialog extends Dialog implements TabLayout.OnTabSelected
         }
     }
 
-    public void setOnReverberationChangeListener(SoundEffectViewAdapter.OnReverberationChangeListener listener) {
+    public void setOnReverberationChangeListener(SoundEffectViewAdapter.OnReverberationChangeListener listener){
         if (mSoundEffectViewAdapter != null) {
             mSoundEffectViewAdapter.setOnReverberationChangeListener(listener);
         }
     }
 
-    public void setOnStereoChangeListener(SoundEffectViewAdapter.OnStereoChangeListener listener) {
+    public void setOnStereoChangeListener(SoundEffectViewAdapter.OnStereoChangeListener listener){
         if (mSoundEffectViewAdapter != null) {
             mSoundEffectViewAdapter.setOnStereoChangeListener(listener);
         }

@@ -1,16 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.zego.liveroomplayground"
         minSdkVersion 15
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode getAppVersionCode()
+
         versionName getAppVersionName()
 
+        
         ndk {
-            abiFilters 'arm64-v8a', 'armeabi-v7a'
+            //设置支持的SO库架构
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'
         }
 
         multiDexEnabled true
@@ -64,6 +67,10 @@ android {
             dirs '../common/libs'   // aar目录
         }
     }
+
+    dexOptions{
+        preDexLibraries = false
+    }
 }
 
 def static getAppVersionName() {
@@ -112,6 +119,5 @@ dependencies {
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.google.code.gson:gson:2.8.0'
 
-    implementation 'com.android.support:multidex:1.0.1'
-    
+    implementation 'com.android.support:multidex:1.0.3'
 }

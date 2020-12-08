@@ -4,13 +4,14 @@ import android.graphics.Bitmap;
 
 import com.zego.zegoavkit2.IZegoMediaPlayerWithIndexCallback;
 import com.zego.zegoavkit2.ZegoMediaPlayer;
+import com.zego.zegoavkit2.ZegoVideoDataFormat;
 
 public class ZGMultiPlayerDemo implements IZegoMediaPlayerWithIndexCallback {
 
     static private ZGMultiPlayerDemo zgMultiPlayerDemo;
 
     public static ZGMultiPlayerDemo sharedInstance() {
-        synchronized (ZGMediaPlayerDemo.class) {
+        synchronized (ZGMultiPlayerDemo.class) {
             if (zgMultiPlayerDemo == null) {
                 zgMultiPlayerDemo = new ZGMultiPlayerDemo();
             }
@@ -72,19 +73,19 @@ public class ZGMultiPlayerDemo implements IZegoMediaPlayerWithIndexCallback {
 
         if (zegoMediaPlayerFirst != null) {
             zegoMediaPlayerFirst.stop();
-            zegoMediaPlayerFirst.setCallback(null);
+            zegoMediaPlayerFirst.setVideoPlayWithIndexCallback(null, ZegoVideoDataFormat.PIXEL_FORMAT_NV21);
             zegoMediaPlayerFirst.uninit();
             zegoMediaPlayerFirst = null;
         }
         if (zegoMediaPlayerSecond != null) {
             zegoMediaPlayerSecond.stop();
-            zegoMediaPlayerSecond.setCallback(null);
+            zegoMediaPlayerSecond.setVideoPlayWithIndexCallback(null, ZegoVideoDataFormat.PIXEL_FORMAT_NV21);
             zegoMediaPlayerSecond.uninit();
             zegoMediaPlayerSecond = null;
         }
         if (zegoMediaPlayerThird != null) {
             zegoMediaPlayerThird.stop();
-            zegoMediaPlayerThird.setCallback(null);
+            zegoMediaPlayerThird.setVideoPlayWithIndexCallback(null, ZegoVideoDataFormat.PIXEL_FORMAT_NV21);
             zegoMediaPlayerThird.uninit();
             zegoMediaPlayerThird = null;
         }
@@ -182,6 +183,11 @@ public class ZGMultiPlayerDemo implements IZegoMediaPlayerWithIndexCallback {
 
     @Override
     public void onProcessInterval(long l, int i) {
+
+    }
+
+    @Override
+    public void onReadEOF(int i) {
 
     }
 }

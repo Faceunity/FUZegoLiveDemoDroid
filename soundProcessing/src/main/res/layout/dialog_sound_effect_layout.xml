@@ -13,7 +13,7 @@
         android:layout_marginStart="21dp"
         android:layout_marginEnd="21dp"
         app:tabIndicatorHeight="0dp"
-        app:tabBackground="@null" />
+        app:tabBackground="@null"/>
 
     <com.zego.common.widgets.CustomScrollViewPager
         android:id="@+id/view_pager"

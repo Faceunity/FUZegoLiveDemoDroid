@@ -33,7 +33,7 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
         return zgMixStreamPublisher;
     }
 
-    public void setMixStreamPublisherCallback(MixStreamPublisherCallback callback) {
+    public void setMixStreamPublisherCallback(MixStreamPublisherCallback callback){
         // 设置ZegoRoomCallback监听
         ZGManager.sharedInstance().api().setZegoRoomCallback(this);
         // 设置推流回调监听
@@ -44,7 +44,7 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
         mixStreamPublisherCallback = callback;
     }
 
-    public void startPublish(String publishID, int flag, TextureView view) {
+    public void startPublish(String publishID, int flag, TextureView view){
 
         ZGManager.sharedInstance().api().setPreviewView(view);
         ZGManager.sharedInstance().api().setPreviewViewMode(ZegoVideoViewMode.ScaleAspectFill);
@@ -65,7 +65,7 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
         ZGManager.sharedInstance().api().stopPublishing();
     }
 
-    public void unInit() {
+    public void unInit(){
 
         ZGManager.sharedInstance().api().setZegoLivePlayerCallback(null);
         ZGManager.sharedInstance().api().setZegoRoomCallback(null);
@@ -87,28 +87,22 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
     public interface MixStreamPublisherCallback {
         // 推流状态
         void onPublishStateUpdate(int stateCode, String streamID);
-
         // 连麦请求
         void onJoinLiveRequest(int seq, String fromUserID, String roomID);
-
         // 推流质量
         void onPublishQualityUpdate(String quality);
 
         // 与服务器断开
         void onDisconnect(int errorCode);
-
         // 房间流更新
         void onStreamUpdated(int type, ZegoStreamInfo[] zegoStreamInfos, String roomID);
-
         // 流的附加信息更新
         void onStreamExtraInfoUpdated(ZegoStreamInfo[] zegoStreamInfos, String roomID);
 
         // 拉流状态
         void onPlayStateUpdate(int stateCode, String streamID);
-
         // 拉流质量
         void onPlayQualityUpdate(String quality);
-
         // 结束连麦
         void onRecvEndJoinLiveCommand(String fromUserId, String fromUserName, String roomID);
 
@@ -117,7 +111,7 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
     // 播放回调
     @Override
     public void onPlayStateUpdate(int stateCode, String streamID) {
-        if (mixStreamPublisherCallback != null) {
+        if (mixStreamPublisherCallback != null){
             mixStreamPublisherCallback.onPlayStateUpdate(stateCode, streamID);
         }
     }
@@ -141,12 +135,12 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
                 break;
         }
 
-        double bitRate = Math.round(zegoPlayStreamQuality.vkbps * 10) / 10;
-        double fps = Math.round(zegoPlayStreamQuality.vnetFps * 10) / 10;
+        double bitRate = Math.round(zegoPlayStreamQuality.vkbps*10)/10;
+        double fps = Math.round(zegoPlayStreamQuality.vnetFps*10)/10;
 
-        String qualityStr = "当前网络质量：" + netQualityStr + "；码率：" + bitRate + "kb/s" + "；帧率：" + fps;
+        String qualityStr = "当前网络质量："+netQualityStr+"；码率："+bitRate+"kb/s"+"；帧率："+fps;
 
-        if (mixStreamPublisherCallback != null) {
+        if (mixStreamPublisherCallback != null){
             mixStreamPublisherCallback.onPlayQualityUpdate(qualityStr);
         }
     }
@@ -158,7 +152,7 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
 
     @Override
     public void onRecvEndJoinLiveCommand(String fromUserId, String fromUserName, String roomID) {
-        if (mixStreamPublisherCallback != null) {
+        if (mixStreamPublisherCallback != null){
             mixStreamPublisherCallback.onRecvEndJoinLiveCommand(fromUserId, fromUserName, roomID);
         }
     }
@@ -178,7 +172,7 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
 
     @Override
     public void onJoinLiveRequest(int seq, String fromUserID, String fromUserName, String roomID) {
-        if (mixStreamPublisherCallback != null) {
+        if (mixStreamPublisherCallback != null){
             mixStreamPublisherCallback.onJoinLiveRequest(seq, fromUserID, roomID);
         }
     }
@@ -202,12 +196,12 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
                 break;
         }
 
-        double bitRate = Math.round(zegoPublishStreamQuality.vkbps * 10) / 10;
-        double fps = Math.round(zegoPublishStreamQuality.vcapFps * 10) / 10;
+        double bitRate = Math.round(zegoPublishStreamQuality.vkbps*10)/10;
+        double fps = Math.round(zegoPublishStreamQuality.vcapFps*10)/10;
 
-        String qualityStr = "当前网络质量：" + netQualityStr + "；码率：" + bitRate + "kb/s" + "；帧率：" + fps;
+        String qualityStr = "当前网络质量："+netQualityStr+"；码率："+bitRate+"kb/s"+"；帧率："+fps;
 
-        if (mixStreamPublisherCallback != null) {
+        if (mixStreamPublisherCallback != null){
             mixStreamPublisherCallback.onPublishQualityUpdate(qualityStr);
         }
     }
@@ -235,7 +229,7 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
 
     @Override
     public void onDisconnect(int errorcode, String s) {
-        if (mixStreamPublisherCallback != null) {
+        if (mixStreamPublisherCallback != null){
             mixStreamPublisherCallback.onDisconnect(errorcode);
         }
     }
@@ -260,7 +254,7 @@ public class ZGMixStreamPublisher implements IZegoLivePublisherCallback, IZegoLi
 
     @Override
     public void onStreamExtraInfoUpdated(ZegoStreamInfo[] zegoStreamInfos, String roomID) {
-        if (mixStreamPublisherCallback != null) {
+        if (mixStreamPublisherCallback != null){
             mixStreamPublisherCallback.onStreamExtraInfoUpdated(zegoStreamInfos, roomID);
         }
     }

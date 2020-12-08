@@ -8,13 +8,14 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
 
-import com.zego.common.ZGBaseHelper;
-import com.zego.common.ui.BaseActivity;
-import com.zego.common.ui.WebActivity;
-import com.zego.common.util.AppLogger;
 import com.zego.common.widgets.CustomDialog;
 import com.zego.play.R;
 import com.zego.play.databinding.ActivityLoginRoomBinding;
+import com.zego.common.ZGBaseHelper;
+import com.zego.common.constants.ZGLiveRoomConstants;
+import com.zego.common.ui.BaseActivity;
+import com.zego.common.ui.WebActivity;
+import com.zego.common.util.AppLogger;
 import com.zego.zegoliveroom.callback.IZegoLoginCompletionCallback;
 import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;

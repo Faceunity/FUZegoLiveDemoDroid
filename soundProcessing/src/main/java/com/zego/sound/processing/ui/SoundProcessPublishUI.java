@@ -15,6 +15,7 @@ import com.zego.zegoavkit2.audioprocessing.ZegoAudioReverbMode;
 
 /**
  * Created by zego on 2019/4/22.
+ *
  */
 
 public class SoundProcessPublishUI extends SoundProcessPublishBaseUI {
@@ -141,6 +142,7 @@ public class SoundProcessPublishUI extends SoundProcessPublishBaseUI {
         // 关闭耳返
         ZGSoundProcessingHelper.sharedInstance().enableLoopback(false);
     }
+
 
 
     public static void actionStart(Activity activity) {

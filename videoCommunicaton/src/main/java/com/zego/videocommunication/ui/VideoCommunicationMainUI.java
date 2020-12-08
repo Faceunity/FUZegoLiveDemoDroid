@@ -5,18 +5,35 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.zego.common.ui.BaseActivity;
+import com.zego.common.ZGBaseHelper;
+import com.zego.common.ZGManager;
+import com.zego.common.ZGPlayHelper;
+import com.zego.common.ZGPublishHelper;
 import com.zego.common.util.AppLogger;
 import com.zego.videocommunication.ZGVideoCommunicationHelper;
 import com.zego.videocommunicaton.R;
 import com.zego.videocommunicaton.databinding.VideoCommunicationMainBinding;
+import com.zego.common.ui.BaseActivity;
+import com.zego.zegoliveroom.callback.IZegoInitSDKCompletionCallback;
+import com.zego.zegoliveroom.callback.IZegoLivePlayerCallback;
+import com.zego.zegoliveroom.callback.IZegoLivePublisherCallback;
+import com.zego.zegoliveroom.callback.IZegoRoomCallback;
+import com.zego.zegoliveroom.constants.ZegoAvConfig;
+import com.zego.zegoliveroom.entity.AuxData;
+import com.zego.zegoliveroom.entity.ZegoPlayStreamQuality;
+import com.zego.zegoliveroom.entity.ZegoPublishStreamQuality;
+import com.zego.zegoliveroom.entity.ZegoStreamInfo;
+
+import java.util.HashMap;
 
 
 /**
  * 视频通话专题入口
+ *
  */
 public class VideoCommunicationMainUI extends BaseActivity {
 
@@ -40,9 +57,9 @@ public class VideoCommunicationMainUI extends BaseActivity {
             @Override
             public void onClick(View v) {
                 String roomid = videoCommunicationMainBinding.edRoomId.getText().toString().trim();
-                if (0 != roomid.length()) {
+                if(0 != roomid.length()){
                     PublishStreamAndPlayStreamUI.actionStart(VideoCommunicationMainUI.this, roomid);
-                } else {
+                }else {
                     AppLogger.getInstance().i(VideoCommunicationMainUI.class, getString(com.zego.common.R.string.tx_room_id_is_no_null));
                     Toast.makeText(VideoCommunicationMainUI.this, getString(com.zego.common.R.string.tx_room_id_is_no_null), Toast.LENGTH_SHORT).show();
 
@@ -57,7 +74,8 @@ public class VideoCommunicationMainUI extends BaseActivity {
 
     /**
      * 退出当前Activity的时候释放SDK，对于这里的方式，开发者无需照搬，可根据需要将SDK一直设置为初始化状态
-     */
+     *
+     * */
     @Override
     public void onBackPressed() {
 
@@ -77,8 +95,9 @@ public class VideoCommunicationMainUI extends BaseActivity {
 
     /**
      * 返回到应用主界面
+     *
      */
-    public void goBackToMainUIFromVideoCommunication() {
+    public void goBackToMainUIFromVideoCommunication(){
 
         this.onBackPressed();
     }

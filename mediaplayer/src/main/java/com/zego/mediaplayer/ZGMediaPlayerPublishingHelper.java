@@ -77,8 +77,8 @@ public class ZGMediaPlayerPublishingHelper implements IZegoLivePublisherCallback
             }
 
             state = String.format("PUBLISH STARTED:%s \n%s\n%s\n%s", streamID,
-                    hlsList.length >= 1 ? hlsList[0] : ""
-                    , rtmpList.length >= 1 ? rtmpList[0] : "", flvList.length >= 1 ? flvList[0] : "");
+                    hlsList.length >=1 ? hlsList[0] : ""
+                    , rtmpList.length >=1 ? rtmpList[0] : "", flvList.length >=1 ? flvList[0] : "");
 
         } else {
             state = String.format("PUBLISH STOP: %d",

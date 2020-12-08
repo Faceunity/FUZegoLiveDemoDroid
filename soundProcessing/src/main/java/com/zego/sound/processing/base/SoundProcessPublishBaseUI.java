@@ -30,8 +30,9 @@ import java.util.HashMap;
 
 /**
  * Created by zego on 2019/5/8.
- * <p>
+ *
  * 推流相关逻辑都在这里。主要目的是为了让开发者更方便阅读变声/混响/立体声的代码。
+ *
  */
 
 public class SoundProcessPublishBaseUI extends BaseActivity {
@@ -137,6 +138,7 @@ public class SoundProcessPublishBaseUI extends BaseActivity {
             }
         });
     }
+
 
 
     /**

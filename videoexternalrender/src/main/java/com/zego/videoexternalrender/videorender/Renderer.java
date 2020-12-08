@@ -1,5 +1,6 @@
 package com.zego.videoexternalrender.videorender;
 
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
@@ -8,6 +9,7 @@ import android.opengl.EGLDisplay;
 import android.opengl.EGLSurface;
 import android.opengl.GLES20;
 import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.Surface;
@@ -18,6 +20,7 @@ import com.zego.videoexternalrender.ve_gl.GlShader;
 import com.zego.videoexternalrender.ve_gl.GlUtil;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 /**
  * Renderer
@@ -62,8 +65,7 @@ public class Renderer implements TextureView.SurfaceTextureListener {
     }
 
 
-    /**
-     * 初始化 Renderer
+    /** 初始化 Renderer
      *
      * @param eglContext OpenGL的共享上下文
      * @param eglDisplay 关联显示屏的通用数据类型
@@ -162,7 +164,7 @@ public class Renderer implements TextureView.SurfaceTextureListener {
     private int[] measure(int imageWidth, int imageHeight, int viewWidth, int viewHeight) {
         int[] value = {0, 0, viewWidth, viewHeight};
         float scale;
-        scale = (float) viewWidth / (float) imageWidth;
+        scale = (float) viewWidth / (float)imageWidth;
         float height = imageHeight * scale;
         value[0] = 0;
         value[1] = (int) (viewHeight - height) / 2;
@@ -201,14 +203,15 @@ public class Renderer implements TextureView.SurfaceTextureListener {
     private void attachTextureView() {
 
         // 判断是否切入后台后又切入前台，若有需要重新创建Surface
-        if (isTextureAvailable) {
+        if (isTextureAvailable){
             releaseSurface();
             isTextureAvailable = false;
         }
 
         if (eglSurface != EGL14.EGL_NO_SURFACE
                 && eglContext != EGL14.EGL_NO_CONTEXT
-                && eglDisplay != EGL14.EGL_NO_DISPLAY) {
+                && eglDisplay != EGL14.EGL_NO_DISPLAY)
+        {
             return;
         }
 

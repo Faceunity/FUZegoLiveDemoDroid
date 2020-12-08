@@ -65,7 +65,6 @@ public class VideoCaptureFromCamera extends ZegoVideoCaptureDevice implements Ca
 
     /**
      * 初始化资源，必须实现
-     *
      * @param client 通知ZEGO SDK采集结果的客户端
      */
     protected void allocateAndStart(ZegoVideoCaptureDevice.Client client) {
@@ -116,8 +115,7 @@ public class VideoCaptureFromCamera extends ZegoVideoCaptureDevice implements Ca
         Log.d(TAG, "stopCapture");
         final CountDownLatch barrier = new CountDownLatch(1);
         final boolean didPost = maybePostOnCameraThread(new Runnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 // 停止camera
                 stopCaptureOnCameraThread(true /* stopHandler */);
                 // 释放camera资源

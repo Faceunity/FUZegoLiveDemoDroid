@@ -6,7 +6,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
-import com.zego.videofilter.faceunity.FURenderer;
+import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.IFURenderer;
 import com.zego.videofilter.videoFilter.ve_gl.EglBase;
 import com.zego.videofilter.videoFilter.ve_gl.GlUtil;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
@@ -252,8 +253,8 @@ public class VideoFilterHybridDemo extends ZegoVideoFilter {
                 pixelBuffer.buffer.position(0);
                 pixelBuffer.buffer.get(mModiBuffer);
                 // 调用 faceunity 进行美颜
-//                int textureID = mFURenderer.onDrawFrame(mTextureId, pixelBuffer.width, pixelBuffer.height);
-                int textureID = mFURenderer.onDrawFrameSingleInput(mModiBuffer, mTextureId, pixelBuffer.width, pixelBuffer.height);
+//                int textureID = mFURenderer.onDrawFrameSingleInput(mTextureId, pixelBuffer.width, pixelBuffer.height);
+                int textureID = mFURenderer.onDrawFrameSingleInput(mModiBuffer, pixelBuffer.width, pixelBuffer.height, IFURenderer.INPUT_FORMAT_NV21_BUFFER);
 
                 // 此步骤会使用此 textureID 用做本地预览的视图渲染，并将美颜后的 textureID 传给 SDK（拉该条流时是美颜后的视频）
                 mClient.onProcessCallback(textureID, pixelBuffer.width, pixelBuffer.height, pixelBuffer.timestamp_100n);

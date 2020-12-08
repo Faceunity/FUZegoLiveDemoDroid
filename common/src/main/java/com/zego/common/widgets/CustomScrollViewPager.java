@@ -15,7 +15,7 @@ public class CustomScrollViewPager extends ViewPager {
     private boolean scrollable = false;
 
     public CustomScrollViewPager(Context context) {
-        this(context, null);
+       this(context, null);
     }
 
     public CustomScrollViewPager(Context context, AttributeSet attrs) {

@@ -28,11 +28,11 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
     }
 
     /**
-     * 激活媒体次要信息通道
-     *
-     * @param onlyAudioPublish 是否只推音频流
-     * @param channelIndex     推流通道
-     * @discassion 在创建了 ZegoLiveRoomApi 对象之后，推流之前调用
+     激活媒体次要信息通道
+
+     @param onlyAudioPublish 是否只推音频流
+     @param channelIndex 推流通道
+     @discassion 在创建了 ZegoLiveRoomApi 对象之后，推流之前调用
      */
     public void activateMediaSideInfoForPublishChannel(boolean onlyAudioPublish, int channelIndex) {
 
@@ -42,20 +42,20 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
     }
 
     /**
-     * 设置使用自定义包头
-     *
-     * @param useCutomPacket 是否使用自定义包头，true-自定义包头，false-内部包头
-     * @discussion 等同于 [-sendMediaSideInfo:data toPublishChannel:ZEGOAPI_CHN_MAIN]
+     设置使用自定义包头
+
+     @param useCutomPacket 是否使用自定义包头，true-自定义包头，false-内部包头
+     @discussion 等同于 [-sendMediaSideInfo:data toPublishChannel:ZEGOAPI_CHN_MAIN]
      */
     public void setUseCutomPacket(boolean useCutomPacket) {
         mIsUseCustomPacket = useCutomPacket;
     }
 
     /**
-     * 发送媒体次要信息
-     *
-     * @param content 待发送的媒体次要信息
-     * @discussion 等同于 [-sendMediaSideInfo:data toPublishChannel:ZEGOAPI_CHN_MAIN]
+     发送媒体次要信息
+
+     @param content 待发送的媒体次要信息
+     @discussion 等同于 [-sendMediaSideInfo:data toPublishChannel:ZEGOAPI_CHN_MAIN]
      */
     public void sendMediaSideInfo(String content) {
 
@@ -64,19 +64,19 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
         }
 
         ByteBuffer inData = ByteBuffer.allocateDirect(content.getBytes().length);
-        inData.put(content.getBytes(), 0, content.getBytes().length);
+        inData.put(content.getBytes(), 0,content.getBytes().length);
         inData.flip();
 
-        zegoMediaSideInfo.sendMediaSideInfo(inData, content.getBytes().length, mIsUseCustomPacket, 0);
+        zegoMediaSideInfo.sendMediaSideInfo(inData, content.getBytes().length, mIsUseCustomPacket,0);
 
         mSendMsgArr.add(content);
     }
 
     /**
-     * 发送媒体次要信息
-     *
-     * @param content      待发送的媒体次要信息
-     * @param channelIndex 推流通道
+     发送媒体次要信息
+
+     @param content 待发送的媒体次要信息
+     @param channelIndex 推流通道
      */
     public void sendMediaSideInfo(String content, int channelIndex) {
         if (mIsUseCustomPacket) {
@@ -84,11 +84,11 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
             // 采用外部封装包头
 
             // * packet length: 4 bytes
-            byte[] dataLen = intToBytesBig(content.getBytes().length + 1);
+            byte[] dataLen = intToBytesBig(content.getBytes().length+1);
             // * packet NAL type  [26, 31)  1 bytes
             byte[] packetType = {26};
 
-            int firstLength = dataLen.length + packetType.length;  // 5 bytes
+            int firstLength = dataLen.length+packetType.length;  // 5 bytes
             int totalLength = firstLength + content.getBytes().length;
 
             if (totalLength > 1000) {
@@ -96,12 +96,12 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
             }
 
             byte[] tmpData = new byte[totalLength];
-            System.arraycopy(dataLen, 0, tmpData, 0, dataLen.length);
-            System.arraycopy(packetType, 0, tmpData, dataLen.length, packetType.length);
-            System.arraycopy(content.getBytes(), 0, tmpData, firstLength, content.getBytes().length);
+            System.arraycopy(dataLen,0,tmpData,0,dataLen.length);
+            System.arraycopy(packetType,0,tmpData,dataLen.length,packetType.length);
+            System.arraycopy(content.getBytes(),0,tmpData,firstLength,content.getBytes().length);
 
             ByteBuffer inData = ByteBuffer.allocateDirect(totalLength);
-            inData.put(tmpData, 0, totalLength);
+            inData.put(tmpData,0,totalLength);
             inData.flip();
 
             zegoMediaSideInfo.sendMediaSideInfo(inData, totalLength, mIsUseCustomPacket, channelIndex);
@@ -112,7 +112,7 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
                 return;
             }
             ByteBuffer inData = ByteBuffer.allocateDirect(content.getBytes().length);
-            inData.put(content.getBytes(), 0, content.getBytes().length);
+            inData.put(content.getBytes(), 0,content.getBytes().length);
             inData.flip();
 
             zegoMediaSideInfo.sendMediaSideInfo(inData, content.getBytes().length, mIsUseCustomPacket, channelIndex);
@@ -122,26 +122,26 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
     }
 
     /**
-     * 设置媒体次要信息回调监听
-     *
-     * @param callback 媒体次要信息回调接口
+     设置媒体次要信息回调监听
+
+     @param callback 媒体次要信息回调接口
      */
-    public void setMediaSideInfoCallback(RecvMediaSideInfoCallback callback) {
+    public void setMediaSideInfoCallback(RecvMediaSideInfoCallback callback){
         mediaSideInfoCallback = callback;
     }
 
 
-    public void unSetMediaSideInfoCallback() {
+    public void unSetMediaSideInfoCallback(){
         mediaSideInfoCallback = null;
         zegoMediaSideInfo.setZegoMediaSideCallback(null);
     }
 
     /**
-     * 媒体次要信息回调
-     *
-     * @param streamID 拉流流名
-     * @param inData   媒体次要信息
-     * @param dataLen  媒体次要信息长度
+     媒体次要信息回调
+
+     @param streamID 拉流流名
+     @param inData   媒体次要信息
+     @param dataLen  媒体次要信息长度
      */
     @Override
     public void onRecvMediaSideInfo(String streamID, ByteBuffer inData, int dataLen) {
@@ -156,7 +156,7 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
 //        int mediaType = inData.getInt();
         int mediaType = getIntFrom(inData, dataLen);
 
-        if (1001 == mediaType) {
+        if (1001 == mediaType){
             //SDK packet
             String mediaSideInfoStr = getStringFrom(inData, dataLen);
 
@@ -165,7 +165,7 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
             }
             mRecvMsgArr.add(mediaSideInfoStr);
 
-        } else if (1002 == mediaType) {
+        }else if (1002 == mediaType){
             //mix stream user data
             String mediaSideInfoStr = getStringFrom(inData, dataLen);
 
@@ -175,7 +175,7 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
 
             mRecvMsgArr.add(mediaSideInfoStr);
 
-        } else {
+        }else {
             //custom packet
 
             /* custom packet format
@@ -186,7 +186,7 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
              * +--------+-----------------+--------+--------+----------------------+
              */
 
-            byte[] tmpData = new byte[dataLen - 5];
+            byte[] tmpData = new byte[dataLen-5];
 
             for (int i = 0; i < dataLen - 5; i++) {
                 tmpData[i] = inData.get(i + 5);
@@ -202,7 +202,7 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
     }
 
     public String checkSendRecvMsgs() {
-        if (mSendMsgArr.size() <= 0) {
+        if (mSendMsgArr.size() <= 0){
             return "";
         }
         if (mSendMsgArr.size() != mRecvMsgArr.size()) {
@@ -222,10 +222,10 @@ public class ZGMediaSideInfoDemo implements IZegoMediaSideCallback {
 
     public interface RecvMediaSideInfoCallback {
         /**
-         * 接收到媒体次要信息回调
-         *
-         * @param content  接收到的数据
-         * @param streamID 流ID，标记当前回调的信息所属媒体流
+         接收到媒体次要信息回调
+
+         @param content 接收到的数据
+         @param streamID 流ID，标记当前回调的信息所属媒体流
          */
         void onRecvMediaSideInfo(String streamID, String content);
 

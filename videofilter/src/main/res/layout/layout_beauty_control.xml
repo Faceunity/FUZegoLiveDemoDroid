@@ -12,7 +12,7 @@
         android:background="#BD050F14"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.zego.videofilter.view.seekbar.DiscreteSeekBar
+        <com.faceunity.nama.ui.seekbar.DiscreteSeekBar
             android:id="@+id/beauty_seek_bar"
             android:layout_width="@dimen/x528"
             android:layout_height="wrap_content"
@@ -84,16 +84,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
+                android:scrollbars="none"
                 android:layout_marginLeft="@dimen/x134">
 
-                <com.zego.videofilter.view.BeautyBoxGroup
+                <com.faceunity.nama.ui.BeautyBoxGroup
                     android:id="@+id/beauty_group_skin_beauty"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal|bottom"
                     android:orientation="horizontal">
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_blur_level"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -103,7 +104,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_buffing_nor_open"
                         app:text_normal="@string/beauty_box_heavy_blur_fine" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_color_level"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -113,7 +114,7 @@
                         app:drawable_open_normal="@drawable/beauty_skin_control_color_open_normal"
                         app:text_normal="@string/beauty_box_color_level" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_red_level"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -123,7 +124,7 @@
                         app:drawable_open_normal="@drawable/beauty_skin_control_red_open_normal"
                         app:text_normal="@string/beauty_box_red_level" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_eye_bright"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -133,7 +134,7 @@
                         app:drawable_open_normal="@drawable/beauty_skin_control_bright_eyes_open_normal"
                         app:text_normal="@string/beauty_box_eye_bright" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_tooth_whiten"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -143,7 +144,7 @@
                         app:drawable_open_normal="@drawable/beauty_skin_control_teeth_open_normal"
                         app:text_normal="@string/beauty_box_tooth_whiten" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_pouch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -153,7 +154,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_dark_circles_nor_open"
                         app:text_normal="@string/beauty_micro_pouch" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_nasolabial"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -163,7 +164,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_wrinkle_nor_open"
                         app:text_normal="@string/beauty_micro_nasolabial" />
 
-                </com.zego.videofilter.view.BeautyBoxGroup>
+                </com.faceunity.nama.ui.BeautyBoxGroup>
             </HorizontalScrollView>
         </FrameLayout>
 
@@ -220,14 +221,14 @@
                 android:layout_marginLeft="@dimen/x134"
                 android:scrollbars="none">
 
-                <com.zego.videofilter.view.BeautyBoxGroup
+                <com.faceunity.nama.ui.BeautyBoxGroup
                     android:id="@+id/beauty_group_face_shape"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal|bottom"
                     android:orientation="horizontal">
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_cheek_thinning"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -237,7 +238,7 @@
                         app:drawable_open_normal="@drawable/beauty_type_control_cheekthin_level_open_normal"
                         app:text_normal="@string/beauty_box_cheek_thinning" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_cheek_v"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -248,7 +249,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_v_nor_open"
                         app:text_normal="@string/beauty_box_cheek_v" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_cheek_narrow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -258,7 +259,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_narrow_face_nor_open"
                         app:text_normal="@string/beauty_box_cheek_narrow" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_cheek_small"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -268,7 +269,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_little_face_nor_open"
                         app:text_normal="@string/beauty_box_cheek_small" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_eye_enlarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -278,7 +279,7 @@
                         app:drawable_open_normal="@drawable/beauty_type_control_enlarge_eye_level_open_normal"
                         app:text_normal="@string/beauty_box_eye_enlarge" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_intensity_chin"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -288,7 +289,7 @@
                         app:drawable_open_normal="@drawable/beauty_type_control_chin_level_open_normal"
                         app:text_normal="@string/beauty_box_intensity_chin" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_intensity_forehead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -298,7 +299,7 @@
                         app:drawable_open_normal="@drawable/beauty_type_control_forehead_level_open_normal"
                         app:text_normal="@string/beauty_box_intensity_forehead" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_intensity_nose"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -308,7 +309,7 @@
                         app:drawable_open_normal="@drawable/beauty_type_control_thin_nose_level_open_normal"
                         app:text_normal="@string/beauty_box_intensity_nose" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_intensity_mouth"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -318,7 +319,7 @@
                         app:drawable_open_normal="@drawable/beauty_type_control_mouth_shape_open_normal"
                         app:text_normal="@string/beauty_box_intensity_mouth" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_canthus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -328,7 +329,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_open_eyes_nor_open"
                         app:text_normal="@string/beauty_micro_canthus" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_eye_space"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -338,7 +339,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_eye_distance_nor_open"
                         app:text_normal="@string/beauty_micro_eye_space" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_eye_rotate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -348,7 +349,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_eye_angle_nor_open"
                         app:text_normal="@string/beauty_micro_eye_rotate" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_long_nose"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -358,7 +359,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_proboscis_nor_open"
                         app:text_normal="@string/beauty_micro_long_nose" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_philtrum"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -368,7 +369,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_shrinking_nor_open"
                         app:text_normal="@string/beauty_micro_philtrum" />
 
-                    <com.zego.videofilter.view.BeautyBox
+                    <com.faceunity.nama.ui.BeautyBox
                         android:id="@+id/beauty_box_smile"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -378,7 +379,7 @@
                         app:drawable_open_normal="@drawable/demo_icon_smile_mouth_nor_open"
                         app:text_normal="@string/beauty_micro_smile" />
 
-                </com.zego.videofilter.view.BeautyBoxGroup>
+                </com.faceunity.nama.ui.BeautyBoxGroup>
             </HorizontalScrollView>
         </FrameLayout>
 
@@ -393,7 +394,7 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <com.zego.videofilter.view.CheckGroup
+    <com.faceunity.nama.ui.CheckGroup
         android:id="@+id/beauty_radio_group"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x98"
@@ -401,7 +402,7 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.zego.videofilter.view.CheckBoxCompat
+        <com.faceunity.nama.ui.CheckBoxCompat
             android:id="@+id/beauty_radio_skin_beauty"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -413,7 +414,7 @@
             android:textColor="@color/beauty_control_bottom_radio_color"
             android:textSize="@dimen/text_size_26" />
 
-        <com.zego.videofilter.view.CheckBoxCompat
+        <com.faceunity.nama.ui.CheckBoxCompat
             android:id="@+id/beauty_radio_face_shape"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -425,7 +426,7 @@
             android:textColor="@color/beauty_control_bottom_radio_color"
             android:textSize="@dimen/text_size_26" />
 
-        <com.zego.videofilter.view.CheckBoxCompat
+        <com.faceunity.nama.ui.CheckBoxCompat
             android:id="@+id/beauty_radio_filter"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -437,7 +438,7 @@
             android:textColor="@color/beauty_control_bottom_radio_color"
             android:textSize="@dimen/text_size_26" />
 
-    </com.zego.videofilter.view.CheckGroup>
+    </com.faceunity.nama.ui.CheckGroup>
 
     <View
         android:layout_width="match_parent"
@@ -446,7 +447,7 @@
         android:background="#33E5E5E5"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <com.zego.videofilter.view.TouchStateImageView
+    <com.faceunity.nama.ui.TouchStateImageView
         android:id="@+id/iv_compare"
         android:layout_width="@dimen/x72"
         android:layout_height="@dimen/x72"

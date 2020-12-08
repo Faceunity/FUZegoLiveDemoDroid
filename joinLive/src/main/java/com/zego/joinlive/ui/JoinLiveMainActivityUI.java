@@ -3,13 +3,14 @@ package com.zego.joinlive.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.widget.Toast;
 
+import com.zego.common.ZGManager;
 import com.zego.common.ui.BaseActivity;
 import com.zego.common.ui.WebActivity;
 import com.zego.common.util.AppLogger;
@@ -77,7 +78,7 @@ public class JoinLiveMainActivityUI extends BaseActivity {
             public void onItemClick(View view, int position, RoomInfo roomInfo) {
                 if (roomInfo.getStreamInfo().size() > 0) {
                     // 登录主播所在的房间并拉流，此demo对房间加了前缀 "JoinLiveRoom-"
-                    JoinLiveAudienceUI.actionStart(JoinLiveMainActivityUI.this, ZGJoinLiveHelper.PREFIX + roomInfo.getRoomId(), roomInfo.getAnchorIdName());
+                    JoinLiveAudienceUI.actionStart(JoinLiveMainActivityUI.this, ZGJoinLiveHelper.PREFIX+roomInfo.getRoomId(), roomInfo.getAnchorIdName());
                 } else {
                     AppLogger.getInstance().i(JoinLiveMainActivityUI.class, getString(R.string.room_no_publish));
                     Toast.makeText(JoinLiveMainActivityUI.this, R.string.room_no_publish, Toast.LENGTH_LONG).show();
@@ -112,7 +113,7 @@ public class JoinLiveMainActivityUI extends BaseActivity {
          * 当 App 集成完成后，再向 ZEGO 申请开启正式环境，改为正式环境再初始化。
          */
         ZegoLiveRoom.setTestEnv(ZegoUtil.getIsTestEnv());
-        AppLogger.getInstance().i(JoinLiveMainActivityUI.class, "test env: " + ZegoUtil.getIsTestEnv());
+        AppLogger.getInstance().i(JoinLiveMainActivityUI.class, "test env: " +ZegoUtil.getIsTestEnv());
 
         // 初始化SDK
         ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().initSDK(ZegoUtil.getAppID(), ZegoUtil.getAppSign(), new IZegoInitSDKCompletionCallback() {
@@ -141,14 +142,14 @@ public class JoinLiveMainActivityUI extends BaseActivity {
             @Override
             public void onUpdateRoomList(ArrayList<RoomInfo> arrayList) {
                 ArrayList<RoomInfo> joinLiveRooms = new ArrayList<>();
-                for (RoomInfo roomInfo : arrayList) {
+                for (RoomInfo roomInfo: arrayList){
                     if (roomInfo.getRoomId().length() > ZGJoinLiveHelper.PREFIX.length()) {
                         String prefix = roomInfo.getRoomId().substring(0, ZGJoinLiveHelper.PREFIX.length());
 
                         if (prefix.equals(ZGJoinLiveHelper.PREFIX)) {
                             String tmpRoomID = roomInfo.getRoomId().substring(ZGJoinLiveHelper.PREFIX.length(), roomInfo.getRoomId().length());
-                            RoomInfo tmpRoomInfo = new RoomInfo(tmpRoomID, roomInfo.getRoomName(),
-                                    roomInfo.getAnchorIdName(), roomInfo.getAnchorNickName(), roomInfo.getStreamInfo());
+                            RoomInfo tmpRoomInfo = new RoomInfo(tmpRoomID,roomInfo.getRoomName(),
+                                    roomInfo.getAnchorIdName(),roomInfo.getAnchorNickName(),roomInfo.getStreamInfo());
                             joinLiveRooms.add(tmpRoomInfo);
                         }
                     }
@@ -170,7 +171,7 @@ public class JoinLiveMainActivityUI extends BaseActivity {
     }
 
     // 创建直播房间
-    public void onClickCreateRoom(View view) {
+    public void onClickCreateRoom(View view){
 
         if (isInitSuccess) {
             // 初始化成功跳转到创建并登录房间的页面
@@ -181,7 +182,7 @@ public class JoinLiveMainActivityUI extends BaseActivity {
     }
 
     // 查看连麦文档
-    public void browseDoc(View view) {
+    public void browseDoc(View view){
         WebActivity.actionStart(this, "https://doc.zego.im/CN/224.html", getString(R.string.tx_joinlive_guide));
     }
 

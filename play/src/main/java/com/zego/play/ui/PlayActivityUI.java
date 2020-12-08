@@ -8,18 +8,18 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.zego.common.ui.WebActivity;
+import com.zego.play.R;
+import com.zego.play.databinding.PlayInputStreamIdLayoutBinding;
+import com.zego.common.entity.SDKConfigInfo;
+import com.zego.common.entity.StreamQuality;
+import com.zego.play.databinding.ActivityPlayBinding;
 import com.zego.common.ZGBaseHelper;
 import com.zego.common.ZGConfigHelper;
 import com.zego.common.ZGPlayHelper;
 import com.zego.common.ZGPublishHelper;
-import com.zego.common.entity.SDKConfigInfo;
-import com.zego.common.entity.StreamQuality;
 import com.zego.common.ui.BaseActivity;
-import com.zego.common.ui.WebActivity;
 import com.zego.common.util.AppLogger;
-import com.zego.play.R;
-import com.zego.play.databinding.ActivityPlayBinding;
-import com.zego.play.databinding.PlayInputStreamIdLayoutBinding;
 import com.zego.zegoliveroom.callback.IZegoLivePlayerCallback;
 import com.zego.zegoliveroom.callback.IZegoRoomCallback;
 import com.zego.zegoliveroom.constants.ZegoConstants;
@@ -118,7 +118,15 @@ public class PlayActivityUI extends BaseActivity {
                 }
             }
         });
-
+        binding.swMirror.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isPressed()) {
+                    sdkConfigInfo.setEnableMirror(isChecked);
+                    ZGConfigHelper.sharedInstance().enablePlayMirror(isChecked, mStreamID);
+                }
+            }
+        });
         // 设置SDK 房间代理回调。业务侧希望检查当前房间有流更新了，会去自动重新拉流。
         ZGBaseHelper.sharedInstance().setZegoRoomCallback(new IZegoRoomCallback() {
             @Override

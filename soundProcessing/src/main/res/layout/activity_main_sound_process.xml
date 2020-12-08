@@ -32,7 +32,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:text="@string/tx_room_list_is_empty" />
+                android:text="@string/tx_room_list_is_empty"
+                />
 
             <android.support.v4.widget.SwipeRefreshLayout
                 android:id="@+id/refreshLayout"

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -30,10 +31,10 @@ public class ZGCreateRoomUI extends AppCompatActivity {
         setTitle("创建直播房间");
         setContentView(R.layout.activity_createroom);
 
-        mNetWorkToggle = (ToggleButton) findViewById(R.id.tb_enable_net);
-        mCameraToggle = (ToggleButton) findViewById(R.id.tb_enable_front_cam);
-        mRoomNameEdit = (EditText) findViewById(R.id.roomName_edit);
-        mJoinBtn = (Button) findViewById(R.id.join_btn);
+        mNetWorkToggle = (ToggleButton)findViewById(R.id.tb_enable_net);
+        mCameraToggle = (ToggleButton)findViewById(R.id.tb_enable_front_cam);
+        mRoomNameEdit = (EditText)findViewById(R.id.roomName_edit);
+        mJoinBtn = (Button)findViewById(R.id.join_btn);
 
         mCameraToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -73,8 +74,8 @@ public class ZGCreateRoomUI extends AppCompatActivity {
 
         Intent intent = new Intent(ZGCreateRoomUI.this, ZGAnchorUI.class);
         intent.putExtra("RoomName", roomName);
-        intent.putExtra("UseFrontCamera", useFrontCamera);
-        intent.putExtra("UseOptimisedNet", useOptimisedNet);
+        intent.putExtra("UseFrontCamera",useFrontCamera);
+        intent.putExtra("UseOptimisedNet",useOptimisedNet);
         ZGCreateRoomUI.this.startActivity(intent);
     }
 }

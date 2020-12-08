@@ -1,6 +1,8 @@
 package com.zego.videofilter.videoFilter;
 
-import com.zego.videofilter.faceunity.FURenderer;
+import android.content.Context;
+
+import com.faceunity.nama.FURenderer;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilterFactory;
 
@@ -14,6 +16,7 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
 
     // faceunity 美颜组件
     private FURenderer mFunRender;
+    private Context mContext;
 
     // 前处理传递数据的类型枚举
     public enum FilterType {
@@ -24,9 +27,10 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
         FilterType_ASYNCI420Mem
     }
 
-    public VideoFilterFactoryDemo(FilterType type, FURenderer fuRenderer) {
+    public VideoFilterFactoryDemo(FilterType type, FURenderer fuRenderer, Context context) {
         this.type = type;
         this.mFunRender = fuRenderer;
+        this.mContext = context;
     }
 
     // 创建外部滤镜实例
@@ -37,7 +41,7 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
                 mFilter = new VideoFilterMemDemo(mFunRender);
                 break;
             case FilterType_SurfaceTexture:
-                mFilter = new VideoFilterSurfaceTextureDemo(mFunRender);
+                mFilter = new VideoFilterSurfaceTextureDemo(mContext, mFunRender);
                 break;
             case FilterType_HybridMem:
                 mFilter = new VideoFilterHybridDemo(mFunRender);
@@ -60,4 +64,7 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
         mFilter = null;
     }
 
+    public ZegoVideoFilter getFilter() {
+        return mFilter;
+    }
 }

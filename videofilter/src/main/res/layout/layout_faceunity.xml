@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom">
 
-    <com.zego.videofilter.view.CheckGroup
+    <com.faceunity.nama.ui.CheckGroup
         android:id="@+id/cg_nav_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x98"
@@ -13,7 +13,7 @@
         android:background="#BD050F14"
         android:orientation="horizontal">
 
-        <com.zego.videofilter.view.CheckBoxCompat
+        <com.faceunity.nama.ui.CheckBoxCompat
             android:id="@+id/cb_face_beauty"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -26,7 +26,7 @@
             android:textColor="@color/beauty_control_bottom_radio_color"
             android:textSize="@dimen/text_size_26" />
 
-        <com.zego.videofilter.view.CheckBoxCompat
+        <com.faceunity.nama.ui.CheckBoxCompat
             android:id="@+id/cb_sticker"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -38,7 +38,7 @@
             android:textColor="@color/beauty_control_bottom_radio_color"
             android:textSize="@dimen/text_size_26" />
 
-        <com.zego.videofilter.view.CheckBoxCompat
+        <com.faceunity.nama.ui.CheckBoxCompat
             android:id="@+id/cb_makeup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -50,7 +50,7 @@
             android:textColor="@color/beauty_control_bottom_radio_color"
             android:textSize="@dimen/text_size_26" />
 
-        <com.zego.videofilter.view.CheckBoxCompat
+        <com.faceunity.nama.ui.CheckBoxCompat
             android:id="@+id/cb_body_slim"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -62,9 +62,9 @@
             android:textColor="@color/beauty_control_bottom_radio_color"
             android:textSize="@dimen/text_size_26" />
 
-    </com.zego.videofilter.view.CheckGroup>
+    </com.faceunity.nama.ui.CheckGroup>
 
-    <com.zego.videofilter.view.BeautyControlView
+    <com.faceunity.nama.ui.BeautyControlView
         android:id="@+id/beauty_control_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
         android:layout_marginBottom="@dimen/x98"
         android:background="#BD050F14">
 
-        <com.zego.videofilter.view.seekbar.DiscreteSeekBar
+        <com.faceunity.nama.ui.seekbar.DiscreteSeekBar
             android:id="@+id/makeup_seek_bar"
             android:layout_width="@dimen/x528"
             android:visibility="invisible"
@@ -120,7 +120,7 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <com.zego.videofilter.view.BeautifyBodyControlView
+    <com.faceunity.nama.ui.BeautifyBodyControlView
         android:id="@+id/body_slim_control_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

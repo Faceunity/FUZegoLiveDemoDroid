@@ -9,8 +9,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.zego.common.ZGManager;
+import com.zego.common.GetAppIdConfig;
 import com.zego.common.util.DeviceInfoManager;
+import com.zego.common.ZGManager;
 import com.zego.common.util.ZegoUtil;
 import com.zego.mixstream.entity.RoomInfo;
 import com.zego.mixstream.entity.RoomInfoEx;
@@ -35,7 +36,7 @@ public class ZGMixStreamDemoHelper {
 
     public String generateRoomID(Context context) {
 //        String roomID = "zgms-"+System.currentTimeMillis()+"-"+SystemUtil.generateDeviceId(context);
-        String roomID = "zgms_" + DeviceInfoManager.generateDeviceId(context);
+        String roomID = "zgms_"+ DeviceInfoManager.generateDeviceId(context);
 
         return roomID;
     }
@@ -74,7 +75,7 @@ public class ZGMixStreamDemoHelper {
                         }
                     }
 
-                    if (null != updateRoomListCallback) {
+                    if (null != updateRoomListCallback){
                         updateRoomListCallback.onUpdateRoomListCallback(pickedRoomInfos);
                     }
                 }
@@ -83,13 +84,13 @@ public class ZGMixStreamDemoHelper {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                if (null != updateRoomListCallback) {
+                if (null != updateRoomListCallback){
                     updateRoomListCallback.onRequestRoomListError(error.getMessage());
                 }
             }
         });
 
-        request.setRetryPolicy(new DefaultRetryPolicy(3000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        request.setRetryPolicy(new DefaultRetryPolicy(3000,0,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(request);
     }
 

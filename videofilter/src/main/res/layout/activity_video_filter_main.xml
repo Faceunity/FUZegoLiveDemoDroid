@@ -117,7 +117,6 @@
                     android:orientation="horizontal">
 
                     <RadioButton
-                        android:checked="true"
                         android:id="@+id/RadioI420Mem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -142,6 +141,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:checked="true"
                         android:text="@string/tx_surface_texture" />
 
                     <ImageView
@@ -201,6 +201,29 @@
                 android:autoLink="all"
                 android:gravity="center_vertical"
                 android:text="@string/room_id_describe" />
+
+            <com.zego.common.widgets.CustomEditText
+                android:id="@+id/ed_stream_id"
+                app:key="stream_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="40dp"
+                android:background="@color/white_color"
+                android:hint="请输入streamID"
+                android:padding="8dp"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="40dp"
+                android:autoLink="all"
+                android:gravity="center_vertical"
+                android:text="@string/stream_id_describe" />
 
             <TextView
                 android:id="@+id/authpack"

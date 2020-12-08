@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
@@ -37,32 +38,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="4">
+                android:layout_weight="4"
+                >
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:id="@+id/ll_view_container_0">
+                    android:id="@+id/ll_view_container_0"
+                    >
 
                 </LinearLayout>
-
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:id="@+id/ll_view_container_1">
+                    android:id="@+id/ll_view_container_1"
+                    >
 
                 </LinearLayout>
-
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:id="@+id/ll_view_container_2">
+                    android:id="@+id/ll_view_container_2"
+                    >
 
                 </LinearLayout>
 
@@ -71,103 +74,107 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="4">
-
+                android:layout_weight="4"
+                >
                 <LinearLayout
                     android:orientation="vertical"
                     android:id="@+id/ll_view_container_3"
 
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    >
 
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/ll_view_container_4"
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    >
 
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/ll_view_container_5"
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    >
 
                 </LinearLayout>
 
 
-            </LinearLayout>
 
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="4">
+                android:layout_weight="4"
+                >
 
                 <LinearLayout
                     android:id="@+id/ll_view_container_6"
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    >
 
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/ll_view_container_7"
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    >
 
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/ll_view_container_8"
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    >
 
                 </LinearLayout>
 
 
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="4">
+                android:layout_weight="4"
+                >
 
                 <LinearLayout
                     android:id="@+id/ll_view_container_9"
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    >
 
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/ll_view_container_10"
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    >
 
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/ll_view_container_11"
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    >
 
                 </LinearLayout>
 
@@ -178,28 +185,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="摄像头:" />
-
+                    android:text="摄像头:"/>
                 <Switch
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:id="@+id/CameraState" />
-
+                    android:id="@+id/CameraState"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="麦克风:" />
-
+                    android:text="麦克风:"/>
                 <Switch
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:id="@+id/MicrophoneState" />
+                    android:id="@+id/MicrophoneState"/>
 
             </LinearLayout>
         </LinearLayout>

@@ -175,7 +175,7 @@ public class ZGVideoCaptureForMediaPlayer extends ZegoVideoCaptureFactory {
         }
 
 
-        /* -------------以下是目前不需要关注的回调------------- */
+    /* -------------以下是目前不需要关注的回调------------- */
 
         @Override
         protected int setFrameRate(int i) {

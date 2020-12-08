@@ -31,7 +31,7 @@
                 android:id="@+id/RadioRGB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="RGB" />
+                android:text="RGB"/>
 
             <RadioButton
                 android:id="@+id/RadioYUV"
@@ -43,7 +43,7 @@
                 android:id="@+id/RadioANY"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ANY" />
+                android:text="ANY"/>
 
         </RadioGroup>
     </LinearLayout>
@@ -77,6 +77,6 @@
         android:layout_marginTop="10dp"
         android:text="开始推流"
         android:onClick="JumpPublish"
-        android:textAllCaps="false" />
+        android:textAllCaps="false"/>
 
 </LinearLayout>

@@ -174,7 +174,7 @@ public final class EglBase14 extends EglBase {
             EGLContext oldContext = EGL14.eglGetCurrentContext();
             EGLSurface oldSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
             if (oldContext == eglContext && oldSurface == eglSurface) {
-                return;
+                return ;
             }
 
             if (!EGL14.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)) {

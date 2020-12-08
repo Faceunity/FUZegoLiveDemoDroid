@@ -1,6 +1,7 @@
 package com.zego.mixstream;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -46,7 +47,7 @@ public class ZGMixStreamDemo implements IZegoMixStreamExCallback, IZegoSoundLeve
         return zgMixStreamDemo;
     }
 
-    public void setMixStreamCallback(MixStreamCallback mixStreamCallback) {
+    public void setMixStreamCallback(MixStreamCallback mixStreamCallback){
         zegoStreamMixer = new ZegoStreamMixer();
         //设置混流配置回调监听
         zegoStreamMixer.setMixStreamExCallback(this);
@@ -57,7 +58,7 @@ public class ZGMixStreamDemo implements IZegoMixStreamExCallback, IZegoSoundLeve
     }
 
     public void startMixStream(String mixStreamID) {
-        if (zegoStreamMixer == null) {
+        if (zegoStreamMixer == null){
             zegoStreamMixer = new ZegoStreamMixer();
         }
 
@@ -101,10 +102,10 @@ public class ZGMixStreamDemo implements IZegoMixStreamExCallback, IZegoSoundLeve
 
         // 水印布局
         ZegoMixStreamWatermark watermark = new ZegoMixStreamWatermark();
-        watermark.left = mixStreamConfig.outputWidth / 3;
-        watermark.top = mixStreamConfig.outputHeight / 3;
-        watermark.right = mixStreamConfig.outputWidth / 3 + mixStreamConfig.outputWidth / 2;
-        watermark.bottom = mixStreamConfig.outputHeight / 3 + mixStreamConfig.outputHeight / 5;
+        watermark.left = mixStreamConfig.outputWidth/3;
+        watermark.top = mixStreamConfig.outputHeight/3;
+        watermark.right = mixStreamConfig.outputWidth/3+mixStreamConfig.outputWidth/2;
+        watermark.bottom = mixStreamConfig.outputHeight/3+mixStreamConfig.outputHeight/5;
         watermark.image = "preset-id://zegowp.png";
         mixStreamConfig.watermark = watermark;
 
@@ -187,7 +188,7 @@ public class ZGMixStreamDemo implements IZegoMixStreamExCallback, IZegoSoundLeve
         return mixStreamID;
     }
 
-    public void unInit() {
+    public void unInit(){
 
         if (zegoStreamMixer != null) {
             zegoStreamMixer = null;
@@ -200,10 +201,9 @@ public class ZGMixStreamDemo implements IZegoMixStreamExCallback, IZegoSoundLeve
         zgMixStreamDemo = null;
     }
 
-    public interface MixStreamCallback {
+    public interface MixStreamCallback{
 
         void onMixStreamCallback(int errorcode, String mixStreamID);
-
         void onSoundLevelInMixStream(long anchorSoundLevel, long audienceSoundLevel);
     }
 
@@ -214,10 +214,10 @@ public class ZGMixStreamDemo implements IZegoMixStreamExCallback, IZegoSoundLeve
             mixStreamCallback.onMixStreamCallback(stateCode, mixStreamID);
         }
 
-        if (streamInfo.outputList.size() > 0) {
-            for (ZegoMixStreamOutputResult outputResult : streamInfo.outputList) {
+        if (streamInfo.outputList.size()>0){
+            for (ZegoMixStreamOutputResult outputResult: streamInfo.outputList) {
 
-                if (!outputResult.streamID.equals("")) {
+                if (!outputResult.streamID.equals("")){
                     Map<String, String> mapUrls = new HashMap<>();
                     mapUrls.put(ZGMixStreamDemoHelper.Constants.FIRST_ANCHOR, String.valueOf(true));
                     mapUrls.put(ZGMixStreamDemoHelper.Constants.KEY_MIX_STREAM_ID, mixStreamID);
@@ -243,15 +243,15 @@ public class ZGMixStreamDemo implements IZegoMixStreamExCallback, IZegoSoundLeve
 
         long anchorSoundLevel = 0;
         long audienceSoundLevel = 0;
-        for (ZegoSoundLevelInMixStreamInfo soundInfo : arrayList) {
+        for (ZegoSoundLevelInMixStreamInfo soundInfo: arrayList){
             if (soundInfo.soundLevelID == anchorSoundLevelID) {
                 anchorSoundLevel = soundInfo.soundLevel;
-            } else if (soundInfo.soundLevelID == audienceSoundLevelID) {
+            } else if (soundInfo.soundLevelID == audienceSoundLevelID){
                 audienceSoundLevel = soundInfo.soundLevel;
             }
         }
 
-        if (mixStreamCallback != null) {
+        if (mixStreamCallback != null){
             mixStreamCallback.onSoundLevelInMixStream(anchorSoundLevel, audienceSoundLevel);
         }
     }
