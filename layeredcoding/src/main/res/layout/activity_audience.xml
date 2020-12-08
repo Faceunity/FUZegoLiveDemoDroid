@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
-
-    <FrameLayout android:id="@+id/main_content"
+    <FrameLayout
+        android:id="@+id/main_content"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -13,7 +15,7 @@
         <TextureView
             android:id="@+id/play_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
@@ -41,14 +43,14 @@
                         android:layout_height="wrap_content"
                         android:text="前置摄像头"
                         android:textColor="@color/text_black"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"/>
 
                     <ToggleButton
                         android:id="@+id/tb_enable_front_cam"
                         style="@style/ToggleButtonText"
                         android:layout_width="55dp"
                         android:layout_height="40dp"
-                        android:checked="true" />
+                        android:checked="true"/>
 
                     <TextView
                         android:layout_width="0dp"
@@ -57,12 +59,12 @@
                         android:visibility="invisible" />
 
                     <Button
-                        android:id="@+id/conference_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:text="请求连麦"
-                        android:onClick="RequestBeAnchor" />
+                    android:id="@+id/conference_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="请求连麦"
+                    android:onClick="RequestBeAnchor"/>
 
                     <Button
                         android:id="@+id/quit_btn"
@@ -71,7 +73,7 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
                         android:text="退出直播"
-                        android:onClick="QuitLiveRoom" />
+                        android:onClick="QuitLiveRoom"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -101,7 +103,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginRight="5dp"
                             android:layout_marginLeft="5dp"
-                            android:text="" />
+                            android:text=""/>
 
                         <TextView
                             android:id="@+id/bitrate_txt"
@@ -110,7 +112,7 @@
                             android:layout_marginRight="5dp"
                             android:layout_marginLeft="5dp"
                             android:layout_marginTop="3dp"
-                            android:text="" />
+                            android:text=""/>
 
                         <TextView
                             android:id="@+id/fps_txt"
@@ -119,7 +121,7 @@
                             android:layout_marginRight="5dp"
                             android:layout_marginLeft="5dp"
                             android:layout_marginTop="3dp"
-                            android:text="" />
+                            android:text=""/>
 
                     </LinearLayout>
 
@@ -146,7 +148,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text=""
-                android:textColor="#FF0000" />
+                android:textColor="#FF0000"/>
 
             <TextureView
                 android:id="@+id/preview_view"

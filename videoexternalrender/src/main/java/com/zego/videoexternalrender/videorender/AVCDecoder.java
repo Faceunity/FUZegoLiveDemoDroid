@@ -4,6 +4,8 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -16,10 +18,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * AVCDecoder
- * <p>
+ *
  * AVCANNEXB 模式解码器
  * 此类的作用是解码 SDK 抛出的未解码视频数据
  * 开发者可参考该类的代码实现接收 SDK 抛出的未解码数据并渲染
+ *
  */
 @TargetApi(23)
 public class AVCDecoder {
@@ -28,18 +31,17 @@ public class AVCDecoder {
     private final static int CONFIGURE_FLAG_DECODE = 0;
 
     // 音视频编解码器组件
-    private MediaCodec mMediaCodec;
+    private MediaCodec  mMediaCodec;
     // 媒体数据格式信息
     private MediaFormat mMediaFormat;
-    private Surface mSurface;
+    private Surface     mSurface;
     // 渲染展示视图宽
-    private int mViewWidth;
+    private int         mViewWidth;
     // 渲染展示视图高
-    private int mViewHeight;
+    private int         mViewHeight;
 
-    /**
-     * 待解码数据信息
-     * 包含时间戳和待解码的数据
+    /** 待解码数据信息
+     *  包含时间戳和待解码的数据
      */
     static class DecodeInfo {
         public long timeStmp; // 纳秒
@@ -95,8 +97,8 @@ public class AVCDecoder {
             int width = outputFormat.getInteger("width");
             int height = outputFormat.getInteger("height");
 //            Log.d(TAG, "decoder OutputBuffer, width: "+width+", height: "+height);
-            if (mMediaFormat == outputFormat && outputBuffer != null && bufferInfo.size > 0) {
-                byte[] buffer = new byte[outputBuffer.remaining()];
+            if(mMediaFormat == outputFormat && outputBuffer != null && bufferInfo.size > 0){
+                byte [] buffer = new byte[outputBuffer.remaining()];
                 outputBuffer.get(buffer);
             }
 
@@ -118,12 +120,11 @@ public class AVCDecoder {
 
     /**
      * 初始化解码器
-     *
-     * @param surface    显示解码内容的surface
-     * @param viewwidth  渲染展示视图的宽
+     * @param surface  显示解码内容的surface
+     * @param viewwidth 渲染展示视图的宽
      * @param viewheight 渲染展示视图的高
      */
-    public AVCDecoder(Surface surface, int viewwidth, int viewheight) {
+    public AVCDecoder(Surface surface, int viewwidth, int viewheight){
         try {
             // 选用MIME类型为AVC、解码器来构造MediaCodec
             mMediaCodec = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC);
@@ -133,11 +134,11 @@ public class AVCDecoder {
             return;
         }
 
-        if (surface == null) {
+        if(surface == null){
             return;
         }
 
-        this.mViewWidth = viewwidth;
+        this.mViewWidth  = viewwidth;
         this.mViewHeight = viewheight;
         this.mSurface = surface;
 
@@ -146,7 +147,7 @@ public class AVCDecoder {
     }
 
     // 为解码器提供视频帧数据
-    public void inputFrameToDecoder(byte[] needEncodeData, long timeStmp) {
+    public void inputFrameToDecoder(byte[] needEncodeData, long timeStmp){
         if (needEncodeData != null) {
             DecodeInfo decodeInfo = new DecodeInfo();
             decodeInfo.inOutData = needEncodeData;
@@ -159,22 +160,22 @@ public class AVCDecoder {
     }
 
     // 启动解码器
-    public void startDecoder() {
-        if (mMediaCodec != null && mSurface != null) {
+    public void startDecoder(){
+        if(mMediaCodec != null && mSurface != null){
             // 设置解码器的回调监听
             mMediaCodec.setCallback(mCallback);
             // 配置MediaCodec，选择采用解码器功能
-            mMediaCodec.configure(mMediaFormat, mSurface, null, CONFIGURE_FLAG_DECODE);
+            mMediaCodec.configure(mMediaFormat, mSurface,null,CONFIGURE_FLAG_DECODE);
             // 启动解码器
             mMediaCodec.start();
-        } else {
+        }else{
             throw new IllegalArgumentException("startDecoder failed, please check the MediaCodec is init correct");
         }
     }
 
     // 释放解码器
-    public void stopAndReleaseDecoder() {
-        if (mMediaCodec != null) {
+    public void stopAndReleaseDecoder(){
+        if(mMediaCodec != null){
             try {
                 mMediaCodec.stop();
                 mMediaCodec.release();
@@ -182,7 +183,7 @@ public class AVCDecoder {
 //            mOutputDatasQueue.clear();
                 mMediaCodec = null;
             } catch (IllegalStateException e) {
-                Log.d(TAG, "MediaCodec decoder stop exception: " + e.getMessage());
+                Log.d(TAG,"MediaCodec decoder stop exception: "+e.getMessage());
             }
 
         }

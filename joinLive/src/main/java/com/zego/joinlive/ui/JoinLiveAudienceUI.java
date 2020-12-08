@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.zego.common.ZGBaseHelper;
 import com.zego.common.entity.SDKConfigInfo;
 import com.zego.common.ui.BaseActivity;
 import com.zego.common.util.AppLogger;
@@ -17,6 +18,7 @@ import com.zego.joinlive.R;
 import com.zego.joinlive.ZGJoinLiveHelper;
 import com.zego.joinlive.constants.JoinLiveView;
 import com.zego.joinlive.databinding.ActivityJoinLiveAudienceBinding;
+import com.zego.zegoliveroom.callback.IZegoAudioRouteCallback;
 import com.zego.zegoliveroom.callback.IZegoLivePlayerCallback;
 import com.zego.zegoliveroom.callback.IZegoLivePublisherCallback;
 import com.zego.zegoliveroom.callback.IZegoLoginCompletionCallback;
@@ -112,7 +114,7 @@ public class JoinLiveAudienceUI extends BaseActivity {
     }
 
     @Override
-    public void finish() {
+    public void finish(){
         super.finish();
 
         // 停止正在拉的流
@@ -146,7 +148,7 @@ public class JoinLiveAudienceUI extends BaseActivity {
     }
 
     // 设置拉流的视图列表
-    protected void initViewList() {
+    protected void initViewList(){
 
         // 全屏视图用于展示主播流
         mBigView = new JoinLiveView(binding.playView, false, "");
@@ -199,12 +201,12 @@ public class JoinLiveAudienceUI extends BaseActivity {
      * 此 demo 中不展示观众向主播申请连麦的一个过程，观众点击连麦则和主播进行连麦，不用经过主播的同意
      * 用户可根据自己的实际业务需求，增加观众向主播进行连麦申请的操作（发送信令实现），在收到主播同意连麦的信令后再推流
      */
-    public void onClickApplyJoinLive(View view) {
+    public void onClickApplyJoinLive(View view){
 
-        if (binding.btnApplyJoinLive.getText().toString().equals(getString(R.string.tx_joinLive))) {
+        if (binding.btnApplyJoinLive.getText().toString().equals(getString(R.string.tx_joinLive))){
             // button 说明为"视频连麦"时，执行推流的操作
 
-            if (mPlayStreamIDs.size() == ZGJoinLiveHelper.MaxJoinLiveNum + 1) {
+            if (mPlayStreamIDs.size() == ZGJoinLiveHelper.MaxJoinLiveNum + 1){
                 // 判断连麦人数是否达到上限，此demo只支持展示三人连麦；达到连麦上限时的拉流总数 = 1条主播流 + 三条连麦者的流
                 Toast.makeText(JoinLiveAudienceUI.this, getString(R.string.join_live_count_overflow), Toast.LENGTH_SHORT).show();
             } else {
@@ -213,7 +215,7 @@ public class JoinLiveAudienceUI extends BaseActivity {
                 // 获取可用的视图
                 JoinLiveView freeView = ZGJoinLiveHelper.sharedInstance().getFreeTextureView();
 
-                if (freeView != null) {
+                if (freeView != null){
                     // 设置预览视图模式，此处采用 SDK 默认值--等比缩放填充整View，可能有部分被裁减。
                     ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().setPreviewViewMode(ZegoVideoViewMode.ScaleAspectFill);
                     // 设置预览 view
@@ -251,10 +253,34 @@ public class JoinLiveAudienceUI extends BaseActivity {
     }
 
     // 登录房间并拉流
-    public void startPlay() {
+    public void startPlay(){
         AppLogger.getInstance().i(JoinLiveAudienceUI.class, "登录房间 %s", mRoomID);
         // 防止用户点击，弹出加载对话框
         CustomDialog.createDialog("登录房间中...", this).show();
+        ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().setZegoAudioRouteCallback(new IZegoAudioRouteCallback() {
+            @Override
+            public void onAudioRouteChange(int i) {
+                String devices = "";
+                switch (i) {
+                    case com.zego.zegoavkit2.ZegoConstants.AudioRouteType.Bluetooth:
+                        devices = String.format("onAudioRouteChange回调：%s", "蓝牙");
+                        break;
+                    case com.zego.zegoavkit2.ZegoConstants.AudioRouteType.EarPhone:
+                        devices = String.format("onAudioRouteChange回调：%s", "耳机");
+                        break;
+                    case com.zego.zegoavkit2.ZegoConstants.AudioRouteType.LoudSpeaker:
+                        devices = String.format("onAudioRouteChange回调：%s", "扬声器");
+                        break;
+                    case com.zego.zegoavkit2.ZegoConstants.AudioRouteType.Receiver:
+                        devices = String.format("onAudioRouteChange回调：%s", "听筒");
+                        break;
+                    case com.zego.zegoavkit2.ZegoConstants.AudioRouteType.UsbAudio:
+                        devices = String.format("onAudioRouteChange回调：%s", "USB设备");
+                        break;
+                }
+                AppLogger.getInstance().e(JoinLiveAudienceUI.class, devices);
+            }
+        });
 
         // 开始拉流前需要先登录房间，此处是观众登录主播所在的房间
         ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().loginRoom(mRoomID, ZegoConstants.RoomRole.Audience, new IZegoLoginCompletionCallback() {
@@ -265,9 +291,9 @@ public class JoinLiveAudienceUI extends BaseActivity {
                     AppLogger.getInstance().i(JoinLiveAudienceUI.class, "登录房间成功 roomId : %s", mRoomID);
 
                     // 筛选主播流，主播流采用全屏的视图
-                    for (ZegoStreamInfo streamInfo : zegoStreamInfos) {
+                    for (ZegoStreamInfo streamInfo:zegoStreamInfos){
 
-                        if (streamInfo.userID.equals(mAnchorID)) {
+                        if (streamInfo.userID.equals(mAnchorID)){
                             // 主播流采用全屏的视图，开始拉流
                             ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().startPlayingStream(streamInfo.streamID, mBigView.textureView);
                             // 设置拉流视图模式，此处采用 SDK 默认值--等比缩放填充整View，可能有部分被裁减。
@@ -275,7 +301,7 @@ public class JoinLiveAudienceUI extends BaseActivity {
 
                             // 向拉流流名列表中添加流名
                             mPlayStreamIDs.add(streamInfo.streamID);
-
+                            
                             // 修改视图信息
                             mBigView.streamID = streamInfo.streamID;
                             ZGJoinLiveHelper.sharedInstance().modifyTextureViewInfo(mBigView);
@@ -288,9 +314,9 @@ public class JoinLiveAudienceUI extends BaseActivity {
                     }
 
                     // 拉副主播流（即连麦者的流）
-                    for (ZegoStreamInfo streamInfo : zegoStreamInfos) {
+                    for (ZegoStreamInfo streamInfo:zegoStreamInfos) {
 
-                        if (!streamInfo.userID.equals(mAnchorID)) {
+                        if (!streamInfo.userID.equals(mAnchorID)){
                             // 获取可用的视图
                             JoinLiveView freeView = ZGJoinLiveHelper.sharedInstance().getFreeTextureView();
                             if (freeView != null) {
@@ -330,7 +356,7 @@ public class JoinLiveAudienceUI extends BaseActivity {
     }
 
     // 设置 SDK 相关回调的监听
-    public void initSDKCallback() {
+    public void initSDKCallback(){
         // 设置房间回调监听
         ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().setZegoRoomCallback(new IZegoRoomCallback() {
             @Override
@@ -357,7 +383,7 @@ public class JoinLiveAudienceUI extends BaseActivity {
             public void onStreamUpdated(int type, ZegoStreamInfo[] zegoStreamInfos, String roomID) {
                 // 房间流列表更新
 
-                if (roomID.equals(mRoomID)) {
+                if (roomID.equals(mRoomID)){
                     // 当登录房间成功后，如果房间内中途有人推流或停止推流。房间内其他人就能通过该回调收到流更新通知。
 
                     for (ZegoStreamInfo streamInfo : zegoStreamInfos) {
@@ -399,8 +425,8 @@ public class JoinLiveAudienceUI extends BaseActivity {
                         // 当有其他流关闭的时候，停止拉流
                         else if (type == ZegoConstants.StreamUpdateType.Deleted) {
                             AppLogger.getInstance().i(JoinLiveAudienceUI.class, "房间内收到流删除通知. streamID : %s, userName : %s, extraInfo : %s", streamInfo.streamID, streamInfo.userName, streamInfo.extraInfo);
-                            for (String playStreamID : mPlayStreamIDs) {
-                                if (playStreamID.equals(streamInfo.streamID)) {
+                            for (String playStreamID:mPlayStreamIDs){
+                                if (playStreamID.equals(streamInfo.streamID)){
 
                                     // 停止拉流
                                     ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().stopPlayingStream(streamInfo.streamID);
@@ -484,7 +510,7 @@ public class JoinLiveAudienceUI extends BaseActivity {
             }
 
             @Override
-            public void onRecvEndJoinLiveCommand(String fromUserID, String fromUserName, String roomID) {
+            public void onRecvEndJoinLiveCommand(String fromUserID, String fromUserName, String roomID ) {
 
             }
 
@@ -545,7 +571,7 @@ public class JoinLiveAudienceUI extends BaseActivity {
     }
 
     // 去除SDK相关的回调监听
-    public void releaseSDKCallback() {
+    public void releaseSDKCallback(){
         ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().setZegoLivePublisherCallback(null);
         ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().setZegoLivePlayerCallback(null);
         ZGJoinLiveHelper.sharedInstance().getZegoLiveRoom().setZegoRoomCallback(null);

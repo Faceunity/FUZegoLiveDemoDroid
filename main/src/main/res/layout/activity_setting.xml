@@ -27,18 +27,18 @@
                 android:background="@mipmap/ic_round_left" />
 
             <!--<TextView-->
-            <!--android:id="@+id/save_setting"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:gravity="center_vertical"-->
-            <!--android:layout_gravity="end"-->
-            <!--android:layout_marginRight="10dp"-->
-            <!--android:layout_marginEnd="10dp"-->
-            <!--android:textSize="16sp"-->
-            <!--android:textColor="@color/blue"-->
-            <!--android:text="@string/tx_save"-->
-            <!--android:clickable="true"-->
-            <!--android:focusable="true"/>-->
+                <!--android:id="@+id/save_setting"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:gravity="center_vertical"-->
+                <!--android:layout_gravity="end"-->
+                <!--android:layout_marginRight="10dp"-->
+                <!--android:layout_marginEnd="10dp"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textColor="@color/blue"-->
+                <!--android:text="@string/tx_save"-->
+                <!--android:clickable="true"-->
+                <!--android:focusable="true"/>-->
 
         </com.zego.common.widgets.TitleLayout>
 
@@ -54,7 +54,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:textColor="#333333"
-                android:text="@string/tx_appid" />
+                android:text="@string/tx_appid"/>
 
             <com.zego.common.widgets.CustomEditText
                 android:id="@+id/ed_app_id"
@@ -68,7 +68,7 @@
                 android:background="@drawable/edit_shape"
                 android:hint="请输入 AppID"
                 android:padding="8dp"
-                android:textSize="14sp" />
+                android:textSize="14sp"/>
 
             <ImageView
                 android:layout_width="match_parent"
@@ -89,7 +89,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:textColor="#333333"
-                android:text="@string/tx_appsign" />
+                android:text="@string/tx_appsign"/>
 
             <com.zego.common.widgets.CustomEditText
                 android:id="@+id/ed_app_sign"
@@ -103,7 +103,7 @@
                 android:background="@drawable/edit_shape"
                 android:hint="请输入 AppSign"
                 android:padding="8dp"
-                android:textSize="14sp" />
+                android:textSize="14sp"/>
 
             <ImageView
                 android:layout_width="match_parent"
@@ -124,7 +124,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:textColor="#333333"
-                android:text="@string/tx_env" />
+                android:text="@string/tx_env"/>
 
             <Spinner
                 android:id="@+id/sp_env"
@@ -135,7 +135,8 @@
                 android:layout_centerVertical="true"
                 android:paddingRight="30dp"
                 android:background="@drawable/spinner_border"
-                android:entries="@array/environment_types"></Spinner>
+                android:entries="@array/environment_types">
+            </Spinner>
 
             <ImageView
                 android:layout_width="match_parent"
@@ -156,7 +157,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:textColor="#333333" />
+                android:textColor="#333333"/>
 
             <ImageView
                 android:layout_width="match_parent"
@@ -177,7 +178,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:textColor="#333333" />
+                android:textColor="#333333"/>
 
             <ImageView
                 android:layout_width="match_parent"
@@ -199,7 +200,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:textColor="#333333" />
+                android:textColor="#333333"/>
 
 
             <ImageView

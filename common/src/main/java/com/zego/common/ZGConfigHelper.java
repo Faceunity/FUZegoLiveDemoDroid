@@ -2,6 +2,8 @@ package com.zego.common;
 
 
 import com.zego.common.util.AppLogger;
+import com.zego.zegoavkit2.audioprocessing.ZegoAudioProcessing;
+import com.zego.zegoavkit2.audioprocessing.ZegoAudioReverbMode;
 import com.zego.zegoavkit2.audioprocessing.ZegoAudioReverbParam;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.constants.ZegoAvConfig;
@@ -109,6 +111,22 @@ public class ZGConfigHelper {
         if (isInitSDKSuccess()) {
             ZegoLiveRoom zegoLiveRoom = ZGBaseHelper.sharedInstance().getZegoLiveRoom();
             zegoLiveRoom.enableSpeaker(enable);
+        }
+    }
+
+    /**
+     * 开启拉流镜像
+     * <p>
+     * 调用时机: 初始化之后
+     *
+     * @param enable
+     * @param streamId
+     */
+    public void enablePlayMirror(boolean enable, String streamId) {
+        AppLogger.getInstance().i(ZGConfigHelper.class, enable ? "开启拉流镜像" : "关闭拉流镜像");
+        if (isInitSDKSuccess()) {
+            ZegoLiveRoom zegoLiveRoom = ZGBaseHelper.sharedInstance().getZegoLiveRoom();
+            zegoLiveRoom.enableViewMirror(enable, streamId);
         }
     }
 

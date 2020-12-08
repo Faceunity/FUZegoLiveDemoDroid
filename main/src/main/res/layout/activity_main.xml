@@ -25,7 +25,7 @@
                 android:textSize="16sp"
                 android:textColor="@color/black"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true"/>
 
         </com.zego.common.widgets.TitleLayout>
 

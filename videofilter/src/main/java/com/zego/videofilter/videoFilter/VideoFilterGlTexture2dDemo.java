@@ -3,7 +3,7 @@ package com.zego.videofilter.videoFilter;
 import android.graphics.SurfaceTexture;
 import android.util.Log;
 
-import com.zego.videofilter.faceunity.FURenderer;
+import com.faceunity.nama.FURenderer;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;

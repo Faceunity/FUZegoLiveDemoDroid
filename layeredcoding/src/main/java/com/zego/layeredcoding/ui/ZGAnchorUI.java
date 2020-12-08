@@ -66,16 +66,16 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
         setTitle("");
         setContentView(R.layout.activity_anchor);
 
-        mExitBtn = (Button) findViewById(R.id.quit_btn);
+        mExitBtn = (Button)findViewById(R.id.quit_btn);
         mExitBtn.setEnabled(false);
-        mPreview = (TextureView) findViewById(R.id.preview_view);
-        mPlayView = (TextureView) findViewById(R.id.play_view);
+        mPreview = (TextureView)findViewById(R.id.preview_view);
+        mPlayView = (TextureView)findViewById(R.id.play_view);
 
-        mLayerSpin = (Spinner) findViewById(R.id.sp_layers);
-        mNetQualityTxt = (TextView) findViewById(R.id.netQuality_txt);
-        mBitrateTxt = (TextView) findViewById(R.id.bitrate_txt);
-        mFpsTxt = (TextView) findViewById(R.id.fps_txt);
-        mErrorTxt = (TextView) findViewById(R.id.error_txt);
+        mLayerSpin = (Spinner)findViewById(R.id.sp_layers);
+        mNetQualityTxt = (TextView)findViewById(R.id.netQuality_txt);
+        mBitrateTxt = (TextView)findViewById(R.id.bitrate_txt);
+        mFpsTxt = (TextView)findViewById(R.id.fps_txt);
+        mErrorTxt = (TextView)findViewById(R.id.error_txt);
 
         List<String> allLayers = new ArrayList<String>();
         for (int i = 0; i < mLayeredChoices.length; i++) {
@@ -87,7 +87,7 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
 
 
         getIntent().getBooleanExtra("UseFrontCamera", useFrontCamera);
-        getIntent().getBooleanExtra("UseOptimisedNet", useOptimisedNet);
+        getIntent().getBooleanExtra("UseOptimisedNet",useOptimisedNet);
         mRoomName = getIntent().getStringExtra("RoomName");
         mRoomID = ZGLayeredCodingDemoHelper.sharedInstance().generateRoomID(this);
 
@@ -125,7 +125,7 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
                     ZGManager.sharedInstance().api().startPublishing(mRoomID, mRoomName, ZegoConstants.PublishFlag.JoinPublish);
 
                 } else {
-                    mErrorTxt.setText("login room fail, err: " + errorcode);
+                    mErrorTxt.setText("login room fail, err: "+ errorcode);
                 }
 
             }
@@ -134,7 +134,7 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
             mErrorTxt.setText("login room fail(sync) ");
         }
 
-        mLayerSpin.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+        mLayerSpin.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
 
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -170,7 +170,7 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
         ZGManager.sharedInstance().api().logoutRoom();
     }
 
-    public void EndJoinLive(View view) {
+    public void EndJoinLive(View view){
 
         //结束连麦
         ZGManager.sharedInstance().api().endJoinLive(joinLiveUserID, new IZegoEndJoinLiveCallback() {
@@ -197,8 +197,8 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
     @Override
     public void onPublishStateUpdate(int stateCode, String streamID, HashMap<String, Object> hashMap) {
 
-        if (0 != stateCode) {
-            runOnUiThread(() -> {
+        if (0 !=  stateCode) {
+            runOnUiThread(()->{
                 mErrorTxt.setText("pulish fail, err: " + stateCode);
             });
         }
@@ -237,14 +237,14 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
             default:
                 break;
         }
-        String netQuality = "(pulish)当前网络质量：" + qualityStr;
-        String bitrate = "码率：" + zegoPublishStreamQuality.vkbps + "kb/s";
-        String fps = "帧率：" + zegoPublishStreamQuality.vcapFps;
+        String netQuality = "(pulish)当前网络质量："+qualityStr;
+        String bitrate = "码率：" + zegoPublishStreamQuality.vkbps+"kb/s";
+        String fps = "帧率："+zegoPublishStreamQuality.vcapFps;
 
 //        String bitrate = "码率：" + zegoStreamQuality.videoBitrate+"kb/s";
 //        String fps = "帧率："+zegoStreamQuality.videoFPS;
 
-        runOnUiThread(() -> {
+        runOnUiThread(()->{
             mNetQualityTxt.setText(netQuality);
             mBitrateTxt.setText(bitrate);
             mFpsTxt.setText(fps);
@@ -273,8 +273,8 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
 
     @Override
     public void onDisconnect(int errorCode, String roomID) {
-        runOnUiThread(() -> {
-            mErrorTxt.setText("disconnect zego server, err:" + errorCode);
+        runOnUiThread(()->{
+            mErrorTxt.setText("disconnect zego server, err:"+errorCode);
         });
     }
 
@@ -293,10 +293,10 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
         if (ZegoConstants.StreamUpdateType.Added == type) {
 
             // 处理流增加
-            if (0 == respondJoinLiveResult) {
+            if (0 == respondJoinLiveResult){
 
-                for (int i = 0; i < zegoStreamInfos.length; i++) {
-                    if ((zegoStreamInfos[i].userID.equals(joinLiveUserID)) && !zegoStreamInfos[i].streamID.equals("")) {
+                for (int i=0;i<zegoStreamInfos.length;i++) {
+                    if ((zegoStreamInfos[i].userID.equals(joinLiveUserID)) && !zegoStreamInfos[i].streamID.equals("") ) {
 
                         mPlayView.setVisibility(View.VISIBLE);
 
@@ -344,8 +344,8 @@ public class ZGAnchorUI extends AppCompatActivity implements IZegoLivePublisherC
         if (0 == stateCode) {
             bePlayingStream = true;
         } else {
-            runOnUiThread(() -> {
-                mErrorTxt.setText("play fail, err: " + stateCode);
+            runOnUiThread(()->{
+                mErrorTxt.setText("play fail, err: "+stateCode);
             });
         }
     }

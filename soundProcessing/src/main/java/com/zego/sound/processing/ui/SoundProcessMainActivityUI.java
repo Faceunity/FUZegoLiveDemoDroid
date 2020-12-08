@@ -3,14 +3,15 @@ package com.zego.sound.processing.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.widget.Toast;
 
 import com.zego.common.ZGBaseHelper;
+import com.zego.common.ZGManager;
 import com.zego.common.ui.BaseActivity;
 import com.zego.common.util.AppLogger;
 import com.zego.common.util.ZegoUtil;

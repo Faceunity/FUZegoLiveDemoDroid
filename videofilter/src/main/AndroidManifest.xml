@@ -4,9 +4,7 @@
 
     <application>
         <activity android:name=".ui.VideoFilterMainUI" />
-        <activity
-            android:name=".ui.FUBeautyActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name=".ui.FUBeautyActivity" />
 
     </application>
 

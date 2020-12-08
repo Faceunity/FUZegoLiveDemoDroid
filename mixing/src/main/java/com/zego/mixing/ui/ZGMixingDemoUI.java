@@ -49,12 +49,12 @@ public class ZGMixingDemoUI extends BaseActivity implements IZegoLivePublisherCa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zgmixing);
 
-        mAuxTxt = (TextView) findViewById(R.id.aux_txt);
-        mAuxCheckBox = (CheckBox) findViewById(R.id.CheckboxAux);
+        mAuxTxt = (TextView)findViewById(R.id.aux_txt);
+        mAuxCheckBox = (CheckBox)findViewById(R.id.CheckboxAux);
         mPreview = (TextureView) findViewById(R.id.pre_view);
         mErrorTxt = (TextView) findViewById(R.id.error_txt);
-        mHintTxt = (TextView) findViewById(R.id.hint);
-        mPublishBtn = (Button) findViewById(R.id.publish_btn);
+        mHintTxt = (TextView)findViewById(R.id.hint);
+        mPublishBtn = (Button)findViewById(R.id.publish_btn);
 
         String dirPath = this.getExternalCacheDir().getPath();
         mPCMFilePath = dirPath + "/mixdemo.pcm";
@@ -74,7 +74,7 @@ public class ZGMixingDemoUI extends BaseActivity implements IZegoLivePublisherCa
                 @Override
                 public void run() {
                     ZGMixingDemo.sharedInstance().MP3ToPCM(mMP3FilePath, mPCMFilePath);
-                    runOnUiThread(() -> {
+                    runOnUiThread(()->{
                         mAuxTxt.setVisibility(View.VISIBLE);
                         mAuxCheckBox.setVisibility(View.VISIBLE);
                     });
@@ -208,7 +208,7 @@ public class ZGMixingDemoUI extends BaseActivity implements IZegoLivePublisherCa
     private IZegoAudioAuxCallbackEx auxCallbackEx = new IZegoAudioAuxCallbackEx() {
         @Override
         public AuxDataEx onAuxCallback(int dataLen) {
-            return ZGMixingDemo.sharedInstance().handleAuxCallback(mPCMFilePath, dataLen);
+            return ZGMixingDemo.sharedInstance().handleAuxCallback(mPCMFilePath,dataLen);
         }
     };
 }

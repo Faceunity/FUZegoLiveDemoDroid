@@ -12,15 +12,19 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.zego.common.ui.BaseActivity;
-import com.zego.frequency_spectrum.R;
 import com.zego.frequency_spectrum.ZGFrequencySpectrumAndSoundLevelHelper;
 import com.zego.zegoavkit2.frequencyspectrum.ZegoFrequencySpectrumMonitor;
+
+
 import com.zego.zegoavkit2.soundlevel.ZegoSoundLevelMonitor;
+
+import com.zego.common.ui.BaseActivity;
+import com.zego.frequency_spectrum.R;
 
 
 /**
  * 本类为设置页面相关的Activity，没有详细注释，业务可以根据自己的需求设计自己的设置页面,也可根据以下作为参考
+ *
  */
 public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity {
 
@@ -48,7 +52,7 @@ public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity
 
         sw_frequency_spectrum = findViewById(R.id.sw_frequency_spectrum);
         sw_sound_level = findViewById(R.id.sw_sound_level);
-        tv_frequency_spectrum_current_monitor_cycle = findViewById(R.id.tv_frequency_spectrum_current_monitor_cycle);
+        tv_frequency_spectrum_current_monitor_cycle =  findViewById(R.id.tv_frequency_spectrum_current_monitor_cycle);
         tv_sound_level_current_monitor_cycle = findViewById(R.id.tv_sound_level_current_monitor_cycle);
         sb_frequency_spectrum_monitor_cycle_settings = findViewById(R.id.sb_frequency_spectrum_monitor_cycle_settings);
         sb_sound_level_monitor_cycle_settings = findViewById(R.id.sb_sound_level_monitor_cycle_settings);
@@ -62,7 +66,7 @@ public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity
 
         sw_frequency_spectrum.setChecked(last_frequency_spectrum_monitor_state);
         sw_sound_level.setChecked(last_sound_level_monitor_state);
-        tv_frequency_spectrum_current_monitor_cycle.setText(last_frequency_spectrum_monitor_circle + "ms");
+        tv_frequency_spectrum_current_monitor_cycle.setText(last_frequency_spectrum_monitor_circle +"ms");
         tv_sound_level_current_monitor_cycle.setText(last_sound_level_monitor_circle + "ms");
 
         sb_frequency_spectrum_monitor_cycle_settings.setProgress(last_frequency_spectrum_monitor_circle - 10);
@@ -74,8 +78,8 @@ public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                last_frequency_spectrum_monitor_circle = progress + 10;
-                tv_frequency_spectrum_current_monitor_cycle.setText(progress + 10 + "ms");
+                last_frequency_spectrum_monitor_circle = progress+10;
+                tv_frequency_spectrum_current_monitor_cycle.setText(progress+ 10 + "ms");
 
             }
 
@@ -87,7 +91,7 @@ public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
-                ZGFrequencySpectrumAndSoundLevelHelper.modifyFrequencySpectrumMonitorCycle(seekBar.getProgress() + 10);
+                ZGFrequencySpectrumAndSoundLevelHelper.modifyFrequencySpectrumMonitorCycle(seekBar.getProgress()+10);
 
             }
         });
@@ -96,8 +100,8 @@ public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                last_sound_level_monitor_circle = progress + 100;
-                tv_sound_level_current_monitor_cycle.setText(progress + 100 + "ms");
+                last_sound_level_monitor_circle = progress+100;
+                tv_sound_level_current_monitor_cycle.setText(progress+ 100 + "ms");
             }
 
             @Override
@@ -116,12 +120,12 @@ public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                if (true == isChecked) {
+                if(true == isChecked){
                     ZegoFrequencySpectrumMonitor.getInstance().start();
                     sb_frequency_spectrum_monitor_cycle_settings.setEnabled(true);
                     last_frequency_spectrum_monitor_state = true;
 
-                } else {
+                }else {
                     ZegoFrequencySpectrumMonitor.getInstance().stop();
                     sb_frequency_spectrum_monitor_cycle_settings.setEnabled(false);
                     last_frequency_spectrum_monitor_state = false;
@@ -135,11 +139,11 @@ public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                if (true == isChecked) {
+                if(true == isChecked){
                     ZegoSoundLevelMonitor.getInstance().start();
                     sb_sound_level_monitor_cycle_settings.setEnabled(true);
                     last_sound_level_monitor_state = true;
-                } else {
+                }else {
                     ZegoSoundLevelMonitor.getInstance().stop();
                     sb_sound_level_monitor_cycle_settings.setEnabled(false);
                     last_sound_level_monitor_state = false;
@@ -150,6 +154,7 @@ public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity
         });
 
 
+
     }
 
 
@@ -158,14 +163,14 @@ public class FrequencySpectrumAndSoundLevelSettingsActivity extends BaseActivity
         activity.startActivity(intent);
     }
 
-    public void goBackToFrequencySpectrumRoomActivity(View view) {
+    public void goBackToFrequencySpectrumRoomActivity(View view){
 
         finish();
 
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop(){
 
         super.onStop();
 

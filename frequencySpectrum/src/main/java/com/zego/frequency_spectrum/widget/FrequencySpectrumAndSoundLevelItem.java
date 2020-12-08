@@ -3,6 +3,7 @@ package com.zego.frequency_spectrum.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ public class FrequencySpectrumAndSoundLevelItem extends LinearLayout {
     }
 
 
+
     private TextView tv_username;
 
     public TextView getTv_username() {
@@ -27,6 +29,7 @@ public class FrequencySpectrumAndSoundLevelItem extends LinearLayout {
     public void setTv_username(TextView tv_username) {
         this.tv_username = tv_username;
     }
+
 
 
     private String stream_id;
@@ -40,6 +43,7 @@ public class FrequencySpectrumAndSoundLevelItem extends LinearLayout {
     }
 
 
+
     private ProgressBar pb_play_sound_level;
 
     public ProgressBar getPb_play_sound_level() {
@@ -51,7 +55,8 @@ public class FrequencySpectrumAndSoundLevelItem extends LinearLayout {
     }
 
 
-    public FrequencySpectrumAndSoundLevelItem(Context ctx, AttributeSet attributeSet) {
+
+    public FrequencySpectrumAndSoundLevelItem(Context ctx, AttributeSet attributeSet){
 
         super(ctx, attributeSet);
 

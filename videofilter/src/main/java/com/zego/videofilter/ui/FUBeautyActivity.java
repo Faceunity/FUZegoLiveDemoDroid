@@ -6,23 +6,25 @@ import android.databinding.DataBindingUtil;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.Toast;
 
+import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.IFURenderer;
+import com.faceunity.nama.ui.FaceUnityView;
+import com.faceunity.nama.utils.CameraUtils;
+import com.faceunity.nama.utils.LifeCycleSensorManager;
+import com.zego.common.entity.StreamQuality;
 import com.zego.common.util.AppLogger;
 import com.zego.common.util.ZegoUtil;
 import com.zego.common.widgets.CustomDialog;
 import com.zego.videofilter.R;
 import com.zego.videofilter.ZGFilterHelper;
 import com.zego.videofilter.databinding.ActivityFuBaseBinding;
-import com.zego.videofilter.faceunity.FURenderer;
-import com.zego.videofilter.faceunity.utils.LifeCycleSensorManager;
-import com.zego.videofilter.util.PreferenceUtil;
 import com.zego.videofilter.videoFilter.VideoFilterFactoryDemo;
-import com.zego.videofilter.view.FaceUnityView;
+import com.zego.videofilter.videoFilter.VideoFilterSurfaceTextureDemo;
 import com.zego.zegoavkit2.videofilter.ZegoExternalVideoFilter;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.callback.IZegoInitSDKCompletionCallback;
@@ -51,18 +53,20 @@ public class FUBeautyActivity extends AppCompatActivity {
 
     // 房间 ID
     private String mRoomID = "";
-
     // 主播流名
-    private String anchorStreamID = ZegoUtil.getPublishStreamID();
+    private String anchorStreamID = "";
 
     private VideoFilterFactoryDemo.FilterType chooseFilterType;
+    private int mCameraFacing = IFURenderer.CAMERA_FACING_FRONT;
+    private StreamQuality streamQuality = new StreamQuality();
+    private VideoFilterFactoryDemo mVideoFilterFactoryDemo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_fu_base);
-
+        binding.setQuality(streamQuality);
         ViewStub bottomViewStub = (ViewStub) findViewById(R.id.fu_base_bottom);
         bottomViewStub.setInflatedId(R.id.fu_base_bottom);
 
@@ -72,57 +76,80 @@ public class FUBeautyActivity extends AppCompatActivity {
                 finish();
             }
         });
+        binding.ivSwitchCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCameraFacing = IFURenderer.CAMERA_FACING_FRONT - mCameraFacing;
+                ZGFilterHelper.sharedInstance().getZegoLiveRoom().setFrontCam(mCameraFacing == IFURenderer.CAMERA_FACING_FRONT);
+                if (mVideoFilterFactoryDemo.getFilter() instanceof VideoFilterSurfaceTextureDemo) {
+                    ((VideoFilterSurfaceTextureDemo)mVideoFilterFactoryDemo.getFilter()).onCameraChange();
+                }
+                mFURenderer.onCameraChanged(mCameraFacing, CameraUtils.getCameraOrientation(mCameraFacing));
+                if (mFURenderer.getMakeupModule() != null) {
+                    mFURenderer.getMakeupModule().setIsMakeupFlipPoints(mCameraFacing == IFURenderer.CAMERA_FACING_FRONT ? 0 : 1);
+                }
+
+            }
+        });
 
         bottomViewStub.setLayoutResource(R.layout.layout_fu_beauty);
         bottomViewStub.inflate();
 
         mRoomID = getIntent().getStringExtra("roomID");
+        anchorStreamID = getIntent().getStringExtra("streamID");
         chooseFilterType = (VideoFilterFactoryDemo.FilterType) getIntent().getSerializableExtra("FilterType");
         Log.d(TAG, "onCreate: roomID:" + mRoomID + ", filterType:" + chooseFilterType);
         FaceUnityView faceUnityView = findViewById(R.id.fu_beauty_control);
-        boolean isFuBeautyOpen = TextUtils.equals(PreferenceUtil.VALUE_ON, PreferenceUtil.getString(this, PreferenceUtil.KEY_FACEUNITY_IS_ON));
-        if (isFuBeautyOpen) {
-            FURenderer.initFURenderer(this);
-            switch (chooseFilterType) {
-                case FilterType_SurfaceTexture: {
-                    mFURenderer = new FURenderer.Builder(this)
-                            .setInputTextureType(FURenderer.INPUT_EXTERNAL_OES_TEXTURE)
-                            .setCameraType(Camera.CameraInfo.CAMERA_FACING_FRONT)
-                            .setInputImageOrientation(FURenderer.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_FRONT))
-                            .setRunBenchmark(false)
-                            .setOnDebugListener(new FURenderer.OnDebugListener() {
-                                @Override
-                                public void onFpsChanged(double fps, double renderTime) {
-                                    Log.v(TAG, "onFpsChanged: fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
-                                }
-                            })
-                            .build();
-                }
-                break;
-                case FilterType_Mem:
-                case FilterType_ASYNCI420Mem:
-                case FilterType_HybridMem:
-                case FilterType_SyncTexture: {
-                    mFURenderer = new FURenderer.Builder(this)
-                            .setInputTextureType(FURenderer.INPUT_2D_TEXTURE)
-                            .setCameraType(Camera.CameraInfo.CAMERA_FACING_FRONT)
-                            .setInputImageOrientation(FURenderer.getCameraOrientation(Camera.CameraInfo.CAMERA_FACING_FRONT))
-                            .setRunBenchmark(false)
-                            .setOnDebugListener(new FURenderer.OnDebugListener() {
-                                @Override
-                                public void onFpsChanged(double fps, double renderTime) {
-                                    Log.v(TAG, "onFpsChanged: fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
-                                }
-                            })
-                            .build();
-                }
-                break;
-                default:
+        FURenderer.setup(this);
+        switch (chooseFilterType) {
+            case FilterType_SurfaceTexture: {
+                mFURenderer = new FURenderer.Builder(this)
+                        .setInputTextureType(IFURenderer.INPUT_TEXTURE_EXTERNAL_OES)
+                        .setCameraFacing(mCameraFacing)
+                        .setInputImageOrientation(CameraUtils.getCameraOrientation(mCameraFacing))
+                        .setRunBenchmark(true)
+                        .setOnDebugListener(new FURenderer.OnDebugListener() {
+                            @Override
+                            public void onFpsChanged(double fps, double renderTime) {
+                                Log.v(TAG, "onFpsChanged OES : fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        binding.tvFps.setText("fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
+                                    }
+                                });
+                            }
+                        })
+                        .build();
             }
-            faceUnityView.setOnFaceUnityControlListener(mFURenderer);
-        } else {
-            faceUnityView.setVisibility(View.INVISIBLE);
+            break;
+            case FilterType_Mem:
+            case FilterType_ASYNCI420Mem:
+            case FilterType_HybridMem:
+            case FilterType_SyncTexture: {
+                mFURenderer = new FURenderer.Builder(this)
+                        .setInputTextureType(IFURenderer.INPUT_TEXTURE_2D)
+                        .setCameraFacing(Camera.CameraInfo.CAMERA_FACING_FRONT)
+                        .setInputImageOrientation(CameraUtils.getCameraOrientation(FURenderer.CAMERA_FACING_FRONT))
+                        .setRunBenchmark(true)
+                        .setOnDebugListener(new FURenderer.OnDebugListener() {
+                            @Override
+                            public void onFpsChanged(double fps, double renderTime) {
+                                Log.v(TAG, "onFpsChanged 2D : fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        binding.tvFps.setText("fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
+                                    }
+                                });
+                            }
+                        })
+                        .build();
+            }
+            break;
+            default:
         }
+        faceUnityView.setModuleManager(mFURenderer);
 
         // 初始化SDK
         initSDK();
@@ -180,9 +207,10 @@ public class FUBeautyActivity extends AppCompatActivity {
      *
      * @param activity
      */
-    public static void actionStart(Activity activity, String roomID, VideoFilterFactoryDemo.FilterType filterType) {
+    public static void actionStart(Activity activity, String roomID, String streamID, VideoFilterFactoryDemo.FilterType filterType) {
         Intent intent = new Intent(activity, FUBeautyActivity.class);
         intent.putExtra("roomID", roomID);
+        intent.putExtra("streamID", streamID);
         intent.putExtra("FilterType", filterType);
         activity.startActivity(intent);
     }
@@ -202,8 +230,8 @@ public class FUBeautyActivity extends AppCompatActivity {
         ZegoLiveRoom.setTestEnv(ZegoUtil.getIsTestEnv());
 
         // 设置外部滤镜---必须在初始化 ZEGO SDK 之前设置，否则不会回调   SyncTexture
-        VideoFilterFactoryDemo filterFactory = new VideoFilterFactoryDemo(chooseFilterType, mFURenderer);
-        ZegoExternalVideoFilter.setVideoFilterFactory(filterFactory, ZegoConstants.PublishChannelIndex.MAIN);
+        mVideoFilterFactoryDemo = new VideoFilterFactoryDemo(chooseFilterType, mFURenderer, this);
+        ZegoExternalVideoFilter.setVideoFilterFactory(mVideoFilterFactoryDemo, ZegoConstants.PublishChannelIndex.MAIN);
 
         // 初始化SDK
         ZGFilterHelper.sharedInstance().getZegoLiveRoom().initSDK(ZegoUtil.getAppID(), ZegoUtil.getAppSign(), new IZegoInitSDKCompletionCallback() {
@@ -237,9 +265,11 @@ public class FUBeautyActivity extends AppCompatActivity {
                 if (errorCode == 0) {
                     AppLogger.getInstance().i(FUBeautyActivity.class, "登录房间成功 roomId : %s", mRoomID);
 
-                    ZegoAvConfig config = new ZegoAvConfig(ZegoAvConfig.Level.High);
-                    config.setVideoFPS(30);
-                    ZGFilterHelper.sharedInstance().getZegoLiveRoom().setAVConfig(config);
+                    ZegoAvConfig zegoAvConfig = new ZegoAvConfig(ZegoAvConfig.Level.Generic);
+                    zegoAvConfig.setVideoFPS(30);
+                    ZGFilterHelper.sharedInstance().getZegoLiveRoom().setAVConfig(zegoAvConfig);
+                    ZegoLiveRoom.requireHardwareEncoder(true);
+
                     // 设置预览视图模式，此处采用 SDK 默认值--等比缩放填充整View，可能有部分被裁减。
                     ZGFilterHelper.sharedInstance().getZegoLiveRoom().setPreviewViewMode(ZegoVideoViewMode.ScaleAspectFill);
                     // 设置预览 view，主播自己推流采用全屏视图
@@ -282,12 +312,18 @@ public class FUBeautyActivity extends AppCompatActivity {
 
             @Override
             public void onPublishQualityUpdate(String s, ZegoPublishStreamQuality zegoPublishStreamQuality) {
-
+                /**
+                 * 推流质量更新, 回调频率默认3秒一次
+                 * 可通过 {@link com.zego.zegoliveroom.ZegoLiveRoom#setPublishQualityMonitorCycle(long)} 修改回调频率
+                 */
+                streamQuality.setFps(String.format("帧率: %f", zegoPublishStreamQuality.vnetFps));
+                streamQuality.setBitrate(String.format("码率: %f kbs", zegoPublishStreamQuality.vkbps));
             }
 
             @Override
-            public void onCaptureVideoSizeChangedTo(int i, int i1) {
-
+            public void onCaptureVideoSizeChangedTo(int width, int height) {
+                // 当采集时分辨率有变化时，sdk会回调该方法
+                streamQuality.setResolution(String.format("分辨率: %dX%d", width, height));
             }
 
             @Override

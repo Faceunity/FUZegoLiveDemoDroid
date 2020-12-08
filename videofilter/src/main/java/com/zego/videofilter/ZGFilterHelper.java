@@ -19,7 +19,7 @@ public class ZGFilterHelper {
     }
 
     // 获取 ZegoLiveRoom 实例
-    public ZegoLiveRoom getZegoLiveRoom() {
+    public ZegoLiveRoom getZegoLiveRoom(){
         if (null == zegoLiveRoom) {
             zegoLiveRoom = new ZegoLiveRoom();
         }
@@ -27,8 +27,8 @@ public class ZGFilterHelper {
     }
 
     // 销毁 ZegoLiveRoom 实例
-    public void releaseZegoLiveRoom() {
-        if (null != zegoLiveRoom) {
+    public void releaseZegoLiveRoom(){
+        if (null != zegoLiveRoom){
             // 释放 SDK 资源
             zegoLiveRoom.unInitSDK();
             zegoLiveRoom = null;

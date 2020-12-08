@@ -29,6 +29,7 @@ import java.util.Iterator;
 /**
  * FrequencySpectrumAndSoundLevelBaseActivity 存放的是与SDK无关的UI逻辑和业务逻辑
  * 将SDK接口调用相关而跟SDK的音频频谱和声浪无关的接口定义在此类中
+ *
  */
 public class FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity extends FrequencySpectrumAndSoundLevelBaseActivity {
 
@@ -61,6 +62,7 @@ public class FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity extends Frequen
 
     /**
      * 推流接口在本专题的封装
+     *
      */
     protected void startPublishing() {
         publishStreamID = ZegoUtil.getPublishStreamID();
@@ -71,8 +73,9 @@ public class FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity extends Frequen
 
     /**
      * 登录房间的接口在本专题的封装
+     *
      */
-    protected void loginRoom() {
+    protected void loginRoom(){
 
         CustomDialog.createDialog("登录房间中...", this).show();
 
@@ -86,9 +89,9 @@ public class FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity extends Frequen
                     AppLogger.getInstance().i(FrequencySpectrumAndSoundLevelMainActivity.class, "登陆房间成功 roomId : %s", roomID);
 
 
-                    for (ZegoStreamInfo ZegoStreamInfo_tmp : zegoStreamInfos) {
+                    for(ZegoStreamInfo ZegoStreamInfo_tmp: zegoStreamInfos){
 
-                        if (ZegoStreamInfo_tmp.streamID != null) {
+                        if(ZegoStreamInfo_tmp.streamID != null){
                             // 拉流
                             startPlay(ZegoStreamInfo_tmp.streamID);
                             // 创建临时的FrequencySpectrumAndSoundLevelItem
@@ -116,8 +119,9 @@ public class FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity extends Frequen
 
     /**
      * 设置房间相关的回调在本专题的封装
+     *
      */
-    protected void setZegoRoomCallback() {
+    protected void setZegoRoomCallback(){
 
         // 设置房间相关回调
         ZGBaseHelper.sharedInstance().setZegoRoomCallback(new IZegoRoomCallback() {
@@ -168,10 +172,10 @@ public class FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity extends Frequen
 
                         Iterator<FrequencySpectrumAndSoundLevelItem> it = arrayList_FrequencySpectrumAndSoundLevelItem.iterator();
 
-                        while (it.hasNext()) {
+                        while(it.hasNext()){
 
                             FrequencySpectrumAndSoundLevelItem frequencySpectrumAndSoundLevelItem_tmp = it.next();
-                            if (frequencySpectrumAndSoundLevelItem_tmp.getStream_id().equals(zegoStreamInfo.streamID)) {
+                            if(frequencySpectrumAndSoundLevelItem_tmp.getStream_id().equals(zegoStreamInfo.streamID)){
                                 it.remove();
                                 ll_container.removeView(frequencySpectrumAndSoundLevelItem_tmp);
                             }
@@ -197,8 +201,9 @@ public class FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity extends Frequen
 
     /**
      * 设置推流相关的回调在本专题的封装
+     *
      */
-    protected void setPublishCallback() {
+    protected void setPublishCallback(){
 
         // 设置推流回调
         ZGPublishHelper.sharedInstance().setPublisherCallback(new IZegoLivePublisherCallback() {
@@ -264,8 +269,9 @@ public class FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity extends Frequen
 
     /**
      * 设置拉流相关的回调在本专题的封装
+     *
      */
-    protected void setPlayCallback() {
+    protected void setPlayCallback(){
 
         // 设置拉流回调
         ZGPlayHelper.sharedInstance().setPlayerCallback(new IZegoLivePlayerCallback() {

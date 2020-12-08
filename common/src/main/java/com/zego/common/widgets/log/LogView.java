@@ -2,6 +2,7 @@ package com.zego.common.widgets.log;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,7 +45,7 @@ public class LogView extends FrameLayout {
         recyclerView.setAdapter(logAdapter);
         txCpuInfo = findViewById(R.id.tx_cpu_info);
         cpuClockFrequency = findViewById(R.id.cpu_clock_frequency);
-        Button button = findViewById(R.id.clear_log);
+        Button button= findViewById(R.id.clear_log);
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

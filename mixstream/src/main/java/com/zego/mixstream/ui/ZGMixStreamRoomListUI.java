@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ZGMixStreamRoomListUI extends BaseActivity implements ZGMixStreamDemoHelper.UpdateRoomListCallback {
+public class ZGMixStreamRoomListUI extends BaseActivity implements ZGMixStreamDemoHelper.UpdateRoomListCallback{
 
     private ListView mRoomListView;
     private TextView mQueryStatusTxt;
@@ -33,8 +33,8 @@ public class ZGMixStreamRoomListUI extends BaseActivity implements ZGMixStreamDe
         setTitle("房间列表");
         setContentView(R.layout.activity_mix_roomlist);
 
-        mRoomListView = (ListView) findViewById(R.id.roomlist);
-        mQueryStatusTxt = (TextView) findViewById(R.id.querystatus_txt);
+        mRoomListView = (ListView)findViewById(R.id.roomlist);
+        mQueryStatusTxt = (TextView)findViewById(R.id.querystatus_txt);
 
         ZGMixStreamDemoHelper.sharedInstance().setUpdateRoomListCallback(this);
         ZGMixStreamDemoHelper.sharedInstance().requestRoomList(this);
@@ -42,7 +42,7 @@ public class ZGMixStreamRoomListUI extends BaseActivity implements ZGMixStreamDe
         mRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                HashMap<String, String> map = (HashMap<String, String>) adapterView.getItemAtPosition(position);
+                HashMap<String, String> map = (HashMap<String, String>)adapterView.getItemAtPosition(position);
 
                 Intent intent = new Intent(ZGMixStreamRoomListUI.this, ZGMixAudienceUI.class);
                 intent.putExtra("AnchorRoomID", map.get("RoomID"));

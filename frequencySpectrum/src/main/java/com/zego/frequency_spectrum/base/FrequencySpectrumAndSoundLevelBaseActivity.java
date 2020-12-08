@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+
 import com.zego.common.ui.BaseActivity;
 import com.zego.common.util.DeviceInfoManager;
 import com.zego.common.widgets.TitleLayout;
@@ -28,11 +29,12 @@ import java.util.ArrayList;
 /**
  * 本类为 FrequencySpectrumAndSoundLevelRoomActivity 的业务方面逻辑和UI逻辑部分的提取，以帮助客户能直观的关注 FrequencySpectrumAndSoundLevelRoomActivity 里与声浪和频谱设置的方式
  * 即在 FrequencySpectrumAndSoundLevelRoomActivity 类里只包含了音频频谱和声浪设置相关逻辑
+ *
  */
 public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
 
     // 在 activity_frequency_spectrum_sound_level_room.xml 布局文件展现roomid
-    public String roomID;
+    public String roomID ;
     // 推流的流id，这里为避免流id冲突，会获取随机值
     String publishStreamID;
 
@@ -51,7 +53,7 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
     public TitleLayout tl_activity_frequency_spectrum_room_title;
 
     // 这里使用 SharedPreferences 来保存音频频谱和声浪的相关设置状态，以实现在UI设置界面进行相关设置之后起效果的功能
-    public SharedPreferences sp;
+    public SharedPreferences sp ;
     // 音频频谱监控的上一次开关状态
     public Boolean last_frequency_spectrum_monitor_state;
     // 声浪监控的上一次开关状态
@@ -63,6 +65,7 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
 
     // 拉多条流的时候，使用list来保存展现的频谱和声浪的视图
     public ArrayList<FrequencySpectrumAndSoundLevelItem> arrayList_FrequencySpectrumAndSoundLevelItem = new ArrayList<>();
+
 
 
     @Override
@@ -78,8 +81,8 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
 
         tv_username = findViewById(R.id.tv_username);
         // 对于自己推流的一端，指定自己的设备型号
-        String deviceName = DeviceInfoManager.getProductName();
-        tv_username.setText(deviceName + "(我)");
+        String deviceName =DeviceInfoManager.getProductName();
+        tv_username.setText(deviceName+"(我)");
 
         ll_container = findViewById(R.id.ll_container);
 
@@ -92,7 +95,7 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
 
         //*******************获取音频频谱和声浪的设置值*******************//
 
-        sp = getSharedPreferences("FrequencySpectrumAndSoundLevel", Context.MODE_PRIVATE);
+        sp = getSharedPreferences("FrequencySpectrumAndSoundLevel",Context.MODE_PRIVATE);
         last_frequency_spectrum_monitor_state = sp.getBoolean("last_frequency_spectrum_state", true);
         last_sound_level_monitor_state = sp.getBoolean("last_sound_level_monitor_state", true);
         last_frequency_spectrum_monitor_circle = sp.getInt("last_frequency_spectrum_monitor_circle", 500);
@@ -120,7 +123,7 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
      *
      * @param vewi
      */
-    public void goBackToFrequencySpectrumMainActivity(View vewi) {
+    public void goBackToFrequencySpectrumMainActivity(View vewi){
 
         finish();
 
@@ -131,11 +134,11 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
      *
      * @param zegoFrequencySpectrumInfos SDK频谱回调抛出的频谱的信息
      */
-    public void dealwithPlayFrequencySpectrumUpdate(ZegoFrequencySpectrumInfo[] zegoFrequencySpectrumInfos) {
+    public void dealwithPlayFrequencySpectrumUpdate(ZegoFrequencySpectrumInfo[] zegoFrequencySpectrumInfos){
 
         for (ZegoFrequencySpectrumInfo zegoFrequencySpectrumInfo : zegoFrequencySpectrumInfos) {
 
-            for (FrequencySpectrumAndSoundLevelItem frequencySpectrumAndSoundLevelItem : arrayList_FrequencySpectrumAndSoundLevelItem) {
+            for(FrequencySpectrumAndSoundLevelItem frequencySpectrumAndSoundLevelItem:arrayList_FrequencySpectrumAndSoundLevelItem){
 
                 if (zegoFrequencySpectrumInfo.streamID.equals(frequencySpectrumAndSoundLevelItem.getStream_id())) {
 
@@ -152,7 +155,7 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
      *
      * @param zegoFrequencySpectrumInfo SDK频谱回调抛出的频谱的信息
      */
-    public void dealwithPublishFrequencySpectrumUpdate(ZegoFrequencySpectrumInfo zegoFrequencySpectrumInfo) {
+    public void dealwithPublishFrequencySpectrumUpdate(ZegoFrequencySpectrumInfo zegoFrequencySpectrumInfo){
 
         publish_beat_load_view.updateFrequencySpectrum(zegoFrequencySpectrumInfo.frequencySpectrumList);
 
@@ -161,8 +164,9 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
 
     /**
      * 由于本专题声浪效果方面需要动画效果，在这里 DealWithSoundLevelCallback 里单独处理SDK抛出的回调并且实现过渡动画的效果
+     *
      */
-    public class DealWithSoundLevelCallback implements IZegoSoundLevelCallback {
+    public class DealWithSoundLevelCallback implements IZegoSoundLevelCallback{
 
 
         // 由于本专题中声浪需要做动画效果，这里使用两个实例变量来保存上一次SDK声浪回调中抛出的值，以实现过度动画的效果
@@ -174,23 +178,23 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
         @Override
         public void onSoundLevelUpdate(ZegoSoundLevelInfo[] zegoSoundLevelInfos) {
 
-            for (int i = 0; i < zegoSoundLevelInfos.length; i++) {
+            for(int i = 0; i < zegoSoundLevelInfos.length; i++ ){
 
-                for (FrequencySpectrumAndSoundLevelItem frequencySpectrumAndSoundLevelItem : arrayList_FrequencySpectrumAndSoundLevelItem) {
+                for(FrequencySpectrumAndSoundLevelItem frequencySpectrumAndSoundLevelItem:arrayList_FrequencySpectrumAndSoundLevelItem){
 
                     if (zegoSoundLevelInfos[i].streamID.equals(frequencySpectrumAndSoundLevelItem.getStream_id())) {
 
-                        ValueAnimator animator = ValueAnimator.ofInt(last_progress_play[i], (int) zegoSoundLevelInfos[i].soundLevel).setDuration(last_sound_level_monitor_circle);
+                        ValueAnimator animator = ValueAnimator.ofInt(last_progress_play[i], (int)zegoSoundLevelInfos[i].soundLevel).setDuration(last_sound_level_monitor_circle);
 
-                        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        animator.addUpdateListener( new ValueAnimator.AnimatorUpdateListener() {
                             @Override
                             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                frequencySpectrumAndSoundLevelItem.getPb_play_sound_level().setProgress((int) valueAnimator.getAnimatedValue());
+                                frequencySpectrumAndSoundLevelItem.getPb_play_sound_level().setProgress((int)valueAnimator.getAnimatedValue());
 
                             }
                         });
                         animator.start();
-                        last_progress_play[i] = (int) zegoSoundLevelInfos[i].soundLevel;
+                        last_progress_play[i] = (int)zegoSoundLevelInfos[i].soundLevel;
 
                     }
                 }
@@ -206,16 +210,16 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
         @Override
         public void onCaptureSoundLevelUpdate(ZegoSoundLevelInfo zegoSoundLevelInfo) {
 
-            ValueAnimator animator = ValueAnimator.ofInt(last_progress_publish, (int) zegoSoundLevelInfo.soundLevel).setDuration(last_sound_level_monitor_circle);
+            ValueAnimator animator = ValueAnimator.ofInt(last_progress_publish, (int)zegoSoundLevelInfo.soundLevel).setDuration(last_sound_level_monitor_circle);
 
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            animator.addUpdateListener( new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    pb_publish_sound_level.setProgress((int) valueAnimator.getAnimatedValue());
+                    pb_publish_sound_level.setProgress((int)valueAnimator.getAnimatedValue());
                 }
             });
             animator.start();
-            last_progress_publish = (int) zegoSoundLevelInfo.soundLevel;
+            last_progress_publish = (int)zegoSoundLevelInfo.soundLevel;
 
         }
 
@@ -227,7 +231,7 @@ public class FrequencySpectrumAndSoundLevelBaseActivity extends BaseActivity {
      *
      * @param view
      */
-    public void goSetting(View view) {
+    public void goSetting(View view){
 
         FrequencySpectrumAndSoundLevelSettingsActivity.actionStart(this);
 

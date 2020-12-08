@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">joinLive</string>
     <string name="tx_join_live_title">直播连麦</string>
     <string name="tx_refresh_hint">下拉完成刷新房间列表</string>

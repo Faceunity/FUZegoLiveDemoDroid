@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.zego.common.ZGBaseHelper;
+import com.zego.common.ZGManager;
 import com.zego.common.ui.BaseActivity;
 import com.zego.common.ui.WebActivity;
 import com.zego.common.util.AppLogger;
@@ -18,12 +19,12 @@ import com.zego.zegoliveroom.callback.IZegoInitSDKCompletionCallback;
 
 /**
  * Created by zego on 2019/5/6.
- * <p>
+ *
  * 本类为音频功率谱与声浪专题界面的入口，主要逻辑为加载进入此Activity时：
- * 初始化SDK
- * 触发登录房间的相关逻辑
+ *  初始化SDK
+ *  触发登录房间的相关逻辑
  */
-public class FrequencySpectrumAndSoundLevelMainActivity extends BaseActivity {
+public class FrequencySpectrumAndSoundLevelMainActivity extends BaseActivity{
 
 
     @Override
@@ -37,6 +38,7 @@ public class FrequencySpectrumAndSoundLevelMainActivity extends BaseActivity {
 
     /**
      * 初始化SDK逻辑
+     *
      */
     private void initSDK() {
         // 初始化SDK
@@ -61,7 +63,7 @@ public class FrequencySpectrumAndSoundLevelMainActivity extends BaseActivity {
      */
     public void joinRoom(View view) {
 
-        final String roomId = ((EditText) findViewById(R.id.ed_room_id)).getText().toString();
+        final String roomId = ((EditText)findViewById(R.id.ed_room_id)).getText().toString();
         if (!"".equals(roomId)) {
             FrequencySpectrumAndSoundLevelRoomActivity.actionStart(this, roomId);
 
@@ -72,7 +74,7 @@ public class FrequencySpectrumAndSoundLevelMainActivity extends BaseActivity {
 
     }
 
-    public void goToFrequencySpectrumAndSoundLevelDocs(View view) {
+    public void goToFrequencySpectrumAndSoundLevelDocs(View view){
 
         WebActivity.actionStart(this, "https://doc.zego.im/CN/709.html", "音频频谱与声浪");
     }
@@ -82,7 +84,7 @@ public class FrequencySpectrumAndSoundLevelMainActivity extends BaseActivity {
      *
      * @param view
      */
-    public void goBack(View view) {
+    public void goBack(View view){
 
         finish();
 
@@ -100,6 +102,7 @@ public class FrequencySpectrumAndSoundLevelMainActivity extends BaseActivity {
 
     /**
      * 进入此Activity时会初始化SDK，在退出本专题时可按需释放SDK
+     *
      */
     @Override
     protected void onDestroy() {

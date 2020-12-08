@@ -39,7 +39,8 @@
             android:gravity="center"
             android:layout_alignParentRight="true"
             android:textColor="@color/sl_btn"
-            android:textSize="@dimen/text_size_4" />
+            android:textSize="@dimen/text_size_4"
+            />
 
 
     </RelativeLayout>

@@ -26,6 +26,7 @@ import static com.zego.videocommunication.ZGVideoCommunicationHelper.ZGVideoComm
 
 /**
  * 本类为 VideoCommunication 专题的帮助类，视频通话场景需要关注的SDK的API接口, 集成型开发者可以考虑直接复制本类到自己项目中
+ *
  */
 public class ZGVideoCommunicationHelper {
 
@@ -59,10 +60,10 @@ public class ZGVideoCommunicationHelper {
         InitFailureState
     }
 
-    private ZGVideoCommunicationHelper() {
+    private ZGVideoCommunicationHelper(){
     }
 
-    public void initZGVideoCommunicationHelper() {
+    public void initZGVideoCommunicationHelper(){
         // 在进入当前Activity之后马上初始化SDK
         ZGVideoCommunicationHelper.sharedInstance().initZegoSDK(ZegoUtil.getAppID(), ZegoUtil.getAppSign(), ZegoUtil.getIsTestEnv());
 
@@ -79,9 +80,9 @@ public class ZGVideoCommunicationHelper {
     private static ZGVideoCommunicationHelper zgVideoCommunicationHelper;
 
     /**
-     * 当前示例专题的 VideoCommunication 的 Helper 单例
-     *
-     * @return ZGVideoCommunicationHelper 单例对象
+      当前示例专题的 VideoCommunication 的 Helper 单例
+
+      @return ZGVideoCommunicationHelper 单例对象
      */
     public static ZGVideoCommunicationHelper sharedInstance() {
         if (zgVideoCommunicationHelper == null) {
@@ -108,9 +109,9 @@ public class ZGVideoCommunicationHelper {
      * 帮助简化 Zego  sdk初始化流程。
      * 建议在 App 中的 {@link Application#onCreate()} 中去初始化sdk。
      *
-     * @param appID   Zego appID, 可通过 <a>https://console.zego.im/acount/login</a> 申请 appID
-     * @param appSign Zego 分配的签名, 用来校验对应appID的合法性。 可通过 <a>https://console.zego.im/acount/login</a> 申请 appID 与 appSign
-     * @param testEnv 注意!!! 如果没有向 Zego 申请正式环境的 appID, 则需设置成测试环境, 否则SDK会初始化失败
+     * @param appID    Zego appID, 可通过 <a>https://console.zego.im/acount/login</a> 申请 appID
+     * @param appSign  Zego 分配的签名, 用来校验对应appID的合法性。 可通过 <a>https://console.zego.im/acount/login</a> 申请 appID 与 appSign
+     * @param testEnv  注意!!! 如果没有向 Zego 申请正式环境的 appID, 则需设置成测试环境, 否则SDK会初始化失败
      * @return true 为调用成功，false 为调用失败
      */
     private boolean initZegoSDK(final long appID, byte[] appSign, boolean testEnv) {
@@ -137,14 +138,14 @@ public class ZGVideoCommunicationHelper {
                 // 初始化完成
                 if (i == 0) {
                     setZgsdkInitState(ZGVideoCommunicationHelper.ZGSDKInitState.InitSuccessState);
-                    AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "初始化SDK " + appID + " 成功");
+                    AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "初始化SDK "+ appID + " 成功");
 
                     // 多人实时视频通话由于人多的时候性能原因，这里设置较低的分辨率
                     setVideoQuality(90, 160);
 
                 } else {
                     setZgsdkInitState(ZGVideoCommunicationHelper.ZGSDKInitState.InitFailureState);
-                    AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "初始化SDK " + appID + " 失败");
+                    AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "初始化SDK "+ appID + " 失败");
                     // 当初始化失败时释放SDK, 避免下次再次初始化SDK会收不到回调
                     unInitZegoSDK();
                 }
@@ -156,7 +157,7 @@ public class ZGVideoCommunicationHelper {
         return initSDKResults;
     }
 
-    private void setVideoQuality(int width, int height) {
+    private void setVideoQuality(int width, int height){
         ZegoAvConfig mZegoAvConfig = new ZegoAvConfig(ZegoAvConfig.Level.VeryLow);
         mZegoAvConfig.setVideoEncodeResolution(width, height);
         mZegoAvConfig.setVideoCaptureResolution(width, height);
@@ -175,7 +176,7 @@ public class ZGVideoCommunicationHelper {
      *               每个房间 ID 代表着一个房间。
      * @return true 为调用成功，false 为调用失败
      */
-    public void startVideoCommunication(String roomID, TextureView localPreviewView, String publishStreamid) {
+    public void startVideoCommunication(String roomID, TextureView localPreviewView, String publishStreamid){
 
         if (getZgsdkInitState() != ZGVideoCommunicationHelper.ZGSDKInitState.InitSuccessState) {
             AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "登陆失败: 请先InitSdk");
@@ -189,23 +190,23 @@ public class ZGVideoCommunicationHelper {
                 // 登录房间成功后, 开发者可通过 zegoStreamInfos 获取到当前房间推流信息。便于后续的拉流操作
                 // 当 zegoStreamInfos 为 null 时说明当前房间没有人推流
 
-                if (0 == i) {
+                if(0 == i){
 
-                    if (zegoStreamInfos.length < 12) {
-                        for (ZegoStreamInfo zegoStreamInfo : zegoStreamInfos) {
+                    if(zegoStreamInfos.length < 12){
+                        for(ZegoStreamInfo zegoStreamInfo : zegoStreamInfos){
                             AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "房间内收到流新增通知. streamID : %s, userName : %s, extraInfo : %s", zegoStreamInfo.streamID, zegoStreamInfo.userName, zegoStreamInfo.extraInfo);
 
-                            TextureView playRenderView = mCallback.addRenderViewByStreamAdd(zegoStreamInfo);
+                            TextureView playRenderView =  mCallback.addRenderViewByStreamAdd(zegoStreamInfo);
                             ZGVideoCommunicationHelper.sharedInstance().startPlaying(zegoStreamInfo.streamID, playRenderView);
                             ZGVideoCommunicationHelper.sharedInstance().setPlayViewMode(ZegoVideoViewMode.ScaleAspectFill, zegoStreamInfo.streamID);
                         }
-                    } else {
+                    }else {
                         AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "房间已满人，目前demo只展示12人通讯");
                         mCallback.onLoginRoomFailed(NUMBER_OF_PEOPLE_EXCEED_LIMIT);
                     }
 
 
-                } else {
+                }else {
 
                     mCallback.onLoginRoomFailed(i);
 
@@ -258,17 +259,15 @@ public class ZGVideoCommunicationHelper {
 
     /**
      * SDK 的接口 setZegoRoomCallback 的参数 IZegoRoomCallback 的封装，由于本示例专题中只关注房间内流变化的情况，所以该封装的接口只关注 onStreamUpdated
+     *
      */
     public interface ZGVideoCommunicationHelperCallback {
 
         int NUMBER_OF_PEOPLE_EXCEED_LIMIT = 12;
 
         TextureView addRenderViewByStreamAdd(ZegoStreamInfo listStream);
-
         void removeRenderViewByStreamDelete(ZegoStreamInfo listStream);
-
         void onLoginRoomFailed(int errorcode);
-
         void onPublishStreamFailed(int errorcode);
     }
 
@@ -355,9 +354,10 @@ public class ZGVideoCommunicationHelper {
                     if (type == ZegoConstants.StreamUpdateType.Added) {
 
                         AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "房间内收到流新增通知. streamID : %s, userName : %s, extraInfo : %s", streamInfo.streamID, streamInfo.userName, streamInfo.extraInfo);
-                        TextureView playRenderView = callback.addRenderViewByStreamAdd(streamInfo);
+                        TextureView playRenderView =  callback.addRenderViewByStreamAdd(streamInfo);
                         ZGVideoCommunicationHelper.sharedInstance().startPlaying(streamInfo.streamID, playRenderView);
                         ZGVideoCommunicationHelper.sharedInstance().setPlayViewMode(ZegoVideoViewMode.ScaleAspectFill, streamInfo.streamID);
+
 
 
                     } else if (type == ZegoConstants.StreamUpdateType.Deleted) {
@@ -417,10 +417,10 @@ public class ZGVideoCommunicationHelper {
              */
             @Override
             public void onPublishStateUpdate(int i, String s, HashMap<String, Object> hashMap) {
-                if (i == 0) {
+                if(i == 0){
 
-                } else {
-                    AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "推流 " + s + " 失败，请检查网络");
+                }else{
+                    AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "推流 "+ s +" 失败，请检查网络");
                     mCallback.onPublishStreamFailed(i);
                 }
 
@@ -459,6 +459,7 @@ public class ZGVideoCommunicationHelper {
      * 当不再使用ZegoSDK时，可以释放房间的代理
      * <p>
      * 调用时机：建议在unInitSDK之前设置。
+     *
      */
     public void releaseZGVideoCommunicationHelperCallback() {
         zegoLiveRoom.setZegoRoomCallback(null);
@@ -519,7 +520,7 @@ public class ZGVideoCommunicationHelper {
 
     /**
      * 停止预览
-     * <p>
+     *
      * 注意!!! 停止预览后并不会停止推流，需要停止推流请调用 {@link #stopPublishing()}
      */
     private void stopPreviewView() {
@@ -538,7 +539,7 @@ public class ZGVideoCommunicationHelper {
      */
     private void stopPlaying(@NonNull String streamID) {
         if (getZgsdkInitState() == ZGVideoCommunicationHelper.ZGSDKInitState.InitSuccessState) {
-            AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "停止拉流:" + streamID);
+            AppLogger.getInstance().i(ZGVideoCommunicationHelper.class, "停止拉流:"+streamID);
 
             ZGVideoCommunicationHelper.sharedInstance().getZegoLiveRoom().stopPlayingStream(streamID);
         }
@@ -637,12 +638,14 @@ public class ZGVideoCommunicationHelper {
     }
 
     /**
+     *
+     *
      * @param playStreamids 退出时应传入正在拉流的流id来停止拉流
      */
-    public void quitVideoCommunication(ArrayList<String> playStreamids) {
+    public void quitVideoCommunication(ArrayList<String> playStreamids){
         ZGVideoCommunicationHelper.sharedInstance().stopPublishing();
         ZGVideoCommunicationHelper.sharedInstance().stopPreviewView();
-        for (String playStreamid : playStreamids) {
+        for(String playStreamid : playStreamids){
             ZGVideoCommunicationHelper.sharedInstance().stopPlaying(playStreamid);
         }
         ZGVideoCommunicationHelper.sharedInstance().logoutRoom();
@@ -650,8 +653,9 @@ public class ZGVideoCommunicationHelper {
 
     /**
      * 完全退出专题时需要做的释放动作
+     *
      */
-    public void releaseZGVideoCommunicationHelper() {
+    public void releaseZGVideoCommunicationHelper(){
         stopPublishing();
         logoutRoom();
         releaseZGVideoCommunicationHelperCallback();

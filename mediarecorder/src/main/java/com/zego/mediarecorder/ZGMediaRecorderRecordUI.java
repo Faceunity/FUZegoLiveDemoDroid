@@ -7,9 +7,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.zego.common.ZGBaseHelper;
+import com.zego.common.util.AppLogger;
 import com.zego.common.ZGManager;
 import com.zego.common.ui.BaseActivity;
-import com.zego.common.util.AppLogger;
 import com.zego.common.util.ZegoUtil;
 import com.zego.mediarecorder.databinding.ActivityAvrecordingBinding;
 import com.zego.zegoavkit2.mediarecorder.IZegoMediaRecordCallback;
@@ -211,7 +211,7 @@ public class ZGMediaRecorderRecordUI extends BaseActivity {
                     //更新界面按钮标识
                     binding.recordBtn.setText(getString(R.string.tx_stop_record));
                 } else {
-                    Toast.makeText(ZGMediaRecorderRecordUI.this, "启动录制失败，err: " + errCode, Toast.LENGTH_LONG);
+                    Toast.makeText(ZGMediaRecorderRecordUI.this, "启动录制失败，err: "+ errCode, Toast.LENGTH_LONG);
                     AppLogger.getInstance().e(ZGMediaRecorderRecordUI.class, "启动录制失败， err: %d", errCode);
                 }
             }

@@ -2,6 +2,7 @@ package com.zego.videocapture.videocapture;
 
 import android.content.Context;
 
+
 import com.zego.zegoavkit2.ZegoVideoCaptureDevice;
 import com.zego.zegoavkit2.ZegoVideoCaptureFactory;
 
@@ -9,7 +10,7 @@ import com.zego.zegoavkit2.ZegoVideoCaptureFactory;
  * VideoCaptureFactoryDemo
  * 继承实现 ZEGO 外部采集工厂类，创建并保存外部采集设备实例
  * 注意：1.必须保证外部采集设备实例（ZegoVideoCaptureDevice）在create和destory之间是可用的
- * 2.ZegoVideoCaptureFactory 会缓存 ZegoVideoCaptureDevice 实例，开发者需避免创建新的实例，造成争抢独占设备
+ *      2.ZegoVideoCaptureFactory 会缓存 ZegoVideoCaptureDevice 实例，开发者需避免创建新的实例，造成争抢独占设备
  */
 public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
     private CaptureOrigin origin = CaptureOrigin.CaptureOrigin_Image;
@@ -17,7 +18,7 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
     private Context mContext = null;
 
     // 外部采集来源
-    public enum CaptureOrigin {
+    public enum CaptureOrigin{
         // 图片源，当前采集设备使用的数据传递类型是Surface_Texture
         CaptureOrigin_Image,
         // 图片源，当前采集设备使用的数据传递类型是GL_Texture_2D
@@ -32,7 +33,7 @@ public class VideoCaptureFactoryDemo extends ZegoVideoCaptureFactory {
         CaptureOrigin_CameraV3
     }
 
-    public VideoCaptureFactoryDemo(CaptureOrigin origin) {
+    public VideoCaptureFactoryDemo(CaptureOrigin origin){
         this.origin = origin;
     }
 

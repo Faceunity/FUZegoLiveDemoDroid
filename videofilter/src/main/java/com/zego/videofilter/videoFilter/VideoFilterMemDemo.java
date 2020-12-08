@@ -4,7 +4,8 @@ import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.util.Log;
 
-import com.zego.videofilter.faceunity.FURenderer;
+import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.IFURenderer;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;
@@ -252,7 +253,7 @@ public class VideoFilterMemDemo extends ZegoVideoFilter {
 
                     if (mFURenderer != null) {
                         // 调用 faceunity 进行美颜，美颜后会将数据回写到 modiBuffer
-                        mFURenderer.onDrawFrameSingleInput(mModiBuffer, pixelBuffer.width, pixelBuffer.height, FURenderer.INPUT_FORMAT_RGBA);
+                        mFURenderer.onDrawFrameSingleInput(mModiBuffer, pixelBuffer.width, pixelBuffer.height, IFURenderer.INPUT_FORMAT_RGBA_BUFFER);
                     }
 
                     // 根据获取到的buffer下标写数据到相应的内存中，将美颜后的数据传给 SDK

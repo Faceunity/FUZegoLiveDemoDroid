@@ -34,6 +34,7 @@ public class ShareUtil {
     }
 
 
+
     static final public void sendFiles(File[] fileList, Activity activity) {
         File cacheDir = activity.getExternalCacheDir();
         if (cacheDir == null || !cacheDir.canWrite()) {
@@ -62,9 +63,9 @@ public class ShareUtil {
 
             Uri uri;
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
                 uri = FileProvider.getUriForFile(activity, "com.zego.common.fileProvider", zipFile);
-            } else {
+            }else {
                 uri = Uri.fromFile(zipFile);
             }
             shareIntent.putExtra(Intent.EXTRA_STREAM, uri); // Uri.fromFile(zipFile)

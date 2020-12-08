@@ -12,11 +12,12 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.zego.common.util.DeviceInfoManager;
 import com.zego.common.ZGManager;
 import com.zego.common.ui.BaseActivity;
-import com.zego.mediasideinfo.R;
 import com.zego.mediasideinfo.ZGMediaSideInfoDemo;
 import com.zego.mediasideinfo.ZGMediaSideInfoDemoHelper;
+import com.zego.mediasideinfo.R;
 
 
 /**
@@ -47,7 +48,7 @@ public class MediaSideInfoDemoUI extends BaseActivity implements ZGMediaSideInfo
     private String allSendContent = "";
     private String allRecvContent = "";
 
-    private Handler handler = null;
+    private Handler handler=null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,26 +57,26 @@ public class MediaSideInfoDemoUI extends BaseActivity implements ZGMediaSideInfo
         setTitle("MediaSideInfo");
         setContentView(R.layout.activity_sideinfo);
 
-        mStatusText = (TextView) findViewById(R.id.txt_status);
-        mCheckResultText = (TextView) findViewById(R.id.txt_checkResult);
-        mShowBytesText = (TextView) findViewById(R.id.txt_bytes);
+        mStatusText = (TextView)findViewById(R.id.txt_status);
+        mCheckResultText = (TextView)findViewById(R.id.txt_checkResult);
+        mShowBytesText = (TextView)findViewById(R.id.txt_bytes);
 
-        mOnlyAudioSw = (Switch) findViewById(R.id.switch_onlyAudio);
+        mOnlyAudioSw = (Switch)findViewById(R.id.switch_onlyAudio);
         mOnlyAudioSw.setChecked(false);
-        mCutomPacketSw = (Switch) findViewById(R.id.switch_custom);
+        mCutomPacketSw = (Switch)findViewById(R.id.switch_custom);
         mCutomPacketSw.setChecked(false);
 
-        mPublishBtn = (Button) findViewById(R.id.btn_publish);
-        mSendBtn = (Button) findViewById(R.id.btn_send);
-        mCheckBtn = (Button) findViewById(R.id.btn_check);
+        mPublishBtn = (Button)findViewById(R.id.btn_publish);
+        mSendBtn = (Button)findViewById(R.id.btn_send);
+        mCheckBtn = (Button)findViewById(R.id.btn_check);
 
-        mPreview = (TextureView) findViewById(R.id.view_preview);
-        mPlayView = (TextureView) findViewById(R.id.view_playview);
+        mPreview = (TextureView)findViewById(R.id.view_preview);
+        mPlayView = (TextureView)findViewById(R.id.view_playview);
 
-        mSendContent = (TextView) findViewById(R.id.txt_sendContent);
-        mRecvContent = (TextView) findViewById(R.id.txt_recvContent);
+        mSendContent = (TextView)findViewById(R.id.txt_sendContent);
+        mRecvContent = (TextView)findViewById(R.id.txt_recvContent);
 
-        mSendStr = (EditText) findViewById(R.id.send_data);
+        mSendStr = (EditText)findViewById(R.id.send_data);
 
         ZGMediaSideInfoDemo.sharedInstance().setMediaSideInfoCallback(this);
         ZGMediaSideInfoDemoHelper.sharedInstance().setRecvStatusChangedNotify(this);
@@ -140,7 +141,7 @@ public class MediaSideInfoDemoUI extends BaseActivity implements ZGMediaSideInfo
 
         if (content.length() > 0) {
             if (isUseCustomPacket) {
-                ZGMediaSideInfoDemo.sharedInstance().sendMediaSideInfo(content, 0);
+                ZGMediaSideInfoDemo.sharedInstance().sendMediaSideInfo(content,0);
             } else {
                 ZGMediaSideInfoDemo.sharedInstance().sendMediaSideInfo(content);
             }
@@ -169,7 +170,7 @@ public class MediaSideInfoDemoUI extends BaseActivity implements ZGMediaSideInfo
         allRecvContent += content;
         allRecvContent += "\n";
 
-        runOnUiThread(() -> {
+        runOnUiThread(()->{
             //更新界面
             mRecvContent.setText(allRecvContent);
         });
@@ -180,7 +181,7 @@ public class MediaSideInfoDemoUI extends BaseActivity implements ZGMediaSideInfo
 
         allRecvContent += content;
         allRecvContent += "\n";
-        runOnUiThread(() -> {
+        runOnUiThread(()->{
             //更新界面
             mRecvContent.setText(allRecvContent);
         });

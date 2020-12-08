@@ -62,11 +62,11 @@
                 android:text="camera(yuv)" />
 
             <!--<RadioButton-->
-            <!--android:id="@+id/RadioCameraBitStream"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginLeft="5dp"-->
-            <!--android:text="camera(BitStream)" />-->
+                <!--android:id="@+id/RadioCameraBitStream"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="5dp"-->
+                <!--android:text="camera(BitStream)" />-->
 
         </RadioGroup>
     </LinearLayout>
@@ -78,6 +78,6 @@
         android:layout_marginTop="10dp"
         android:text="开始推流"
         android:onClick="JumpPublish"
-        android:textAllCaps="false" />
+        android:textAllCaps="false"/>
 
 </LinearLayout>

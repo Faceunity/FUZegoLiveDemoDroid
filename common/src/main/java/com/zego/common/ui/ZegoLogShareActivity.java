@@ -29,7 +29,6 @@ import butterknife.OnClick;
 public class ZegoLogShareActivity extends AbsBaseActivity {
 
     private LinkedList<String> mDatas;
-
     @Override
     protected int getContentViewLayout() {
         return R.layout.activity_log_share;
@@ -49,10 +48,10 @@ public class ZegoLogShareActivity extends AbsBaseActivity {
                 return !TextUtils.isEmpty(name) && name.startsWith("zegoavlog") && name.endsWith(".txt");
             }
         });
-        Log.e("test", "*** logfile: " + fileName[0]);
+        Log.e("test","*** logfile: " + fileName[0]);
 
-        List<String> arrayList = Arrays.asList(fileName);
-        mDatas = new LinkedList(arrayList);
+       List<String> arrayList=Arrays.asList(fileName);
+       mDatas = new LinkedList(arrayList);
     }
 
     @Override

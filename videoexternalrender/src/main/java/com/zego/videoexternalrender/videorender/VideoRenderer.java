@@ -60,9 +60,8 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoVideoRen
     private HandlerThread mThread = null;
     private Handler mHandler = null;
 
-    /**
-     * 单帧视频数据
-     * 包含视频画面的宽、高、数据、strides
+    /** 单帧视频数据
+     *  包含视频画面的宽、高、数据、strides
      */
     static class PixelBuffer {
         public int width;
@@ -72,7 +71,6 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoVideoRen
     }
 
     private ConcurrentHashMap<String, VideoFrame> frameMap = new ConcurrentHashMap<>();
-
     private ConcurrentHashMap<String, VideoFrame> getFrameMap() {
         return frameMap;
     }
@@ -119,15 +117,19 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoVideoRen
     }
 
     // 添加解码 AVCANNEXB 格式视频帧的渲染视图
-    public void addDecodView(final TextureView textureView) {
+    public void addDecodView(final TextureView textureView){
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (mAVCDecoder == null) {
+                if (mAVCDecoder == null){
                     // 创建解码器
-                    mAVCDecoder = new AVCDecoder(new Surface(textureView.getSurfaceTexture()), mViewWidth, mViewHeight);
+                    try {
+                        mAVCDecoder = new AVCDecoder(new Surface(textureView.getSurfaceTexture()), mViewWidth, mViewHeight);
+                        mAVCDecoder.startDecoder();
+                    }catch (Throwable throwable){
+                        throwable.printStackTrace();
+                    }
                     // 启动解码器
-                    mAVCDecoder.startDecoder();
                 }
             }
         });
@@ -381,7 +383,7 @@ public class VideoRenderer implements Choreographer.FrameCallback, IZegoVideoRen
     // IZegoVideoDecodeCallback (码流数据)回调监听
     @Override
     public void onVideoDecodeCallback(EncodedVideoFrame encodedVideoFrame, String streamID) {
-        Log.e("test", "**** 解码 callback, " + encodedVideoFrame.codecType);
+        Log.e("test","**** 解码 callback, " + encodedVideoFrame.codecType);
         byte[] tmpData = new byte[encodedVideoFrame.data.capacity()];
         encodedVideoFrame.data.position(0); // 缺少此行，解码后的渲染画面会卡住
         encodedVideoFrame.data.get(tmpData);

@@ -5,15 +5,15 @@
     <item android:id="@android:id/background">
         <shape>
             <corners android:radius="5dp" />
-            <solid android:color="@color/gray" />
+            <solid android:color="@color/gray"/>
         </shape>
     </item>
     <!--定义seekbar滑动条进度颜色-->
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <corners android:radius="5dp" />
-                <solid android:color="@color/blue" />
+                <corners android:radius="5dp"/>
+                <solid android:color="@color/blue"/>
             </shape>
         </clip>
     </item>

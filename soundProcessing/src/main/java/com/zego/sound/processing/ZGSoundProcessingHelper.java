@@ -7,13 +7,14 @@ import com.zego.zegoavkit2.audioprocessing.ZegoAudioProcessing;
 import com.zego.zegoavkit2.audioprocessing.ZegoAudioReverbMode;
 import com.zego.zegoavkit2.audioprocessing.ZegoAudioReverbParam;
 import com.zego.zegoliveroom.ZegoLiveRoom;
+import com.zego.zegoliveroom.constants.ZegoAvConfig;
 
 /**
  * ZGSoundProcessingHelper
  * <p>
  * 此类将SDK 音效配置参数项 进行封装, 简化接口。
  * 开发者可参考该类的代码, 注释, 理解 SDK 接口
- * <p>
+ *
  * 有关变声/混响/立体声的详细说明请查看ZEGO官方文档: <a>https://doc.zego.im/CN/665.html</a>
  */
 public class ZGSoundProcessingHelper {

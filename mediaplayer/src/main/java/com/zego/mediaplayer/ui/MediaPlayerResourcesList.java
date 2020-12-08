@@ -1,9 +1,11 @@
 package com.zego.mediaplayer.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 
 import com.zego.common.ui.BaseActivity;

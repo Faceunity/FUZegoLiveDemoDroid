@@ -47,16 +47,16 @@ public class ZGVideoRenderUI extends AppCompatActivity implements IZegoLivePubli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zgvideo_render);
 
-        mPreView = (TextureView) findViewById(R.id.pre_view);
-        mPlayView = (TextureView) findViewById(R.id.play_view);
-        mErrorTxt = (TextView) findViewById(R.id.error_txt);
-        mDealBtn = (Button) findViewById(R.id.publish_btn);
-        mDealPlayBtn = (Button) findViewById(R.id.play_btn);
+        mPreView = (TextureView)findViewById(R.id.pre_view);
+        mPlayView = (TextureView)findViewById(R.id.play_view);
+        mErrorTxt = (TextView)findViewById(R.id.error_txt);
+        mDealBtn = (Button)findViewById(R.id.publish_btn);
+        mDealPlayBtn = (Button)findViewById(R.id.play_btn);
 
         // 获取已选的渲染类型
         chooseRenderType = getIntent().getIntExtra("RenderType", 0);
         isSetDecodeCallback = getIntent().getBooleanExtra("IsUseNotDecode", false);
-        Log.e("test", "****** chooseRenderType: " + chooseRenderType + ", isSetDecodeCallback: " + isSetDecodeCallback);
+        Log.e("test","****** chooseRenderType: " + chooseRenderType + ", isSetDecodeCallback: " + isSetDecodeCallback);
 
         // 获取设备唯一ID
         String deviceID = DeviceInfoManager.generateDeviceId(this);
@@ -96,12 +96,12 @@ public class ZGVideoRenderUI extends AppCompatActivity implements IZegoLivePubli
                     ZGManager.sharedInstance().api().startPublishing(mRoomID, mRoomName, ZegoConstants.PublishFlag.JoinPublish);
 
                 } else {
-                    mErrorTxt.setText("login room fail, err:" + errorcode);
+                    mErrorTxt.setText("login room fail, err:"+errorcode);
                 }
             }
         });
 
-        if (!ret) {
+        if (!ret){
             mErrorTxt.setText("login room fail(sync)");
         }
     }
@@ -126,9 +126,9 @@ public class ZGVideoRenderUI extends AppCompatActivity implements IZegoLivePubli
     }
 
     // 处理推流相关操作
-    public void DealPublishing(View view) {
+    public void DealPublishing(View view){
         // 界面button==停止推流
-        if (mDealBtn.getText().toString().equals("StopPublish")) {
+        if (mDealBtn.getText().toString().equals("StopPublish")){
             //停止预览，停止推流
             ZGManager.sharedInstance().api().stopPreview();
             ZGManager.sharedInstance().api().setPreviewView(null);
@@ -151,17 +151,17 @@ public class ZGVideoRenderUI extends AppCompatActivity implements IZegoLivePubli
     }
 
     // 处理拉流相关操作
-    public void dealPlay(View view) {
+    public void dealPlay(View view){
 
         // 界面button==开始拉流
-        if (mDealPlayBtn.getText().toString().equals("StartPlay") && !mPlayStreamID.equals("")) {
+        if (mDealPlayBtn.getText().toString().equals("StartPlay") && !mPlayStreamID.equals("")){
             // 设置拉流视图
             if (isSetDecodeCallback) {
                 // 若选择的外部渲染类型是未解码型，设置添加解码类渲染视图
                 videoRenderer.addDecodView(mPlayView);
             } else {
                 // 选择的外部渲染类型不是未解码型，根据拉流流名设置渲染视图
-                videoRenderer.addView(mPlayStreamID, mPlayView);
+                videoRenderer.addView (mPlayStreamID, mPlayView);
             }
 
             // 开始拉流，不为 SDK 设置渲染视图，使用自渲染的视图
@@ -174,7 +174,7 @@ public class ZGVideoRenderUI extends AppCompatActivity implements IZegoLivePubli
 
         } else {
             // 界面button==停止拉流
-            if (!mPlayStreamID.equals("")) {
+            if (!mPlayStreamID.equals("")){
                 //停止拉流
                 ZGManager.sharedInstance().api().stopPlayingStream(mPlayStreamID);
                 //移除外部渲染视图
@@ -250,7 +250,7 @@ public class ZGVideoRenderUI extends AppCompatActivity implements IZegoLivePubli
 
     @Override
     public void onVideoSizeChangedTo(String streamID, int width, int height) {
-        Log.d("Zego", "onVideoSizeChangedTo callback, streamID: " + streamID + ", width:" + width + ",height:" + height);
+        Log.d("Zego","onVideoSizeChangedTo callback, streamID: "+streamID+", width:"+width+",height:"+height);
 
     }
 }

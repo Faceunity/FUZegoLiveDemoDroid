@@ -70,19 +70,19 @@ public class ZGAudienceUI extends AppCompatActivity implements IZegoLivePlayerCa
         setContentView(R.layout.activity_audience);
 
         mCameraTog = (ToggleButton) findViewById(R.id.tb_enable_front_cam);
-        mCameraTxt = (TextView) findViewById(R.id.front_camera_txt);
-        mRequestBtn = (Button) findViewById(R.id.conference_btn);
+        mCameraTxt = (TextView)findViewById(R.id.front_camera_txt);
+        mRequestBtn = (Button)findViewById(R.id.conference_btn);
         mRequestBtn.setEnabled(false);
-        mExitBtn = (Button) findViewById(R.id.quit_btn);
+        mExitBtn = (Button)findViewById(R.id.quit_btn);
         mExitBtn.setEnabled(false);
-        mPlayview = (TextureView) findViewById(R.id.play_view);
-        mPreview = (TextureView) findViewById(R.id.preview_view);
-        mNetQualityTxt = (TextView) findViewById(R.id.netQuality_txt);
-        mBitrateTxt = (TextView) findViewById(R.id.bitrate_txt);
-        mFpsTxt = (TextView) findViewById(R.id.fps_txt);
-        mErrorTxt = (TextView) findViewById(R.id.error_txt);
+        mPlayview = (TextureView)findViewById(R.id.play_view);
+        mPreview = (TextureView)findViewById(R.id.preview_view);
+        mNetQualityTxt = (TextView)findViewById(R.id.netQuality_txt);
+        mBitrateTxt = (TextView)findViewById(R.id.bitrate_txt);
+        mFpsTxt = (TextView)findViewById(R.id.fps_txt);
+        mErrorTxt = (TextView)findViewById(R.id.error_txt);
 
-        mLayerSpin = (Spinner) findViewById(R.id.sp_layers);
+        mLayerSpin = (Spinner)findViewById(R.id.sp_layers);
 
         List<String> allLayers = new ArrayList<String>();
         for (int i = 0; i < mLayeredChoices.length; i++) {
@@ -122,7 +122,7 @@ public class ZGAudienceUI extends AppCompatActivity implements IZegoLivePlayerCa
                 if (0 == errorcode) {
                     //拉流
                     if (zegoStreamInfos.length > 0) {
-                        for (int i = 0; i < zegoStreamInfos.length; i++) {
+                        for (int i = 0; i < zegoStreamInfos.length;i++){
                             if (zegoStreamInfos[i].userID.equals(anchorID)) {
                                 playStreamID = zegoStreamInfos[i].streamID;
                                 break;
@@ -147,7 +147,7 @@ public class ZGAudienceUI extends AppCompatActivity implements IZegoLivePlayerCa
             mErrorTxt.setText("login room fail(sync)");
         }
 
-        mLayerSpin.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+        mLayerSpin.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
 
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -185,33 +185,33 @@ public class ZGAudienceUI extends AppCompatActivity implements IZegoLivePlayerCa
 
     public void RequestBeAnchor(View view) {
         //申请连麦
-        ZGManager.sharedInstance().api().requestJoinLive(new IZegoResponseCallback() {
-            @Override
-            public void onResponse(int result, String fromUserID, String fromUserName) {
+         ZGManager.sharedInstance().api().requestJoinLive(new IZegoResponseCallback() {
+             @Override
+             public void onResponse(int result, String fromUserID, String fromUserName) {
 
-                if (0 == result) {
-                    mLayerSpin.setVisibility(View.VISIBLE);
-                    mPreview.setVisibility(View.VISIBLE);
+                 if (0 == result){
+                     mLayerSpin.setVisibility(View.VISIBLE);
+                     mPreview.setVisibility(View.VISIBLE);
 
-                    // 开始推流
-                    ZGManager.sharedInstance().api().setFrontCam(useFrontCamera);
-                    ZGManager.sharedInstance().api().setPreviewView(mPreview);
-                    ZGManager.sharedInstance().api().setPreviewViewMode(ZegoVideoViewMode.ScaleAspectFill);
-                    ZGManager.sharedInstance().api().enableCamera(true);
-                    ZGManager.sharedInstance().api().startPreview();
-                    // 设置延迟模式
-                    ZGManager.sharedInstance().api().setLatencyMode(ZegoConstants.LatencyMode.Low3);
-                    // 设置流量控制
-                    ZGManager.sharedInstance().api().enableTrafficControl(ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_FPS | ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_RESOLUTION, true);
-                    // 设置分层编码
-                    ZGManager.sharedInstance().api().setVideoCodecId(ZegoConstants.ZegoVideoCodecAvc.VIDEO_CODEC_MULTILAYER, ZegoConstants.PublishChannelIndex.MAIN);
+                     // 开始推流
+                     ZGManager.sharedInstance().api().setFrontCam(useFrontCamera);
+                     ZGManager.sharedInstance().api().setPreviewView(mPreview);
+                     ZGManager.sharedInstance().api().setPreviewViewMode(ZegoVideoViewMode.ScaleAspectFill);
+                     ZGManager.sharedInstance().api().enableCamera(true);
+                     ZGManager.sharedInstance().api().startPreview();
+                     // 设置延迟模式
+                     ZGManager.sharedInstance().api().setLatencyMode(ZegoConstants.LatencyMode.Low3);
+                     // 设置流量控制
+                     ZGManager.sharedInstance().api().enableTrafficControl(ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_FPS | ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_RESOLUTION, true);
+                     // 设置分层编码
+                     ZGManager.sharedInstance().api().setVideoCodecId(ZegoConstants.ZegoVideoCodecAvc.VIDEO_CODEC_MULTILAYER, ZegoConstants.PublishChannelIndex.MAIN);
 
-                    // 推流
-                    ZGManager.sharedInstance().api().startPublishing(mRoomID, mRoomName, ZegoConstants.PublishFlag.JoinPublish);
+                     // 推流
+                     ZGManager.sharedInstance().api().startPublishing(mRoomID, mRoomName, ZegoConstants.PublishFlag.JoinPublish);
 
-                }
-            }
-        });
+                 }
+             }
+         });
     }
 
     public void QuitLiveRoom(View view) {
@@ -232,8 +232,8 @@ public class ZGAudienceUI extends AppCompatActivity implements IZegoLivePlayerCa
             mRequestBtn.setEnabled(true);
             bePlayingStream = true;
         } else {
-            runOnUiThread(() -> {
-                mErrorTxt.setText("play fail,err: " + stateCode);
+            runOnUiThread(()->{
+                mErrorTxt.setText("play fail,err: "+stateCode);
             });
         }
     }
@@ -258,14 +258,14 @@ public class ZGAudienceUI extends AppCompatActivity implements IZegoLivePlayerCa
             default:
                 break;
         }
-        String netQuality = "(play)当前网络质量：" + qualityStr;
+        String netQuality = "(play)当前网络质量："+qualityStr;
 //        String bitrate = "码率：" + zegoStreamQuality.videoBitrate+"kb/s";
 //        String fps = "帧率："+zegoStreamQuality.videoFPS;
 
-        String bitrate = "码率：" + zegoPlayStreamQuality.vkbps + "kb/s";
-        String fps = "帧率：" + zegoPlayStreamQuality.vnetFps;
+        String bitrate = "码率：" + zegoPlayStreamQuality.vkbps+"kb/s";
+        String fps = "帧率："+zegoPlayStreamQuality.vnetFps;
 
-        runOnUiThread(() -> {
+        runOnUiThread(()->{
             mNetQualityTxt.setText(netQuality);
             mBitrateTxt.setText(bitrate);
             mFpsTxt.setText(fps);
@@ -309,7 +309,7 @@ public class ZGAudienceUI extends AppCompatActivity implements IZegoLivePlayerCa
             mCameraTog.setVisibility(View.INVISIBLE);
             mCameraTxt.setVisibility(View.INVISIBLE);
         } else {
-            runOnUiThread(() -> {
+            runOnUiThread(()->{
                 mErrorTxt.setText("publish fail,err: " + stateCode);
             });
         }
@@ -376,7 +376,7 @@ public class ZGAudienceUI extends AppCompatActivity implements IZegoLivePlayerCa
 
             // 对应于此demo中 只拉一条流，此处只停止拉一条流
             if (bePlayingStream) {
-                for (int i = 0; i < zegoStreamInfos.length; i++) {
+                for (int i = 0; i<zegoStreamInfos.length;i++) {
                     if (playStreamID.equals(zegoStreamInfos[i].streamID)) {
                         ZGManager.sharedInstance().api().stopPlayingStream(zegoStreamInfos[i].streamID);
                         bePlayingStream = false;

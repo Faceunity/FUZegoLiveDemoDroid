@@ -34,7 +34,7 @@ public class ZGJoinLiveHelper {
     }
 
     // 获取 ZegoLiveRoom 实例
-    public ZegoLiveRoom getZegoLiveRoom() {
+    public ZegoLiveRoom getZegoLiveRoom(){
         if (null == zegoLiveRoom) {
             zegoLiveRoom = new ZegoLiveRoom();
         }
@@ -42,8 +42,8 @@ public class ZGJoinLiveHelper {
     }
 
     // 销毁 ZegoLiveRoom 实例
-    public void releaseZegoLiveRoom() {
-        if (null != zegoLiveRoom) {
+    public void releaseZegoLiveRoom(){
+        if (null != zegoLiveRoom){
             // 释放 SDK 资源
             zegoLiveRoom.unInitSDK();
             zegoLiveRoom = null;
@@ -150,9 +150,9 @@ public class ZGJoinLiveHelper {
     /**
      * 将所有视图设置为可用
      */
-    public void freeAllJoinLiveView() {
-        for (JoinLiveView joinLiveView : mJoinLiveViewList) {
-            if (!joinLiveView.streamID.equals("")) {
+    public void freeAllJoinLiveView(){
+        for (JoinLiveView joinLiveView : mJoinLiveViewList){
+            if (!joinLiveView.streamID.equals("")){
                 joinLiveView.setFree();
                 joinLiveView.textureView.setVisibility(View.INVISIBLE);
                 modifyTextureViewInfo(joinLiveView);
@@ -161,7 +161,7 @@ public class ZGJoinLiveHelper {
     }
 
     // 获取连麦视图列表
-    public ArrayList<JoinLiveView> getJoinLiveViewList() {
+    public ArrayList<JoinLiveView> getJoinLiveViewList(){
         return mJoinLiveViewList;
     }
 }

@@ -6,12 +6,15 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.zego.common.ZGBaseHelper;
+
 import com.zego.common.ZGPublishHelper;
-import com.zego.frequency_spectrum.base.FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity;
+
 import com.zego.zegoavkit2.frequencyspectrum.IZegoFrequencySpectrumCallback;
 import com.zego.zegoavkit2.frequencyspectrum.ZegoFrequencySpectrumInfo;
 import com.zego.zegoavkit2.frequencyspectrum.ZegoFrequencySpectrumMonitor;
+
 import com.zego.zegoavkit2.soundlevel.ZegoSoundLevelMonitor;
+import com.zego.frequency_spectrum.base.FrequencySpectrumAndSoundLevelSDKAPIRelatedActivity;
 
 
 /**
@@ -65,9 +68,9 @@ public class FrequencySpectrumAndSoundLevelRoomActivity extends FrequencySpectru
         ZegoFrequencySpectrumMonitor.getInstance().setCycle(last_frequency_spectrum_monitor_circle);
 
         // 以下跟本专题的业务策略相关，当开关状态标识为真时，启动音频频谱监听，业务可以根据自己的策略设计开启或关闭方式
-        if (last_frequency_spectrum_monitor_state) {
+        if(last_frequency_spectrum_monitor_state){
             ZegoFrequencySpectrumMonitor.getInstance().start();
-        } else {
+        }else {
             ZegoFrequencySpectrumMonitor.getInstance().stop();
 
         }
@@ -81,9 +84,9 @@ public class FrequencySpectrumAndSoundLevelRoomActivity extends FrequencySpectru
         ZegoSoundLevelMonitor.getInstance().setCycle(last_sound_level_monitor_circle);
 
         // 以下跟本专题的业务策略相关，当开关状态标识为真时，启动声浪监听，业务可以根据自己的策略设计开启或关闭方式
-        if (last_sound_level_monitor_state) {
+        if(last_sound_level_monitor_state){
             ZegoSoundLevelMonitor.getInstance().start();
-        } else {
+        }else {
             ZegoSoundLevelMonitor.getInstance().stop();
         }
 
@@ -95,7 +98,7 @@ public class FrequencySpectrumAndSoundLevelRoomActivity extends FrequencySpectru
      * 其他Activity跳转到本Activity的接口
      *
      * @param activity 其他Activity的实例
-     * @param roomID   需要房间id在本Activity的ActionBar显示
+     * @param roomID 需要房间id在本Activity的ActionBar显示
      */
     public static void actionStart(Activity activity, String roomID) {
         Intent intent = new Intent(activity, FrequencySpectrumAndSoundLevelRoomActivity.class);
@@ -106,6 +109,7 @@ public class FrequencySpectrumAndSoundLevelRoomActivity extends FrequencySpectru
 
     /**
      * SDK销毁时应该释放资源，防止内存泄漏
+     *
      */
     @Override
     protected void onDestroy() {

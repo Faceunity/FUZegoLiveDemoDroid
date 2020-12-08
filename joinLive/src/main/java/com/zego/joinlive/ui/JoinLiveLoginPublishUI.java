@@ -39,7 +39,7 @@ public class JoinLiveLoginPublishUI extends BaseActivity {
 
 
     // 登录房间
-    public void onClickLoginRoomAndPublish(View view) {
+    public void onClickLoginRoomAndPublish(View view){
 
         String roomID = ZGJoinLiveHelper.PREFIX + binding.edRoomId.getText().toString();
         if (!"".equals(roomID)) {
@@ -52,7 +52,7 @@ public class JoinLiveLoginPublishUI extends BaseActivity {
 
 
     // 跳转到主播推流页面
-    public void jumpPublish(String roomID) {
+    public void jumpPublish(String roomID){
         JoinLiveAnchorUI.actionStart(JoinLiveLoginPublishUI.this, roomID);
     }
 

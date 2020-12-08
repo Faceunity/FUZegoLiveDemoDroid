@@ -27,7 +27,7 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.customSeekBar);
         typedArray.getInteger(R.styleable.customSeekBar_current, 100);
-        Integer max = typedArray.getInteger(R.styleable.customSeekBar_max, 100);
+        Integer max=typedArray.getInteger(R.styleable.customSeekBar_max, 100);
         typedArray.getInteger(R.styleable.customSeekBar_min, 0);
         setMax(mMax);
         setLayoutResource(R.layout.seekbar_prefs);

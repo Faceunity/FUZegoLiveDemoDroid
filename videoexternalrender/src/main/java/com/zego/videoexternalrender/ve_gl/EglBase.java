@@ -11,7 +11,11 @@
 package com.zego.videoexternalrender.ve_gl;
 
 import android.graphics.SurfaceTexture;
+import android.opengl.GLES20;
+import android.util.Log;
 import android.view.Surface;
+
+import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGL10;
 
@@ -21,8 +25,7 @@ import javax.microedition.khronos.egl.EGL10;
  */
 public abstract class EglBase {
     // EGL wrapper for an actual EGLContext.
-    public static class Context {
-    }
+    public static class Context {}
 
     // According to the documentation, EGL can be used from multiple threads at the same time if each
     // thread has its own EGLContext, but in practice it deadlocks on some devices when doing this.

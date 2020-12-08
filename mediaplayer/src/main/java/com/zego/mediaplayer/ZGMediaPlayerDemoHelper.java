@@ -21,7 +21,7 @@ public class ZGMediaPlayerDemoHelper {
     static ZGMediaPlayerDemoHelper zgMediaPlayerDemoHelper;
 
     public static ZGMediaPlayerDemoHelper sharedInstance() {
-        synchronized (ZGMediaPlayerDemo.class) {
+        synchronized (ZGMediaPlayerDemoHelper.class) {
             if (zgMediaPlayerDemoHelper == null) {
                 zgMediaPlayerDemoHelper = new ZGMediaPlayerDemoHelper();
             }
@@ -67,6 +67,8 @@ public class ZGMediaPlayerDemoHelper {
     }
 
 
+
+
     private static boolean isFileByName(String string) {
         if (string.contains(".")) {
             return true;
@@ -89,6 +91,7 @@ public class ZGMediaPlayerDemoHelper {
      * @param context            安卓上下文：用于获取 assets 目录下的资源
      * @param assetsFilePath     assets文件的路径名如：xxx.mp3
      * @param targetFileFullPath sd卡目标文件路径如：/sdcard/xxx.mp3
+     *
      */
     public static void copyFileFromAssets(Context context, String assetsFilePath, String targetFileFullPath) {
         Log.d("Tag", "copyFileFromAssets ");

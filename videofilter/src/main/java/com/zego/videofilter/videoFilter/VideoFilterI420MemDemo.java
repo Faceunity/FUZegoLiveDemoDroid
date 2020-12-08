@@ -4,7 +4,8 @@ import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.util.Log;
 
-import com.zego.videofilter.faceunity.FURenderer;
+import com.faceunity.nama.FURenderer;
+import com.faceunity.nama.IFURenderer;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
 import java.nio.ByteBuffer;
@@ -62,7 +63,6 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
      */
     @Override
     protected void allocateAndStart(Client client) {
-        Log.d(TAG, "allocateAndStart: egl " + EGL14.eglGetCurrentContext());
         mClient = client;
 //        mThread = new HandlerThread("video-filter");
 //        mThread.start();
@@ -110,7 +110,6 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
      */
     @Override
     protected void stopAndDeAllocate() {
-        Log.d(TAG, "stopAndDeAllocate:  egl " + EGL14.eglGetCurrentContext());
         mIsRunning = false;
 
 //        final CountDownLatch barrier = new CountDownLatch(1);
@@ -253,7 +252,7 @@ public class VideoFilterI420MemDemo extends ZegoVideoFilter {
 
                     // 调用 faceunity 进行美颜，美颜后会将数据回写到 modiBuffer
                     if (mFURenderer != null) {
-                        mFURenderer.onDrawFrameSingleInput(mModiBuffer, pixelBuffer.width, pixelBuffer.height, FURenderer.INPUT_FORMAT_I420);
+                        mFURenderer.onDrawFrameSingleInput(mModiBuffer, pixelBuffer.width, pixelBuffer.height, IFURenderer.INPUT_FORMAT_I420_BUFFER);
                     }
 
                     // 根据获取到的buffer下标写数据到相应的内存中，将美颜后的数据传给 SDK

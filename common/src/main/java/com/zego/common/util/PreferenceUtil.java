@@ -2,7 +2,12 @@ package com.zego.common.util;
 
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
 
+
+import com.zego.common.GetAppIdConfig;
 import com.zego.common.application.ZegoApplication;
 
 

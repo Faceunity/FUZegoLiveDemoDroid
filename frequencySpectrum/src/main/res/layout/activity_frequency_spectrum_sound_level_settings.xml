@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="音频频谱设置"
-        android:layout_marginVertical="10dp" />
+        android:layout_marginVertical="10dp"/>
 
 
     <RelativeLayout
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="是否开启"
-            android:layout_margin="10dp" />
+            android:layout_margin="10dp"/>
 
         <Switch
             android:layout_width="wrap_content"
@@ -48,7 +48,8 @@
             android:layout_margin="10dp"
             android:layout_alignParentRight="true"
             android:id="@+id/sw_frequency_spectrum"
-            android:checked="true" />
+            android:checked="true"
+            />
 
     </RelativeLayout>
 
@@ -66,14 +67,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="监控周期"
-                android:layout_margin="10dp" />
+                android:layout_margin="10dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_frequency_spectrum_current_monitor_cycle"
                 android:text="500ms"
-                android:layout_marginVertical="10dp" />
+                android:layout_marginVertical="10dp"/>
 
         </LinearLayout>
 
@@ -85,8 +86,8 @@
             android:max="2990"
             android:min="0"
             android:id="@+id/sb_frequency_spectrum_monitor_cycle_settings"
-            android:progress="500" />
-
+            android:progress="500"/>
+        
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -95,15 +96,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="10ms" />
+                android:text="10ms"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:text="3000ms" />
+                android:text="3000ms"/>
 
         </RelativeLayout>
+
 
 
     </LinearLayout>
@@ -112,7 +114,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="声浪设置"
-        android:layout_marginVertical="10dp" />
+        android:layout_marginVertical="10dp"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -124,7 +126,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="是否开启"
-            android:layout_margin="10dp" />
+            android:layout_margin="10dp"/>
 
         <Switch
             android:layout_width="wrap_content"
@@ -132,7 +134,8 @@
             android:layout_margin="10dp"
             android:layout_alignParentRight="true"
             android:id="@+id/sw_sound_level"
-            android:checked="true" />
+            android:checked="true"
+            />
 
     </RelativeLayout>
 
@@ -150,14 +153,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="监控周期"
-                android:layout_margin="10dp" />
+                android:layout_margin="10dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="200ms"
                 android:id="@+id/tv_sound_level_current_monitor_cycle"
-                android:layout_marginVertical="10dp" />
+                android:layout_marginVertical="10dp"/>
 
         </LinearLayout>
 
@@ -168,7 +171,7 @@
             android:max="2900"
             android:min="0"
             android:id="@+id/sb_sound_level_monitor_cycle_settings"
-            android:progress="100" />
+            android:progress="100"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -178,15 +181,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="100ms" />
+                android:text="100ms"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:text="3000ms" />
+                android:text="3000ms"/>
 
         </RelativeLayout>
+
 
 
     </LinearLayout>

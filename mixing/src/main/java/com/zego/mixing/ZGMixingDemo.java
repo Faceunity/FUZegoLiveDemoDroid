@@ -34,10 +34,10 @@ public class ZGMixingDemo {
     private static ZGMixingDemo zgMixingDemo = null;
     private ZegoAudioAux mZegoAudioAux = null;
 
-    public static ZGMixingDemo sharedInstance() {
-        if (zgMixingDemo == null) {
-            synchronized (ZGMixingDemo.class) {
-                if (zgMixingDemo == null) {
+    public static ZGMixingDemo sharedInstance(){
+        if (zgMixingDemo == null){
+            synchronized (ZGMixingDemo.class){
+                if (zgMixingDemo == null){
                     zgMixingDemo = new ZGMixingDemo();
                 }
             }
@@ -81,7 +81,7 @@ public class ZGMixingDemo {
             int len = mBackgroundMusic.read(dataBuf);
 
             if (len > 0) {
-                mPcmBuffer.put(dataBuf, 0, exceptDataLength);
+                mPcmBuffer.put(dataBuf,0,exceptDataLength);
                 auxDataEx.auxDataBuf = mPcmBuffer;
                 auxDataEx.auxDataBufLen = len;
             } else {
@@ -106,7 +106,7 @@ public class ZGMixingDemo {
         FileOutputStream fos = null;
 
         try {
-            byte[] pcmData = decodeToPCM(mp3FilePath, 0, DURATION);
+            byte[] pcmData = decodeToPCM(mp3FilePath, 0,DURATION);
 
             if (pcmData != null) {
 
@@ -118,7 +118,7 @@ public class ZGMixingDemo {
                 }
             }
 
-        } catch (IOException e) {
+        } catch (IOException e){
             Log.e("Zego", "io exception happened to mp3 to pcm");
         }
     }
@@ -173,10 +173,10 @@ public class ZGMixingDemo {
                 }
                 bitstream.closeFrame();
             }
-
+            
             return outStream.toByteArray();
         } catch (BitstreamException e) {
-            Log.e("Zego", "Bitstream error: " + e.getMessage());
+            Log.e("Zego", "Bitstream error: "+ e.getMessage());
             throw new IOException("Bitstream error: " + e);
 
         } catch (DecoderException e) {
@@ -209,7 +209,7 @@ public class ZGMixingDemo {
             mSampleRate = Integer.valueOf(samplerate);
 
         } catch (Exception e) {
-            Log.e("Zego", "get mp3file info exception");
+            Log.e("Zego","get mp3file info exception");
             e.printStackTrace();
         }
     }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -35,7 +36,7 @@ public class PublishStreamAndPlayStreamUI extends BaseActivity {
     protected PublishStreamAndPlayStreamBinding publishStreamAndPlayStreamBinding;
 
     // 这里为防止多个设备测试时相同流id冲推导致的推流失败，这里使用时间戳的后4位来作为随机的流id，开发者可根据业务需要定义业务上的流id
-    private String mPublishStreamid = "s-streamid-" + new Date().getTime() % (new Date().getTime() / 10000);
+    private String mPublishStreamid = "s-streamid-" + new Date().getTime()%(new Date().getTime()/10000);
 
     // 推拉流布局模型
     PublishStreamAndPlayStreamLayoutModel mPublishStreamAndPlayStreamLayoutModel;
@@ -69,7 +70,7 @@ public class PublishStreamAndPlayStreamUI extends BaseActivity {
             }
         });
 
-        ZGVideoCommunicationHelper.sharedInstance().setZGVideoCommunicationHelperCallback(new ZGVideoCommunicationHelper.ZGVideoCommunicationHelperCallback() {
+        ZGVideoCommunicationHelper.sharedInstance().setZGVideoCommunicationHelperCallback( new ZGVideoCommunicationHelper.ZGVideoCommunicationHelperCallback(){
 
             @Override
             public TextureView addRenderViewByStreamAdd(ZegoStreamInfo listStream) {
@@ -79,11 +80,11 @@ public class PublishStreamAndPlayStreamUI extends BaseActivity {
             }
 
             @Override
-            public void onLoginRoomFailed(int errorcode) {
+            public void onLoginRoomFailed(int errorcode){
 
-                if (ZGVideoCommunicationHelper.ZGVideoCommunicationHelperCallback.NUMBER_OF_PEOPLE_EXCEED_LIMIT == errorcode) {
+                if(ZGVideoCommunicationHelper.ZGVideoCommunicationHelperCallback.NUMBER_OF_PEOPLE_EXCEED_LIMIT == errorcode){
                     Toast.makeText(PublishStreamAndPlayStreamUI.this, "房间已满人，目前demo只展示12人通讯", Toast.LENGTH_LONG).show();
-                } else {
+                }else {
                     Toast.makeText(PublishStreamAndPlayStreamUI.this, "登录房间失败，请检查网络", Toast.LENGTH_LONG).show();
                 }
                 PublishStreamAndPlayStreamUI.this.onBackPressed();
@@ -91,7 +92,7 @@ public class PublishStreamAndPlayStreamUI extends BaseActivity {
             }
 
             @Override
-            public void onPublishStreamFailed(int errorcode) {
+            public void onPublishStreamFailed(int errorcode){
 
                 Toast.makeText(PublishStreamAndPlayStreamUI.this, "开启视频通话失败，检查网络", Toast.LENGTH_LONG).show();
                 onBackPressed();
@@ -119,6 +120,7 @@ public class PublishStreamAndPlayStreamUI extends BaseActivity {
 
     /**
      * 定义设置麦克风和摄像头开关状态的点击事件
+     *
      */
     private void setCameraAndMicrophoneStateChangedOnClickEvent() {
 
@@ -127,9 +129,9 @@ public class PublishStreamAndPlayStreamUI extends BaseActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                if (isChecked) {
+                if(isChecked){
                     ZGVideoCommunicationHelper.sharedInstance().enableCamera(true);
-                } else {
+                }else {
                     ZGVideoCommunicationHelper.sharedInstance().enableCamera(false);
 
                 }
@@ -142,9 +144,9 @@ public class PublishStreamAndPlayStreamUI extends BaseActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                if (isChecked) {
+                if(isChecked){
                     ZGVideoCommunicationHelper.sharedInstance().enableMic(true);
-                } else {
+                }else {
                     ZGVideoCommunicationHelper.sharedInstance().enableMic(false);
                 }
 
@@ -154,6 +156,7 @@ public class PublishStreamAndPlayStreamUI extends BaseActivity {
 
     /**
      * 当返回当前Activity的时候应该停止推拉流并退出房间，此处作为参考
+     *
      */
     @Override
     public void onBackPressed() {
@@ -180,7 +183,7 @@ public class PublishStreamAndPlayStreamUI extends BaseActivity {
      *
      * @param v 点击返回的按钮
      */
-    public void goBackToVideoCommunicationInputRoomidUI(View v) {
+    public void goBackToVideoCommunicationInputRoomidUI(View v){
         this.onBackPressed();
     }
 

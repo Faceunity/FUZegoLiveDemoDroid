@@ -189,7 +189,7 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
 
     /**
      * 更新采集数据
-     * <p>
+     *
      * 当 Choreographer 刷新回调触发时，绘制图像数据到屏幕和 SDK 提供的 EglSurface 上
      */
     @Override
@@ -293,7 +293,6 @@ public class VideoCaptureFromImage extends ZegoVideoCaptureDevice
 
     /**
      * 初始化资源，必须实现
-     *
      * @param client 通知ZEGO SDK采集结果的客户端
      */
     @Override

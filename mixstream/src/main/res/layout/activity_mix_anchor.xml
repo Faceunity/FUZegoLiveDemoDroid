@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
-
-    <FrameLayout android:id="@+id/main_content"
+    <FrameLayout
+        android:id="@+id/main_content"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,7 +14,7 @@
         <TextureView
             android:id="@+id/preview_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
@@ -42,21 +42,21 @@
                         android:layout_height="wrap_content"
                         android:text="前置摄像头"
                         android:textColor="#000000"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"/>
 
                     <ToggleButton
                         android:id="@+id/tb_enable_front_cam"
                         style="@style/ToggleButtonText"
                         android:layout_width="50dp"
                         android:layout_height="40dp"
-                        android:checked="true" />
+                        android:checked="true"/>
 
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:visibility="invisible" />
+                        android:visibility="invisible"/>
 
                     <Button
                         android:id="@+id/mix_btn"
@@ -64,7 +64,7 @@
                         android:layout_height="45dp"
                         android:layout_marginLeft="5dp"
                         android:text="开始混流"
-                        android:onClick="StartMixStream" />
+                        android:onClick="StartMixStream"/>
 
                     <Button
                         android:id="@+id/quit_btn"
@@ -73,7 +73,7 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="10dp"
                         android:text="结束连麦"
-                        android:onClick="EndJoinLive" />
+                        android:onClick="EndJoinLive"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -91,7 +91,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="5dp"
                         android:layout_marginLeft="5dp"
-                        android:text="" />
+                        android:text=""/>
 
                 </LinearLayout>
 
@@ -103,7 +103,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text=""
-                android:textColor="#FF0000" />
+                android:textColor="#FF0000"/>
 
             <TextureView
                 android:id="@+id/play_view"

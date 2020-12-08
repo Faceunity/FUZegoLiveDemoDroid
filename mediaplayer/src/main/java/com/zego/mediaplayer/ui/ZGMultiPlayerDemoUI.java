@@ -279,7 +279,7 @@ public class ZGMultiPlayerDemoUI extends BaseActivity implements ZGMultiPlayerDe
                     break;
             }
 
-        } else if (type == ZGMultiPlayerDemo.ZGPlayerStateType.ZGPlayerStateType_End) {
+        } else if (type == ZGMultiPlayerDemo.ZGPlayerStateType.ZGPlayerStateType_End){
             switch (index) {
                 case ZegoMediaPlayer.PlayerIndex.First:
 
@@ -307,8 +307,8 @@ public class ZGMultiPlayerDemoUI extends BaseActivity implements ZGMultiPlayerDe
 
     @Override
     public void onPlayerError(int errorcode, int index) {
-        runOnUiThread(() -> {
-            mErrorTxt.setText("player " + index + " play err: " + errorcode);
+        runOnUiThread(()->{
+            mErrorTxt.setText("player "+index+" play err: " + errorcode);
         });
     }
 
@@ -316,11 +316,11 @@ public class ZGMultiPlayerDemoUI extends BaseActivity implements ZGMultiPlayerDe
     @Override
     public void onPublishStateUpdate(int stateCode, String streamID, HashMap<String, Object> hashMap) {
         if (stateCode == 0) {
-            runOnUiThread(() -> {
+            runOnUiThread(()->{
                 mPublishBtn.setText("StopPublish");
             });
         } else {
-            runOnUiThread(() -> {
+            runOnUiThread(()->{
                 mErrorTxt.setText("publish fail err: " + stateCode);
             });
         }

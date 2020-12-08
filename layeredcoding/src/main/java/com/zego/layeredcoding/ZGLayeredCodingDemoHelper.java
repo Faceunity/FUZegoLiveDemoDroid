@@ -9,6 +9,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.zego.common.GetAppIdConfig;
 import com.zego.common.ZGManager;
 import com.zego.common.util.DeviceInfoManager;
 import com.zego.common.util.ZegoUtil;
@@ -24,7 +25,7 @@ public class ZGLayeredCodingDemoHelper {
 
     static private ZGLayeredCodingDemoHelper zgLayeredCodingDemoHelper;
 
-    private ArrayList<HashMap<String, Object>> mRoomList = null;
+    private ArrayList<HashMap<String,Object>>  mRoomList = null;
 
     private UpdateRoomListCallback updateRoomListCallback = null;
 
@@ -38,7 +39,7 @@ public class ZGLayeredCodingDemoHelper {
     }
 
     public String generateRoomID(Context context) {
-        String roomID = "zglc-" + System.currentTimeMillis() + "-" + DeviceInfoManager.generateDeviceId(context);
+        String roomID = "zglc-"+System.currentTimeMillis()+"-"+ DeviceInfoManager.generateDeviceId(context);
 
         return roomID;
     }
@@ -91,7 +92,7 @@ public class ZGLayeredCodingDemoHelper {
                         }
                     }
 
-                    if (null != updateRoomListCallback) {
+                    if (null != updateRoomListCallback){
                         updateRoomListCallback.onUpdateRoomListCallback(pickedRoomInfos);
                     }
                 }
@@ -100,13 +101,13 @@ public class ZGLayeredCodingDemoHelper {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                if (null != updateRoomListCallback) {
+                if (null != updateRoomListCallback){
                     updateRoomListCallback.onRequestRoomListError(error.getMessage());
                 }
             }
         });
 
-        request.setRetryPolicy(new DefaultRetryPolicy(3000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        request.setRetryPolicy(new DefaultRetryPolicy(3000,0,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(request);
     }
 

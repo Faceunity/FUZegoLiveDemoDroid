@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -93,9 +94,9 @@ public class ZGAudioPlayerPublishUI extends BaseActivity {
 
         // 获取音效名称
         effectNameArr = getResources().getStringArray(R.array.effect_describe);
-        for (int i = 0; i < effectNameArr.length; i++) {
+        for (int i=0; i<effectNameArr.length; i++) {
             // 获取音效文件路径
-            effectFilePathArr[i] = ZGAudioPlayerHelper.sharedInstance().getPath(this, effectNameArr[i] + ".mp3");
+            effectFilePathArr[i] = ZGAudioPlayerHelper.sharedInstance().getPath(this, effectNameArr[i]+".mp3");
             // 预加载音效，多次播放下可提升性能
             if (i > 0) {
                 mZegoAudioPlayer.preloadEffect(effectFilePathArr[i], i);
@@ -140,7 +141,7 @@ public class ZGAudioPlayerPublishUI extends BaseActivity {
         mZegoAudioPlayer.stopAll();
         mZegoAudioPlayer.setCallback(null);
         // 删除欲加载音效
-        for (int i = 0; i < effectFilePathArr.length; i++) {
+        for (int i=0; i<effectFilePathArr.length; i++) {
             mZegoAudioPlayer.unloadEffect(i);
         }
 
@@ -159,7 +160,7 @@ public class ZGAudioPlayerPublishUI extends BaseActivity {
     public List<EffectInfo> getEffectInfos() {
 
         if (mEffectInfos.size() <= 0) {
-            for (int i = 0; i < effectNameArr.length; i++) {
+            for (int i=0; i<effectNameArr.length; i++) {
                 EffectInfo effectInfo = new EffectInfo(effectNameArr[i], effectFilePathArr[i]);
                 mEffectInfos.add(effectInfo);
             }
@@ -223,7 +224,7 @@ public class ZGAudioPlayerPublishUI extends BaseActivity {
                     ZGBaseHelper.sharedInstance().getZegoLiveRoom().startPublishing(mStreamID, "", ZegoConstants.PublishFlag.JoinPublish);
                 } else {
                     Toast.makeText(ZGAudioPlayerPublishUI.this, getString(R.string.tx_login_fail_hint, mRoomID, err)
-                            , Toast.LENGTH_SHORT).show();
+                    , Toast.LENGTH_SHORT).show();
                     AppLogger.getInstance().e(ZGAudioPlayerPublishUI.class, getString(R.string.tx_login_fail_hint), mRoomID, err);
                 }
             }

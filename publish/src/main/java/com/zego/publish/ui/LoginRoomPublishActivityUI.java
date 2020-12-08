@@ -8,13 +8,15 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
 
-import com.zego.common.ZGBaseHelper;
-import com.zego.common.ui.BaseActivity;
-import com.zego.common.ui.WebActivity;
-import com.zego.common.util.AppLogger;
+import com.zego.common.ZGPlayHelper;
 import com.zego.common.widgets.CustomDialog;
 import com.zego.publish.R;
 import com.zego.publish.databinding.ActivityLoginPublishRoomBinding;
+import com.zego.common.ZGBaseHelper;
+import com.zego.common.constants.ZGLiveRoomConstants;
+import com.zego.common.ui.BaseActivity;
+import com.zego.common.ui.WebActivity;
+import com.zego.common.util.AppLogger;
 import com.zego.zegoliveroom.callback.IZegoLoginCompletionCallback;
 import com.zego.zegoliveroom.constants.ZegoConstants;
 import com.zego.zegoliveroom.entity.ZegoStreamInfo;
@@ -83,7 +85,7 @@ public class LoginRoomPublishActivityUI extends BaseActivity {
      *
      * @param isLoginRoom 是否登陆房间成功
      * @param finalRoomId roomID
-     * @param errorCode   登陆房间错误码
+     * @param errorCode 登陆房间错误码
      */
     private void loginRoomCompletion(boolean isLoginRoom, String finalRoomId, int errorCode) {
         // 关闭加载对话框

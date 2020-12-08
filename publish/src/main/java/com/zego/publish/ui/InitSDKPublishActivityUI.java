@@ -5,20 +5,24 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zego.common.GetAppIdConfig;
+import com.zego.common.util.ZegoUtil;
+import com.zego.common.widgets.CustomDialog;
+import com.zego.publish.R;
 import com.zego.common.ZGBaseHelper;
 import com.zego.common.ui.BaseActivity;
 import com.zego.common.ui.WebActivity;
 import com.zego.common.util.AppLogger;
-import com.zego.common.util.ZegoUtil;
-import com.zego.common.widgets.CustomDialog;
 import com.zego.common.widgets.CustomPopWindow;
-import com.zego.publish.R;
 import com.zego.publish.databinding.ActivityPublishInitSdkBinding;
 import com.zego.zegoliveroom.callback.IZegoInitSDKCompletionCallback;
+
+import java.util.regex.Pattern;
 
 
 public class InitSDKPublishActivityUI extends BaseActivity implements View.OnClickListener {

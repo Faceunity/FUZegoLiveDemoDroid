@@ -1,23 +1,27 @@
 package com.zego.mediaplayer.ui;
 
+import android.app.AlertDialog;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 
 import com.zego.common.ZGManager;
 import com.zego.common.ui.BaseActivity;
-import com.zego.mediaplayer.R;
 import com.zego.mediaplayer.ZGMediaPlayerDemo;
 import com.zego.mediaplayer.ZGMediaPlayerDemoHelper;
-import com.zego.mediaplayer.databinding.ActivityMediaPlayerBinding;
 import com.zego.mediaplayer.entity.ZGResourcesInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.zego.mediaplayer.R;
+import com.zego.mediaplayer.databinding.ActivityMediaPlayerBinding;
 
 import static com.zego.zegoavkit2.ZegoMediaPlayer.PlayerTypeAux;
 import static com.zego.zegoavkit2.ZegoMediaPlayer.PlayerTypePlayer;
@@ -70,18 +74,15 @@ public class MediaPlayerDemoUI extends BaseActivity implements ZGMediaPlayerDemo
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
+            public void onNothingSelected(AdapterView<?> parent) { }
         });
 
         binding.audioVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            }
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) { }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -91,12 +92,10 @@ public class MediaPlayerDemoUI extends BaseActivity implements ZGMediaPlayerDemo
 
         binding.videoProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            }
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) { }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -114,7 +113,7 @@ public class MediaPlayerDemoUI extends BaseActivity implements ZGMediaPlayerDemo
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ZGMediaPlayerDemo.sharedInstance(this).setView(null);
+        ZGMediaPlayerDemo .sharedInstance(this).setView(null);
         ZGMediaPlayerDemo.sharedInstance(this).setZGMediaPLayerDelegate(null);
         ZGMediaPlayerDemo.sharedInstance(this).setZgMediaPlayerDemoHelper(null);
         ZGMediaPlayerDemo.sharedInstance(this).unInit();
@@ -176,8 +175,7 @@ public class MediaPlayerDemoUI extends BaseActivity implements ZGMediaPlayerDemo
     }
 
     @Override
-    public void onPlayerStop() {
-    }
+    public void onPlayerStop() { }
 
     @Override
     public void onPublishState(String state) {

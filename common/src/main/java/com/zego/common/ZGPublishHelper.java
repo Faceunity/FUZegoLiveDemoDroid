@@ -6,15 +6,17 @@ import android.view.View;
 import com.zego.common.util.AppLogger;
 import com.zego.zegoliveroom.ZegoLiveRoom;
 import com.zego.zegoliveroom.callback.IZegoLivePublisherCallback;
+import com.zego.zegoliveroom.callback.IZegoLivePublisherExCallback;
 
 /**
  * ZGPublishHelper
- * <p>
+ *
  * 推流帮助类
  * 主要简化SDK推流一系列接口
  * 开发者可参考该类的代码, 理解SDK接口
- * <p>
+ *
  * 注意!!! 开发者需要先初始化sdk, 登录房间后, 才能进行推流
+ *
  */
 
 public class ZGPublishHelper {
@@ -86,7 +88,7 @@ public class ZGPublishHelper {
 
     /**
      * 停止预览
-     * <p>
+     *
      * 注意!!! 停止预览后并不会停止推流，需要停止推流请调用 {@link #stopPublishing()}
      */
     public void stopPreviewView() {
@@ -113,6 +115,7 @@ public class ZGPublishHelper {
     }
 
     /**
+     *
      * 推流代理很重要, 开发者可以按自己的需求在回调里实现自己的业务
      * app相关业务。回调介绍请参考文档<a>https://doc.zego.im/CN/209.html</>
      *
@@ -121,7 +124,7 @@ public class ZGPublishHelper {
     public void setPublisherCallback(IZegoLivePublisherCallback publisherCallback) {
         if (isInitSDKSuccess()) {
             ZGBaseHelper.sharedInstance().getZegoLiveRoom().setZegoLivePublisherCallback(publisherCallback);
-        } else {
+        }else{
             AppLogger.getInstance().w(ZGBaseHelper.class, "设置推流代理失败! SDK未初始化, 请先初始化SDK");
         }
     }
@@ -131,6 +134,7 @@ public class ZGPublishHelper {
      * 当不再使用ZegoSDK时，可以释放推流的代理
      * <p>
      * 调用时机：建议在unInitSDK之前设置。
+     *
      */
     public void releasePublisherCallback() {
         ZGBaseHelper.sharedInstance().getZegoLiveRoom().setZegoLivePublisherCallback(null);

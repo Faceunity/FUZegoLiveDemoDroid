@@ -177,8 +177,8 @@ public class PublishSettingActivityUI extends FragmentActivity {
         ZGBaseHelper.sharedInstance().getZegoLiveRoom().setAVConfig(ZGConfigHelper.sharedInstance().zegoAvConfig);
 
         ZGBaseHelper.sharedInstance().getZegoLiveRoom().enableTrafficControl(
-                ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_CONTROL_ADAPTIVE_FPS |
-                        ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_CONTROL_RESOLUTION, true);
+                ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_CONTROL_ADAPTIVE_FPS|
+                        ZegoConstants.ZegoTrafficControlProperty.ZEGOAPI_TRAFFIC_CONTROL_RESOLUTION,true);
     }
 
     public static void actionStart(Activity activity) {

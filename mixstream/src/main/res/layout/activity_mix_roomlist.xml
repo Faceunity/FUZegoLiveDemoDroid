@@ -14,19 +14,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="查询房间列表"
-            android:onClick="QueryRoomList" />
+            android:onClick="QueryRoomList"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"/>
 
         <Button
             android:id="@+id/create_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="创建房间"
-            android:onClick="CreateRoom" />
+            android:onClick="CreateRoom"/>
 
     </LinearLayout>
 
@@ -43,7 +43,7 @@
 
             android:gravity="center"
             android:text=""
-            android:textColor="#FF0000" />
+            android:textColor="#FF0000"/>
 
     </LinearLayout>
 
@@ -51,7 +51,8 @@
     <ListView
         android:id="@+id/roomlist"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></ListView>
+        android:layout_height="wrap_content">
+    </ListView>
 
 
 </LinearLayout>

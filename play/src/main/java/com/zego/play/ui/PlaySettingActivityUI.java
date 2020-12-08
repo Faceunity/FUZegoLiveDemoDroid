@@ -115,23 +115,22 @@ public class PlaySettingActivityUI extends FragmentActivity {
         /**
          * 设置SDK拉流视图
          */
-        private void setPlayViewMode(int viewMode) {
+        private void setPlayViewMode(int viewMode){
             ZGConfigHelper.sharedInstance().setPlayViewMode(viewMode, streamID);
         }
 
         /**
          * 启用SDK硬编
          */
-        private void enableHardwareDecode(boolean enable) {
+        private void enableHardwareDecode(boolean enable){
             ZGConfigHelper.sharedInstance().enableHardwareDecode(enable);
         }
 
         /**
          * 设置拉流音量
-         *
          * @param volume
          */
-        private void setPlayVolume(int volume) {
+        private void setPlayVolume(int volume){
             ZGConfigHelper.sharedInstance().setPlayVolume(volume);
         }
 

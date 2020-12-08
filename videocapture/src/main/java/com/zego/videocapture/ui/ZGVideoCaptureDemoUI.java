@@ -52,12 +52,12 @@ public class ZGVideoCaptureDemoUI extends BaseActivity implements IZegoLivePubli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zgvideo_capture_demo);
 
-        mPreView = (TextureView) findViewById(R.id.pre_view);
-        mPlayView = (TextureView) findViewById(R.id.play_view);
-        mErrorTxt = (TextView) findViewById(R.id.error_txt);
-        mNumTxt = (TextView) findViewById(R.id.num_txt);
-        mDealBtn = (Button) findViewById(R.id.publish_btn);
-        mDealPlayBtn = (Button) findViewById(R.id.play_btn);
+        mPreView = (TextureView)findViewById(R.id.pre_view);
+        mPlayView = (TextureView)findViewById(R.id.play_view);
+        mErrorTxt = (TextView)findViewById(R.id.error_txt);
+        mNumTxt = (TextView)findViewById(R.id.num_txt);
+        mDealBtn = (Button)findViewById(R.id.publish_btn);
+        mDealPlayBtn = (Button)findViewById(R.id.play_btn);
 
         // 获取设备唯一ID
         String deviceID = DeviceInfoManager.generateDeviceId(this);
@@ -87,7 +87,7 @@ public class ZGVideoCaptureDemoUI extends BaseActivity implements IZegoLivePubli
     }
 
     // 登录房间并设置推拉流回调监听
-    public void loginLiveRoom() {
+    public void loginLiveRoom(){
         //设置推流回调监听
         ZGManager.sharedInstance().api().setZegoLivePublisherCallback(ZGVideoCaptureDemoUI.this);
         //设置拉流回调监听
@@ -109,12 +109,12 @@ public class ZGVideoCaptureDemoUI extends BaseActivity implements IZegoLivePubli
     }
 
     // 推流
-    public void doPublish() {
+    public void doPublish(){
         // 设置预览视图及视图展示模式
         ZGManager.sharedInstance().api().setPreviewView(mPreView);
         ZGManager.sharedInstance().api().setPreviewViewMode(ZegoVideoViewMode.ScaleAspectFill);
         // 设置推流分辨率
-        ZGManager.sharedInstance().setZegoAvConfig(480, 640);
+        ZGManager.sharedInstance().setZegoAvConfig(480,640);
         // 启动预览
         ZGManager.sharedInstance().api().startPreview();
         // 开始推流
@@ -123,7 +123,7 @@ public class ZGVideoCaptureDemoUI extends BaseActivity implements IZegoLivePubli
     }
 
     // 登出房间，去除推拉流回调监听并释放ZEGO SDK
-    public void logoutLiveRoom() {
+    public void logoutLiveRoom(){
         ZGManager.sharedInstance().api().logoutRoom();
         ZGManager.sharedInstance().api().setZegoLivePublisherCallback(null);
         ZGManager.sharedInstance().api().setZegoLivePlayerCallback(null);
@@ -132,9 +132,9 @@ public class ZGVideoCaptureDemoUI extends BaseActivity implements IZegoLivePubli
 
 
     // 处理推流操作
-    public void dealPublishing(View view) {
+    public void dealPublishing(View view){
         // 界面button==停止推流
-        if (mDealBtn.getText().toString().equals("StopPublish")) {
+        if (mDealBtn.getText().toString().equals("StopPublish")){
 
             // 停止预览和推流
             ZGManager.sharedInstance().api().stopPreview();
@@ -150,7 +150,7 @@ public class ZGVideoCaptureDemoUI extends BaseActivity implements IZegoLivePubli
     }
 
     // 处理拉流操作
-    public void dealPlay(View view) {
+    public void dealPlay(View view){
         // 界面button==开始拉流
         if (mDealPlayBtn.getText().toString().equals("StartPlay") && !mPlayStreamID.equals("")) {
 
@@ -164,7 +164,7 @@ public class ZGVideoCaptureDemoUI extends BaseActivity implements IZegoLivePubli
             }
         } else {
             // 界面button==停止拉流
-            if (!mPlayStreamID.equals("")) {
+            if (!mPlayStreamID.equals("")){
                 //停止拉流
                 ZGManager.sharedInstance().api().stopPlayingStream(mPlayStreamID);
                 mDealPlayBtn.setText("StartPlay");
@@ -250,7 +250,7 @@ public class ZGVideoCaptureDemoUI extends BaseActivity implements IZegoLivePubli
                 try {
                     Thread.sleep(1000);
 
-                    runOnUiThread(() -> {
+                    runOnUiThread(()-> {
                         mNumTxt.setText(String.valueOf(nCur));
                     });
 

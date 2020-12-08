@@ -7,12 +7,15 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 
+import com.zego.common.GetAppIdConfig;
 import com.zego.common.util.PreferenceUtil;
+import com.zego.common.util.ZegoUtil;
 import com.zego.common.widgets.CustomPopWindow;
 import com.zego.liveroomplayground.R;
 import com.zego.liveroomplayground.databinding.ActivitySettingBinding;
@@ -53,7 +56,7 @@ public class SettingActivity extends AppCompatActivity {
         binding.txVeVersion.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                ClipboardManager cmb = (ClipboardManager) SettingActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipboardManager cmb = (ClipboardManager)SettingActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
                 cmb.setText(binding.txVeVersion.getText());
                 showPopWindows(getString(R.string.tx_copyed), v);
                 return false;
@@ -63,7 +66,7 @@ public class SettingActivity extends AppCompatActivity {
         binding.txSdkVersion.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                ClipboardManager cmb = (ClipboardManager) SettingActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipboardManager cmb = (ClipboardManager)SettingActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
                 cmb.setText(binding.txSdkVersion.getText());
                 showPopWindows(getString(R.string.tx_copyed), v);
                 return false;
@@ -73,7 +76,7 @@ public class SettingActivity extends AppCompatActivity {
         binding.txDemoVersion.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                ClipboardManager cmb = (ClipboardManager) SettingActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipboardManager cmb = (ClipboardManager)SettingActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
                 cmb.setText(binding.txDemoVersion.getText());
                 showPopWindows(getString(R.string.tx_copyed), v);
                 return false;
@@ -92,7 +95,7 @@ public class SettingActivity extends AppCompatActivity {
     private void initViewValue() {
         binding.txVeVersion.setText(getVeVersion());
         binding.txSdkVersion.setText(getSdkVersion());
-        binding.txDemoVersion.setText(demoVersion + getLocalVersionName(this));
+        binding.txDemoVersion.setText(demoVersion +getLocalVersionName(this));
 
         binding.edAppId.setText(PreferenceUtil.getInstance().getStringValue(KEY_APP_ID, ""));
         binding.edAppSign.setText(PreferenceUtil.getInstance().getStringValue(KEY_APP_SIGN, ""));
@@ -112,12 +115,12 @@ public class SettingActivity extends AppCompatActivity {
     // 获取 VE 版本
     public String getVeVersion() {
 
-        return veVersion + ZegoLiveRoom.version2();
+        return veVersion+ZegoLiveRoom.version2();
     }
 
     // 获取 SDK 版本
     public String getSdkVersion() {
-        return sdkVersion + ZegoLiveRoom.version();
+        return sdkVersion+ZegoLiveRoom.version();
     }
 
     /**
@@ -139,7 +142,7 @@ public class SettingActivity extends AppCompatActivity {
                     .getPackageInfo(ctx.getPackageName(), 0);
             localVersion = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e("liveroomplayground", "not found package name" + e.getMessage());
+            Log.e("liveroomplayground","not found package name" + e.getMessage());
 
         }
 

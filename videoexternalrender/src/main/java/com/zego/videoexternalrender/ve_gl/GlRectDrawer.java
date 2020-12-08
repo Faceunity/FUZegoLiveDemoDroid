@@ -13,6 +13,10 @@ package com.zego.videoexternalrender.ve_gl;
 
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.util.Log;
+
+import com.zego.videoexternalrender.ve_gl.EglBase;
+import com.zego.videoexternalrender.ve_gl.GlUtil;
 
 import java.nio.FloatBuffer;
 import java.util.IdentityHashMap;
@@ -82,7 +86,7 @@ public class GlRectDrawer {
 
     // Vertex coordinates in Normalized Device Coordinates, i.e. (-1, -1) is bottom-left and (1, 1) is
     // top-right.
-    private static final FloatBuffer FULL_RECTANGLE_BUF = GlUtil.createFloatBuffer(new float[]{
+    private static final FloatBuffer FULL_RECTANGLE_BUF = GlUtil.createFloatBuffer(new float[] {
             -1.0f, -1.0f, // Bottom left.
             1.0f, -1.0f, // Bottom right.
             -1.0f, 1.0f, // Top left.
@@ -90,7 +94,7 @@ public class GlRectDrawer {
     });
 
     // Texture coordinates - (0, 0) is bottom-left and (1, 1) is top-right.
-    private static final FloatBuffer FULL_RECTANGLE_TEX_BUF = GlUtil.createFloatBuffer(new float[]{
+    private static final FloatBuffer FULL_RECTANGLE_TEX_BUF = GlUtil.createFloatBuffer(new float[] {
             0.0f, 0.0f, // Bottom left.
             1.0f, 0.0f, // Bottom right.
             0.0f, 1.0f, // Top left.

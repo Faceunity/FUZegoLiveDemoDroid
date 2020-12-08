@@ -4,21 +4,21 @@
         <shape>
             <stroke
                 android:width="0.5dp"
-                android:color="#000000" />
-            <corners android:radius="3dp" />
-            <solid android:color="#F5F5F5" />
+                android:color="#000000"/>
+            <corners android:radius="3dp"/>
+            <solid android:color="#F5F5F5"/>
             <padding
                 android:top="5dp"
                 android:right="10dp"
                 android:left="5dp"
-                android:bottom="5dp" />
+                android:bottom="5dp"/>
         </shape>
     </item>
 
     <item>
         <bitmap
             android:src="@drawable/updown"
-            android:gravity="end" />
+            android:gravity="end"/>
 
     </item>
 </layer-list>
