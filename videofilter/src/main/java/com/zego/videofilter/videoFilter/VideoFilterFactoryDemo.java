@@ -47,7 +47,7 @@ public class VideoFilterFactoryDemo extends ZegoVideoFilterFactory {
                 mFilter = new VideoFilterHybridDemo(mFunRender);
                 break;
             case FilterType_SyncTexture:
-                mFilter = new VideoFilterGlTexture2dDemo(mFunRender);
+                mFilter = new VideoFilterGlTexture2dDemo(mContext, mFunRender);
                 break;
             case FilterType_ASYNCI420Mem:
                 mFilter = new VideoFilterI420MemDemo(mFunRender);
