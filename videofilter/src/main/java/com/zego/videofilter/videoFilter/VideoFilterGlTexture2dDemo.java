@@ -1,12 +1,19 @@
 package com.zego.videofilter.videoFilter;
 
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.util.Log;
 
 import com.faceunity.nama.FURenderer;
+import com.zego.videofilter.profile.CSVUtils;
+import com.zego.videofilter.profile.Constant;
 import com.zego.zegoavkit2.videofilter.ZegoVideoFilter;
 
+import java.io.File;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * 外部滤镜采用 BUFFER_TYPE_SYNC_GL_TEXTURE_2D（同步传递 texture2d）方式传递数据给 SDK。
@@ -27,9 +34,12 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
     private FURenderer mFURenderer;
 
     private boolean needDropFrame = true;
+    private CSVUtils mCSVUtils;
+    private Context mContext;
 
-    public VideoFilterGlTexture2dDemo(FURenderer fuRenderer) {
+    public VideoFilterGlTexture2dDemo(Context context, FURenderer fuRenderer) {
         this.mFURenderer = fuRenderer;
+        this.mContext = context;
     }
 
     /**
@@ -51,6 +61,7 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         if (mFURenderer != null) {
             mFURenderer.onSurfaceCreated();
         }
+        initCsvUtil(mContext);
     }
 
     /**
@@ -63,6 +74,9 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         // 销毁 faceunity 相关的资源
         if (mFURenderer != null) {
             mFURenderer.onSurfaceDestroyed();
+        }
+        if (mCSVUtils != null) {
+            mCSVUtils.close();
         }
 
         // 建议在同步停止滤镜任务后再清理 client 对象，保证 SDK 调用 stopAndDeAllocate 后，没有残留的异步任务导致野指针 crash
@@ -122,7 +136,12 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
             // 传入 SDK 抛出的采集数据的纹理 ID 使用 faceunity 进行美颜，返回美颜后数据的纹理 ID
             int textureId;
             if (mFURenderer != null) {
+                long start = System.nanoTime();
                 textureId = mFURenderer.onDrawFrameSingleInput(zegoTextureId, width, height);
+                long time = System.nanoTime() - start;
+                if (mCSVUtils != null) {
+                    mCSVUtils.writeCsv(null, time);
+                }
             } else {
                 textureId = zegoTextureId;
             }
@@ -130,5 +149,21 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
             // 使用此 textureId 用做本地预览的视图渲染
             mClient.onProcessCallback(textureId, width, height, timestamp_100n);
         }
+    }
+
+    private void initCsvUtil(Context context) {
+        mCSVUtils = new CSVUtils(context);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
+        String dateStrDir = format.format(new Date(System.currentTimeMillis()));
+        dateStrDir = dateStrDir.replaceAll("-", "").replaceAll("_", "");
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.getDefault());
+        String dateStrFile = df.format(new Date());
+        String filePath = Constant.filePath + dateStrDir + File.separator + "excel-" + dateStrFile + ".csv";
+        Log.d(TAG, "initLog: CSV file path:" + filePath);
+        StringBuilder headerInfo = new StringBuilder();
+        headerInfo.append("version：").append(FURenderer.getVersion()).append(CSVUtils.COMMA)
+                .append("机型：").append(android.os.Build.MANUFACTURER).append(android.os.Build.MODEL)
+                .append("处理方式：单Texture").append(CSVUtils.COMMA);
+        mCSVUtils.initHeader(filePath, headerInfo);
     }
 }

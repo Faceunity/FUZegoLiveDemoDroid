@@ -98,7 +98,9 @@ android {
 
 demo中， 在package com.zego.videofilter.videoFilter;下存在4个集成ZegoVideoFilter的美颜处理类，根据不同的前处理传递数据类型，在 **allocateAndStart**方法或者**dequeueInputBuffer**方法中执行onSurfaceCreated。
 
-选择 **BUFFER_TYPE_SURFACE_TEXTURE** 对接性能最好，推荐使用；但是在荣耀7上会存在**通话过程中内存不断上涨**的bug，**确认是zego bug**
+**推荐使用 BUFFER_TYPE_SYNC_GL_TEXTURE_2D 格式** 
+
+BUFFER_TYPE_SURFACE_TEXTURE 对接性能最好，但是在荣耀7上会存在**通话过程中内存不断上涨**的bug，**确认是zego bug**
 
 #### 3. 图像处理
 
