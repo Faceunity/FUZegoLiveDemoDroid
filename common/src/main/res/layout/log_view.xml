@@ -5,13 +5,13 @@
     android:background="#99000000"
     android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/logListView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="1051dp"
         android:layout_weight="0.7">
 
-    </android.support.v7.widget.RecyclerView>
+    </androidx.recyclerview.widget.RecyclerView>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,7 +24,8 @@
             android:id="@+id/line_top"
             android:layout_width="match_parent"
             android:layout_height="2px"
-            android:background="@color/white_color" />
+            android:background="@color/white_color"
+            android:visibility="invisible" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,7 +41,8 @@
                 android:layout_gravity="center_horizontal"
                 android:text="device info"
                 android:textColor="@color/white_color"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="invisible" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -53,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
                     android:textSize="11sp"
-                    android:text="清空日志" />
+                    android:text="Clear" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -64,11 +66,12 @@
                     android:id="@+id/share_log"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="30dp"
                     android:layout_marginEnd="30dp"
-                    android:textSize="11sp"
+                    android:layout_marginRight="30dp"
+                    android:onClick="goShare"
                     android:text="分享日志"
-                    android:onClick="goShare"/>
+                    android:textSize="11sp"
+                    android:visibility="invisible" />
 
             </LinearLayout>
 
@@ -87,11 +90,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/line_bottom"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
             android:text="[ CPU当前使用率: 20% ]"
             android:textColor="@color/white_color"
             android:textSize="10sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/cpu_clock_frequency"

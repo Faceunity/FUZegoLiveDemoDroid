@@ -1,0 +1,14 @@
+/build
+common/build
+.gradle
+main/build
+QuickStart/build
+Mixer/build
+RoomMessage/build
+SoundLevel/build
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+.externalNativeBuild
+
