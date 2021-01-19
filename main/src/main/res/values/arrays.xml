@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="environment_types">
-        <item>测试环境</item>
-        <item>正式环境</item>
+        <item>Test environment</item>
+        <item>Formal environment</item>
     </string-array>
-
+    <string-array name="scenario_types">
+        <item>General</item>
+        <item>Communication</item>
+        <item>Live</item>
+    </string-array>
 </resources>

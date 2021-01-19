@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/common_title3">
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/view_setting_describe"
+            android:entryValues="@array/view_setting_values"
+            android:key="play_view_mode"
+            android:summary="@string/common_summary1"
+            android:title="@string/common_title1" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/common_other_setting">
+
+
+        <im.zego.common.widgets.SeekBarPreference
+            android:key="play_volume"
+            android:title="@string/common_play_volume"
+            app:max="100" />
+
+        <SwitchPreference
+            android:key="play_hardware_decode"
+            android:summary="@string/tx_hardware_decode_describe"
+            android:title="@string/common_title2" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

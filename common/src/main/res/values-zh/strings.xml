@@ -1,0 +1,409 @@
+<resources>
+    <string name="app_name">ZegoExpressSample</string>
+    <string name="tx_log">LOG</string>
+    <string name="tx_web_refresh_hint">正在刷新当前页面</string>
+    <string name="menu">菜单</string>
+    <string name="tx_menu_copy_link">复制链接</string>
+    <string name="tx_copy_success">已复制到粘贴板</string>
+    <string name="tx_initsdk_title">第一步 初始化SDK</string>
+    <string name="tx_get_appid">点击获取appID和appSign</string>
+    <string name="tx_get_appid_guide">获取appID和appSign</string>
+    <string name="tx_initsdk">初始化SDK</string>
+    <string name="tx_code_demo">代码演示</string>
+    <string name="tx_mirror">镜像</string>
+    <string name="tx_login_console">登录控制台</string>
+    <string name="tx_capture_mirror">预览镜像</string>
+    <string name="tx_hardware_decode_describe">开启硬解后，SDK会使用GPU去处理视频解码，会大大减少App对CPU的占用率,
+达到省电不发热的效果。</string>
+    <string name="tx_hardware_encode_describe">开启硬编后，SDK会使用GPU去处理视频编码，会大大减少App对CPU的占用率,
+达到省电不发热的效果。</string>
+    <string name="userid_describe">!!!必须保证userID的唯一性。可与app业务后台账号进行关联  userID还能便于ZEGO技术支持帮忙查找定位线上问题  建议定义一个有意义的userID</string>
+    <string name="appid_describe">appID 和 appSign 由 ZEGO 分配给各 App。为了安全考虑，建议将 appSign 存储在 App 的业务后台，使用时从后台获取。</string>
+    <string name="app_sign_describe">appID 和 appSign 由 ZEGO 分配给各 App。为了安全考虑，建议将 appSign 存储在 App 的业务后台，使用时从后台获取。</string>
+    <string name="user_name_describe">userName 只支持长度不超过 256 字节的任意格式字符串</string>
+    <string name="room_id_describe">roomID为一个房间的标识，使用长度不超过128字节的字符串表示，需要保证房间ID的全局唯一</string>
+
+    <string name="tx_test_env">测试环境</string>
+
+
+    <string name="tx_init_success">初始化SDK完成</string>
+    <string name="tx_init_failure">初始化SDK失败</string>
+    <string name="tx_login_room_success">登录房间完成</string>
+    <string name="tx_login_room_ing">登录中...</string>
+    <string name="tx_login_room_failure">登录房间失败</string>
+    <string name="tx_logout_room_finish">退出房间完成</string>
+    <string name="tx_publish_title">推流</string>
+    <string name="tx_publish_success">推流完成</string>
+    <string name="tx_publishing">正在推流</string>
+    <string name="tx_publish_fail">推流失败</string>
+    <string name="tx_stop_publish_finish">停止推流完成</string>
+    <string name="tx_start_live">开始推流</string>
+    <string name="tx_end_live">结束推流</string>
+    <string name="tx_play_title">拉流</string>
+    <string name="tx_play_success">拉流完成</string>
+    <string name="tx_playing">正在拉流</string>
+    <string name="tx_play_fail">拉流失败</string>
+    <string name="tx_stop_play">停止拉流</string>
+    <string name="tx_enter_live">开始拉流</string>
+    <string name="tx_leave_live">结束拉流</string>
+    <string name="tx_id_cannot_null">房间ID或流ID不能为空</string>
+
+    <string name="tx_mic_state">麦克风</string>
+    <string name="tx_camera">摄像头</string>
+    <string name="tx_speaker">扬声器</string>
+    <string name="tx_common">常用功能</string>
+
+
+    <string name="tx_login_room_title">第二步 登录房间</string>
+    <string name="tx_login_room">登录房间</string>
+    <string name="tx_login_room_guide">登录房间指引</string>
+
+    <string name="tx_stream_id_cannot_null">streamID不能为空</string>
+    <string name="tx_start_publish_title">开始推流</string>
+    <string name="tx_room_id_is_no_null">roomID不能为空</string>
+    <string name="stream_id_describe">每个用户的流名必须保持唯一，也就是流名必须全局唯一，SDK推拉流都是基于流ID来标识, 只支持长度不超过 256 byte 的数字，下划线，字母</string>
+    <string name="tx_publish_guide">推流文档指引</string>
+    <string name="tx_play_guide">拉流文档指引</string>
+    <string name="tx_start_publish">发起推流</string>
+
+    <string name="tx_confirm_publish">确认推流</string>
+
+
+    <string name="tx_start_play">开始拉流</string>
+
+
+    <string name="play_volume">拉流音量</string>
+    <string name="tx_capture_device">修改摄像头采集设备</string>
+    <string name="hardware_encode">硬编开关(推流前设置生效)</string>
+    <string name="front_facing_camera">前置摄像头</string>
+    <string name="tx_set_play_view_mode_failure">设置失败, 请在拉流之后设置</string>
+    <string name="tx_current_stream_delete">对方已停止推流</string>
+
+    <string name="share_log">分享日志</string>
+    <string name="log">log</string>
+    <string name="back">返回</string>
+    <string name="share">分享</string>
+    <string name="loading">加载中</string>
+    <!--AuxPublisher模块使用-->
+    <string name="publish_stream">推流</string>
+    <string name="play_stream">拉流</string>
+    <string name="login_room">进入房间</string>
+    <string name="logout_room">退出房间</string>
+    <string name="start_publish_main">开始推主流</string>
+    <string name="start_publish_aux">开始推辅流</string>
+    <string name="stream_id_equal_error">主流和辅流 stream id 不能一样</string>
+    <string name="stop_publish_main">停止推主流</string>
+    <string name="stop_publish_aux">停止推辅流</string>
+    <string name="main_streamId_null">主流streamId为空</string>
+    <string name="aux_streamId_null">辅流streamId为空</string>
+    <string name="start_play_stream">开始拉流</string>
+    <string name="stop_play_stream">停止拉流</string>
+    <string name="streamId_null">streamId为空</string>
+    <string name="play_streamId_equal">不能进行相同streamId的多个拉流操作，需要先停止之前相同id的拉流操作</string>
+    <string name="stream_request">请求中</string>
+    <string name="room_unconnect">房间状态：还没连接</string>
+    <string name="no_publish">未在推流</string>
+    <string name="room_connect">房间状态：已连接</string>
+    <string name="publishing">正在推流</string>
+    <string name="no_play">未在拉流</string>
+    <string name="playing">正在拉流</string>
+    <string name="create_zego_engine">create ZegoEngine！！</string>
+
+    <!--main-->
+    <string name="demo_version">Demo版本：</string>
+    <string name="sdk_version">SDK版本：</string>
+    <string name="save_alert">是否保存当前内容</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="save_success">保存成功！！</string>
+    <string name="save_cancel">取消保存</string>
+    <string name="reset_alert">是否重置当前内容</string>
+    <string name="reset_success">重置成功！！</string>
+    <string name="reset_cancel">取消重置</string>
+    <string name="app_sign_cannot_be_null">appkey不能为null</string>
+    <string name="tx_title">示例代码</string>
+    <string name="tx_module_basic">基础通信</string>
+    <string name="tx_module_mixer">混流</string>
+    <string name="tx_module_publish">推流</string>
+    <string name="tx_module_play">拉流</string>
+    <string name="tx_module_custom_cdn_publish">自定义CDN推流</string>
+    <string name="tx_module_im">IM</string>
+    <string name="tx_module_soundlevelandspectrum">声浪与音频频谱</string>
+    <string name="tx_module_mediaplayer">媒体播放器</string>
+    <string name="tx_module_custom_render">自定义渲染</string>
+    <string name="tx_module_custom_capture">自定义采集</string>
+    <string name="tx_title_quickstart">快速开始</string>
+    <string name="tx_title_advance">进阶功能</string>
+    <string name="txt_title_aux">推多路流</string>
+    <string name="txt_title_video_talk">VideoTalk视频通话</string>
+    <!-- CustomCdnPublish-->
+    <string name="room_id">房间ID: </string>
+    <string name="user_id">用户ID: </string>
+    <string name="tx_setting">设置</string>
+    <string name="tx_copyed">已复制</string>
+    <string name="tx_save">保存</string>
+    <string name="tx_appid">AppID：</string>
+    <string name="tx_appsign">AppSign：</string>
+    <string name="tx_env">环境（请选择与AppID对应的环境）</string>
+    <string name="tx_init_sdk">初始化SDK</string>
+    <string name="tx_init_sdk_ok">初始化SDK成功</string>
+    <string name="tx_init_sdk_fail">初始化SDK失败</string>
+    <string name="tx_uninit_sdk">释放SDK</string>
+    <string name="tx_uninit_sdk_ok">释放SDK成功</string>
+    <string name="tx_uninit_sdk_fail">释放SDK失败</string>
+    <string name="tx_sdk_not_init">请先初始化SDK</string>
+    <string name="tx_basic_login_room">进入房间</string>
+    <string name="tx_basic_logout_room">退出房间</string>
+    <string name="tx_basic_login_room_ok">调用进入房间接口成功</string>
+    <string name="tx_basic_logout_room_ok">调用退出房间接口成功</string>
+    <string name="tx_basic_publish">推流</string>
+    <string name="tx_basic_stop_publish">停止推流</string>
+    <string name="tx_basic_publish_ok">调用推流接口成功</string>
+    <string name="tx_basic_stop_publish_ok">调用停止推流接口成功</string>
+    <string name="tx_basic_preview_ok">调用启动预览成功</string>
+    <string name="tx_basic_play">拉流</string>
+    <string name="tx_basic_stop_play">停止拉流</string>
+    <string name="tx_basic_play_ok">调用拉流接口成功</string>
+    <string name="tx_basic_stop_play_ok">调用停止拉流接口成功</string>
+    <!--CustomVideoRender-->
+    <string name="video_interrupt">视频中断, 正在重连</string>
+    <!--Mediaplayer-->
+    <string name="title_app_name">Mediaplayer</string>
+    <string name="local_res_error">加载本地资源异常:</string>
+    <string name="net_res_error">加载网络资源异常:</string>
+    <!--Mixer-->
+    <string name="tx_mixer_publish_ok">推流成功</string>
+    <string name="tx_mixer_publish_request">正在请求推流</string>
+    <string name="tx_mixer_publish_fail">推流失败，错误码为</string>
+    <string name="tx_mixer_stop_publish_ok">停止推流成功</string>
+    <string name="tx_mixer_hint">请选择2条远端的流参与混流</string>
+    <string name="tx_mixer_start_ok">混流成功</string>
+    <string name="tx_mixer_start_fail">混流失败，错误码为</string>
+    <string name="tx_mixer_stop_ok">混流成功</string>
+    <string name="tx_mixer_stop_fail">混流失败，错误码为</string>
+    <string name="tx_mixer_usage_title">使用说明：</string>
+    <string name="tx_mixer_usage_content">本专题需要使用三台设备进行体验，其中两台设备发起推流，使用另外一台设备发起混流并观看</string>
+    <string name="tx_mixer_publish">发起推流</string>
+    <string name="tx_mixer_stop_publish">停止推流</string>
+    <string name="tx_mixer_mix">发起混流</string>
+    <string name="tx_mixer_step1">1.发起并观看混流</string>
+    <string name="tx_mixer_step2">2.停止观看混流</string>
+    <string name="tx_mixer_step3">3.停止混流</string>
+    <!--PlayStream-->
+    <string name="loss_connect">房间与server断开连接</string>
+    <!--CustomVideoCapture-->
+    <string name="record_request">录屏功能只能在Android5.0及以上版本的系统中运行</string>
+
+
+    <string name="frame_rate">"帧率: "</string>
+    <string name="bit_rate">"码率: "</string>
+    <string name="resolution">分辨率:</string>
+    <string name="hardware_encode_1">硬编:</string>
+    <string name="network_quality">网络质量:</string>
+    <string name="excellent">极好</string>
+    <string name="good">优</string>
+    <string name="medium">中</string>
+    <string name="bad">差</string>
+    <string name="die">极差</string>
+    <string name="no_data">无数据</string>
+
+
+    <!--RoomMessage-->
+    <string name="tx_im_send_bc_ok">发送广播消息成功</string>
+    <string name="tx_im_send_bc_fail">发送广播消息失败，错误码为</string>
+    <string name="tx_im_me">(我): </string>
+    <string name="tx_im_send_cc_ok">发送自定义消息成功</string>
+    <string name="tx_im_send_cc_fail">发送自定义消息失败，错误码为</string>
+    <string name="tx_im_msg_list">消息列表：</string>
+    <string name="tx_im_user_list">用户列表：</string>
+    <string name="tx_im_send">发送</string>
+    <string name="tx_im_bc_msg">广播消息(Broadcast Message)</string>
+    <string name="tx_im_cc_msg">自定义消息(Custom Command)</string>
+    <string name="roomid_flag_in_tv">Roomid:</string>
+    <string name="explanation">该专题需要俩台手机设备进行操作体验，一台设备同时推主流和辅流，另一台设备同时拉这俩股流</string>
+    <string name="code_download">代码下载</string>
+    <string name="doc">文档汇总</string>
+    <string name="quick_start">快速开始</string>
+    <string name="local_preview">本地预览画面</string>
+    <string name="remote_screen">远端拉流画面</string>
+    <string name="step1">步骤1: 初始化</string>
+    <string name="step2">步骤2: 进入房间</string>
+    <string name="step3">步骤3: 推流并预览</string>
+    <string name="step4">步骤4: 拉流</string>
+    <string name="tips">使用提示：您也可以使用两台手机，在步骤4拉流时，输入对方推流的流ID进行体验</string>
+    <string name="common_settings">常用设置</string>
+    <string name="common_summary1">等比缩放填充整个View</string>
+    <string name="common_title1">选择拉流View视图模式 (拉流后设置生效)</string>
+    <string name="common_other_setting">其他设置</string>
+    <string name="common_play_volume">拉流音量设置</string>
+    <string name="common_title2">硬解开关(拉流前设置生效)</string>
+    <string name="common_title3">视图设置</string>
+    <string name="frame_rate2">帧率(推流前设置生效)</string>
+    <string name="common_publish">选择推流View视图模式</string>
+    <string name="common_quality">画质设置</string>
+    <string name="sound_monitor">启动声浪监听: </string>
+    <string name="spectrum_monitor">启动频谱监听:</string>
+    <string name="soud_wave">声浪</string>
+    <string name="player_publish">停止推流/开始推流：</string>
+    <string name="player_play">停止拉流/开始拉流：</string>
+    <string name="player_soud">不推音频：</string>
+    <string name="player_video">不推视频：</string>
+    <string name="player_create">销毁/创建播放器：</string>
+    <string name="player_repeat">重复播放：</string>
+    <string name="player_load">加载视频资源:</string>
+    <string name="player_local">本地</string>
+    <string name="player_network">网络</string>
+    <string name="player_pause">停止播放/开始播放：</string>
+    <string name="player_recover">恢复播放/暂停播放：</string>
+    <string name="player_play_soud">播放声音/静音：</string>
+    <string name="player_1">推流混入播放器音频：</string>
+    <string name="player_2">是否抛出视频数据：</string>
+    <string name="player_3">是否抛出音频数据：</string>
+    <string name="player_progress">进度:</string>
+    <string name="render_type">"渲染类型: "</string>
+    <string name="collect_source">"采集来源: "</string>
+    <string name="tx_filter_type">请选择前处理传递数据类型: </string>
+    <string name="rgba32Mem_describe">异步传递 RGBA32 的图像数据</string>
+    <string name="tx_im_bar_msg">弹幕消息</string>
+    <string name="tx_im_send_bar_ok">发送弹幕消息成功</string>
+    <string name="tx_im_send_bar_fail">发送弹幕消息失败，错误码为</string>
+    <string name="tx_video_filter">自定义视频前处理</string>
+    <string name="tx_module_custom_capture_faceu">自定义采集faceU</string>
+
+    <string name="syncTexture2D_describe">同步传递纹理 ID，SDK 会调用此滤镜的 onProcessCallback 方法获取前处理后的纹理 ID </string>
+    <string name="memTexture2D_describe">异步传递纹理 ID，SDK 会抛出 RGBA32 的图像数据，可通过 onProcessCallback 方法传递前处理后的纹理 ID 给 SDK </string>
+
+    <string name="i420Mem_describe">异步传递 I420 的图像数据</string>
+    <string name="surfaceTexture_describe">传递 SurfaceTexture，SDK 会调用此滤镜的 getSurfaceTexture 获取 SurfaceTexture 对象</string>
+
+
+    <string name="tx_sync_gl_texture_2d">BUFFER_TYPE_SYNC_GL_TEXTURE_2D</string>
+    <string name="tx_mem_gl_texture_2d">BUFFER_TYPE_HYBRID_MEM_GL_TEXTURE_2D</string>
+    <string name="tx_mem_rgba32">BUFFER_TYPE_MEM</string>
+    <string name="tx_asyn_i420_mem">BUFFER_TYPE_ASYNC_I420_MEM</string>
+    <string name="tx_surface_texture">BUFFER_TYPE_SURFACE_TEXTURE</string>
+
+    <!--faceunity 相关text-->
+    <string name="home_function_name_beauty">美颜</string>
+    <string name="home_function_name_normal">道具贴纸</string>
+
+    <string name="home_function_name_makeup">美妆</string>
+    <string name="sorry_no_permission">抱歉，你所使用的证书权限或SDK不包括该功能。</string>
+    <string name="camera_dialog_title">警告</string>
+    <string name="camera_dialog_message">相机权限被禁用或者相机被别的应用占用！</string>
+    <string name="camera_dialog_open">重试</string>
+    <string name="camera_dialog_back">退出</string>
+
+    <string name="tx_has_no_fu_authpack">faceunity的证书无效，请替换有效的authpack文件</string>
+    <string name="tx_login">登录房间</string>
+
+    <string name="fu_base_is_tracking_text">未检测到人脸</string>
+    <string name="face_shape_4">自定义</string>
+    <string name="face_shape_3_default">默认</string>
+    <string name="face_shape_0_nvshen">女神</string>
+    <string name="face_shape_1_wanghong">网红</string>
+    <string name="face_shape_2_ziran">自然</string>
+    <string name="beauty_box_skin_detect">精准美肤</string>
+    <string name="beauty_box_skin_detect_close">精准美肤 关闭</string>
+    <string name="beauty_box_skin_detect_open">精准美肤 开启</string>
+    <string name="beauty_box_heavy_blur_double">朦胧磨皮</string>
+    <string name="beauty_box_heavy_blur_normal">清晰磨皮</string>
+    <string name="beauty_box_heavy_blur_normal_text">当前为 清晰磨皮 模式</string>
+    <string name="beauty_box_heavy_blur_double_text">当前为 朦胧磨皮 模式</string>
+    <string name="beauty_box_blur_level">磨皮</string>
+    <string name="beauty_box_color_level">美白</string>
+    <string name="beauty_box_red_level">红润</string>
+    <string name="beauty_box_eye_bright">亮眼</string>
+    <string name="beauty_box_tooth_whiten">美牙</string>
+    <string name="beauty_box_face_shape">脸型</string>
+    <string name="beauty_box_eye_enlarge">大眼</string>
+    <string name="beauty_box_cheek_thinning">瘦脸</string>
+    <string name="beauty_box_cheek_v">V脸</string>
+    <string name="beauty_box_cheek_narrow">窄脸</string>
+    <string name="beauty_box_cheek_small">小脸</string>
+    <string name="beauty_box_cheek_oval">鹅蛋脸</string>
+    <string name="beauty_box_intensity_chin">下巴</string>
+    <string name="beauty_box_intensity_forehead">额头</string>
+    <string name="beauty_box_intensity_nose">瘦鼻</string>
+    <string name="beauty_box_intensity_mouth">嘴型</string>
+    <string name="beauty_radio_skin_beauty">美肤</string>
+    <string name="beauty_radio_face_shape">美型</string>
+    <string name="beauty_radio_beauty_filter">美颜滤镜</string>
+    <string name="beauty_radio_filter">滤镜</string>
+    <string name="beauty_radio_beauty">美妆</string>
+    <string name="makeup_radio_lipstick">口红</string>
+    <string name="makeup_radio_blusher">腮红</string>
+    <string name="makeup_radio_eyebrow">眉毛</string>
+    <string name="makeup_radio_eye_shadow">眼影</string>
+    <string name="makeup_radio_eye_liner">眼线</string>
+    <string name="makeup_radio_eyelash">睫毛</string>
+    <string name="makeup_radio_contact_lens">美瞳</string>
+    <string name="makeup_radio_foundation">粉底</string>
+    <string name="makeup_radio_highlight">高光</string>
+    <string name="makeup_radio_shadow">阴影</string>
+    <string name="makeup_radio_remove">卸妆</string>
+    <string name="makeup_customize">自定义</string>
+    <string name="makeup_freckles">雀斑妆</string>
+    <string name="makeup_punk">朋克妆</string>
+    <string name="makeup_peach_blossom">桃花</string>
+    <string name="makeup_red_tea">赤茶妆</string>
+    <string name="makeup_winter">冬日妆</string>
+    <string name="makeup_boyfriend">男友</string>
+    <string name="makeup_cream">奶油妆</string>
+    <string name="makeup_clear">清透</string>
+    <string name="makeup_grapefruit">西柚</string>
+    <string name="beauty_radio_stickers">贴纸</string>
+
+    <string name="origin">原图</string>
+    <string name="delta">Delta</string>
+    <string name="electric">Electric</string>
+    <string name="slowlived">Slowlived</string>
+    <string name="tokyo">Tokyo</string>
+    <string name="warm">Warm</string>
+    <string name="ziran">自然</string>
+    <string name="bailiang">白亮</string>
+    <string name="danya">淡雅</string>
+    <string name="fennen">粉嫩</string>
+    <string name="qingxin">小清新</string>
+    <string name="lengsediao">冷色调</string>
+    <string name="nuansediao">暖色调</string>
+    <string name="hongrun">红润</string>
+
+    <string name="dialog_got">知道啦</string>
+
+    <string name="avatar_face_face">脸型</string>
+    <string name="avatar_face_eye">眼睛</string>
+    <string name="avatar_face_lip">嘴唇</string>
+    <string name="avatar_face_nose">鼻子</string>
+    <string name="avatar_face_eyebrow">眉毛</string>
+    <string name="avatar_face_eyelash">睫毛</string>
+
+    <string name="avatar_face_length">脸型长度</string>
+    <string name="avatar_face_width">脸颊宽度</string>
+    <string name="avatar_chin_width">下颚宽度</string>
+    <string name="avatar_chin_height">下巴高低</string>
+    <string name="avatar_eye_position">眼睛位置</string>
+    <string name="avatar_eye_corner_height">眼角高度</string>
+    <string name="avatar_eye_height">眼睛高低</string>
+    <string name="avatar_eye_width">眼睛宽窄</string>
+    <string name="avatar_nose_position">鼻子位置</string>
+    <string name="avatar_nose_width">鼻翼宽窄</string>
+    <string name="avatar_nose_height">鼻头高低</string>
+    <string name="avatar_mouth_position">嘴部位置</string>
+    <string name="avatar_up_lip_thickness">上唇厚度</string>
+    <string name="avatar_down_lip_thickness">下唇厚度</string>
+    <string name="avatar_lip_width">嘴唇宽度</string>
+
+    <string name="dialog_reset_avatar_model">是否将所有参数恢复到默认值?</string>
+    <string name="avatar_face_customize">自定义</string>
+
+    <string name="dialog_confirm_delete">确定删除所选中的道具？</string>
+    <string name="toast_delete_succeed">删除成功</string>
+    <string name="toast_delete_failed">删除失败</string>
+
+    <string name="fu_base_debug">Resolution:\n\t%dX%d\nFPS: %d\nRender time:\n\t%dms</string>
+
+
+    <string name="recover">恢复</string>
+
+</resources>

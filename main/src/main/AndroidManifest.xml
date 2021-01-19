@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.zego.liveroomplayground">
+    package="im.zego.expresssample">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -21,14 +21,13 @@
     <application
         android:debuggable="true"
         android:usesCleartextTraffic="true"
-        android:requestLegacyExternalStorage="true"
         tools:ignore="HardcodedDebugMode,UnusedAttribute">
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
 
         <activity
-            android:name=".demo.ui.MainActivity"
+            android:name=".ui.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
@@ -37,7 +36,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".demo.ui.SettingActivity"></activity>
+        <activity android:name="im.zego.quickstart.ui.BasicCommunicationActivity"></activity>
+        <activity android:name="im.zego.mixer.ui.MixerMainActivity"></activity>
+        <activity android:name="im.zego.im.ui.IMActivity"></activity>
+        <activity android:name=".ui.SettingActivity"></activity>
     </application>
 
 </manifest>

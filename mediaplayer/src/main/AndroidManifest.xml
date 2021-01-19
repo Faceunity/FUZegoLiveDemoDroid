@@ -1,12 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zego.mediaplayer">
+    package="im.zego.mediaplayer">
 
     <application>
-
-        <activity android:name="com.zego.mediaplayer.ui.MediaPlayerDemoUI" />
-        <activity android:name="com.zego.mediaplayer.ui.MediaPlayerResourcesList" />
-        <activity android:name=".ui.ZGPlayerTypeUI"/>
-        <activity android:name=".ui.ZGMultiPlayerDemoUI"/>
-
+        <activity android:name=".ui.MediaplayerMainActivity" />
     </application>
 </manifest>
