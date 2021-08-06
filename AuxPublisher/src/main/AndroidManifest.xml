@@ -1,9 +1,0 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="im.zego.auxpublisher">
-
-    <application>
-        <activity android:name="im.zego.auxpublisher.ui.ZGAuxPublisherPublishUI"></activity>
-        <activity android:name="im.zego.auxpublisher.ui.ZGAuxPublisherLoginUI"></activity>
-        <activity android:name="im.zego.auxpublisher.ui.ZGAuxPublisherPlayUI"></activity>
-    </application>
-</manifest>
