@@ -1,7 +1,0 @@
-<resources>
-
-    <style name="ToggleButtonText">
-        <item name="android:textOn">On</item>
-        <item name="android:textOff">Off</item>
-    </style>
-</resources>
