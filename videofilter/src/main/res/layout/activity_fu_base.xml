@@ -55,6 +55,15 @@
                     android:textColor="#000000"
                     android:textSize="@dimen/text_size_26" />
 
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_detect_face"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:textColor="#ffffff"
+                    android:textSize="@dimen/text_size_32" />
+
                 <ImageView
                     android:id="@+id/iv_switch_camera"
                     android:layout_width="30dp"

@@ -29,7 +29,7 @@ public class PreferenceUtil {
         }
         SharedPreferences defaultPreference = PreferenceManager.getDefaultSharedPreferences(context);
         try {
-            return defaultPreference.getString(key, "");
+            return defaultPreference.getString(key, VALUE_OFF);
         } catch (Exception e) {
             return null;
         }

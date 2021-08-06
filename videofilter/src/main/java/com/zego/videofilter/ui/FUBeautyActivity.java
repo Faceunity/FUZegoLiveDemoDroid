@@ -6,15 +6,22 @@ import android.databinding.DataBindingUtil;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.Toast;
 
+import com.faceunity.core.enumeration.CameraFacingEnum;
+import com.faceunity.core.enumeration.FUAIProcessorEnum;
+import com.faceunity.core.enumeration.FUInputTextureEnum;
+import com.faceunity.core.enumeration.FUTransformMatrixEnum;
+import com.faceunity.core.faceunity.FURenderKit;
+import com.faceunity.core.utils.CameraUtils;
 import com.faceunity.nama.FURenderer;
-import com.faceunity.nama.IFURenderer;
+import com.faceunity.nama.data.FaceUnityDataFactory;
+import com.faceunity.nama.listener.FURendererListener;
 import com.faceunity.nama.ui.FaceUnityView;
-import com.faceunity.nama.utils.CameraUtils;
 import com.faceunity.nama.utils.LifeCycleSensorManager;
 import com.zego.common.entity.StreamQuality;
 import com.zego.common.util.AppLogger;
@@ -23,6 +30,7 @@ import com.zego.common.widgets.CustomDialog;
 import com.zego.videofilter.R;
 import com.zego.videofilter.ZGFilterHelper;
 import com.zego.videofilter.databinding.ActivityFuBaseBinding;
+import com.zego.videofilter.util.PreferenceUtil;
 import com.zego.videofilter.videoFilter.VideoFilterFactoryDemo;
 import com.zego.videofilter.videoFilter.VideoFilterSurfaceTextureDemo;
 import com.zego.zegoavkit2.videofilter.ZegoExternalVideoFilter;
@@ -57,9 +65,10 @@ public class FUBeautyActivity extends AppCompatActivity {
     private String anchorStreamID = "";
 
     private VideoFilterFactoryDemo.FilterType chooseFilterType;
-    private int mCameraFacing = IFURenderer.CAMERA_FACING_FRONT;
+    private int mCameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private StreamQuality streamQuality = new StreamQuality();
     private VideoFilterFactoryDemo mVideoFilterFactoryDemo;
+    private FaceUnityDataFactory mFaceUnityDataFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,16 +88,31 @@ public class FUBeautyActivity extends AppCompatActivity {
         binding.ivSwitchCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCameraFacing = IFURenderer.CAMERA_FACING_FRONT - mCameraFacing;
-                ZGFilterHelper.sharedInstance().getZegoLiveRoom().setFrontCam(mCameraFacing == IFURenderer.CAMERA_FACING_FRONT);
+                mCameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT - mCameraFacing;
+                ZGFilterHelper.sharedInstance().getZegoLiveRoom().setFrontCam(mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT);
                 if (mVideoFilterFactoryDemo.getFilter() instanceof VideoFilterSurfaceTextureDemo) {
-                    ((VideoFilterSurfaceTextureDemo)mVideoFilterFactoryDemo.getFilter()).onCameraChange();
+                    ((VideoFilterSurfaceTextureDemo) mVideoFilterFactoryDemo.getFilter()).onCameraChange();
                 }
-                mFURenderer.onCameraChanged(mCameraFacing, CameraUtils.getCameraOrientation(mCameraFacing));
-                if (mFURenderer.getMakeupModule() != null) {
-                    mFURenderer.getMakeupModule().setIsMakeupFlipPoints(mCameraFacing == IFURenderer.CAMERA_FACING_FRONT ? 0 : 1);
+                if (mFURenderer == null) {
+                    return;
                 }
-
+                mFURenderer.setCameraFacing(mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT ? CameraFacingEnum.CAMERA_FRONT : CameraFacingEnum.CAMERA_BACK);
+                mFURenderer.setInputOrientation(CameraUtils.INSTANCE.getCameraOrientation(mCameraFacing));
+                if (mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                    mFURenderer.setInputBufferMatrix(FUTransformMatrixEnum.CCROT0_FLIPVERTICAL);
+                    mFURenderer.setInputTextureMatrix(FUTransformMatrixEnum.CCROT0_FLIPVERTICAL);
+                    mFURenderer.setOutputMatrix(FUTransformMatrixEnum.CCROT0);
+                } else {
+                    if (chooseFilterType == VideoFilterFactoryDemo.FilterType.FilterType_SyncTexture || chooseFilterType == VideoFilterFactoryDemo.FilterType.FilterType_SurfaceTexture) {
+                        mFURenderer.setInputBufferMatrix(FUTransformMatrixEnum.CCROT180);
+                        mFURenderer.setInputTextureMatrix(FUTransformMatrixEnum.CCROT180);
+                        mFURenderer.setOutputMatrix(FUTransformMatrixEnum.CCROT0_FLIPHORIZONTAL);
+                    } else {
+                        mFURenderer.setInputBufferMatrix(FUTransformMatrixEnum.CCROT0);
+                        mFURenderer.setInputTextureMatrix(FUTransformMatrixEnum.CCROT0);
+                        mFURenderer.setOutputMatrix(FUTransformMatrixEnum.CCROT0_FLIPVERTICAL);
+                    }
+                }
             }
         });
 
@@ -99,63 +123,95 @@ public class FUBeautyActivity extends AppCompatActivity {
         anchorStreamID = getIntent().getStringExtra("streamID");
         chooseFilterType = (VideoFilterFactoryDemo.FilterType) getIntent().getSerializableExtra("FilterType");
         Log.d(TAG, "onCreate: roomID:" + mRoomID + ", filterType:" + chooseFilterType);
+        initFU();
+        // 初始化SDK
+        initSDK();
+
+        // 设置 SDK 推流回调监听
+        initSDKCallback();
+
+        String version = ZegoLiveRoom.version();
+        String version2 = ZegoLiveRoom.version2();
+        Log.e(TAG, "onCreate: version:" + version + ", version2:" + version2);
+    }
+
+    private void initFU() {
         FaceUnityView faceUnityView = findViewById(R.id.fu_beauty_control);
-        FURenderer.setup(this);
+
+        String isOpen = PreferenceUtil.getString(this, PreferenceUtil.KEY_FACEUNITY_IS_ON);
+        if (TextUtils.isEmpty(isOpen) || PreferenceUtil.VALUE_OFF.equals(isOpen)) {
+            faceUnityView.setVisibility(View.GONE);
+            return;
+        }
+
+        FURenderer.getInstance().setup(this);
+
+        if (chooseFilterType  == VideoFilterFactoryDemo.FilterType.FilterType_ASYNCI420Mem || chooseFilterType  == VideoFilterFactoryDemo.FilterType.FilterType_Mem) {
+            FURenderKit.getInstance().setReadBackSync(true);
+        }else {
+            FURenderKit.getInstance().setReadBackSync(false);
+        }
+        mFURenderer = FURenderer.getInstance();
+        mFURenderer.setCameraFacing(mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT ? CameraFacingEnum.CAMERA_FRONT : CameraFacingEnum.CAMERA_BACK);
+        mFURenderer.setInputOrientation(CameraUtils.INSTANCE.getCameraOrientation(mCameraFacing));
+        mFURenderer.setMarkFPSEnable(true);
+        mFURenderer.setInputBufferMatrix(mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT ? FUTransformMatrixEnum.CCROT0_FLIPVERTICAL : FUTransformMatrixEnum.CCROT180);
+        mFURenderer.setInputTextureMatrix(mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT ? FUTransformMatrixEnum.CCROT0_FLIPVERTICAL : FUTransformMatrixEnum.CCROT180);
+        mFURenderer.setOutputMatrix(mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT ? FUTransformMatrixEnum.CCROT0 : FUTransformMatrixEnum.CCROT0_FLIPHORIZONTAL);
+        mFURenderer.setFURendererListener(new FURendererListener() {
+            @Override
+            public void onPrepare() {
+                mFaceUnityDataFactory.bindCurrentRenderer();
+            }
+
+            @Override
+            public void onTrackStatusChanged(FUAIProcessorEnum type, int status) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.tvDetectFace.setVisibility(status > 0 ? View.GONE : View.VISIBLE);
+                        if (type == FUAIProcessorEnum.FACE_PROCESSOR) {
+                            binding.tvDetectFace.setText(R.string.toast_not_detect_face);
+                        }else if (type == FUAIProcessorEnum.HUMAN_PROCESSOR) {
+                            binding.tvDetectFace.setText(R.string.toast_not_detect_body);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFpsChanged(double fps, double callTime) {
+                Log.v(TAG, "onFpsChanged OES : fps:" + (int) fps + ", renderTime:" + String.format("%.2f", callTime));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.tvFps.setText("fps:" + (int) fps + ", renderTime:" + String.format("%.2f", callTime));
+                    }
+                });
+            }
+
+            @Override
+            public void onRelease() {
+
+            }
+        });
+
         switch (chooseFilterType) {
             case FilterType_SurfaceTexture: {
-                mFURenderer = new FURenderer.Builder(this)
-                        .setInputTextureType(IFURenderer.INPUT_TEXTURE_EXTERNAL_OES)
-                        .setCameraFacing(mCameraFacing)
-                        .setInputImageOrientation(CameraUtils.getCameraOrientation(mCameraFacing))
-                        .setRunBenchmark(true)
-                        .setOnDebugListener(new FURenderer.OnDebugListener() {
-                            @Override
-                            public void onFpsChanged(double fps, double renderTime) {
-                                Log.v(TAG, "onFpsChanged OES : fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        binding.tvFps.setText("fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
-                                    }
-                                });
-                            }
-                        })
-                        .build();
+                mFURenderer.setInputTextureType(FUInputTextureEnum.FU_ADM_FLAG_EXTERNAL_OES_TEXTURE);
             }
             break;
             case FilterType_Mem:
             case FilterType_ASYNCI420Mem:
             case FilterType_HybridMem:
             case FilterType_SyncTexture: {
-                mFURenderer = new FURenderer.Builder(this)
-                        .setInputTextureType(IFURenderer.INPUT_TEXTURE_2D)
-                        .setCameraFacing(Camera.CameraInfo.CAMERA_FACING_FRONT)
-                        .setInputImageOrientation(CameraUtils.getCameraOrientation(FURenderer.CAMERA_FACING_FRONT))
-                        .setRunBenchmark(true)
-                        .setOnDebugListener(new FURenderer.OnDebugListener() {
-                            @Override
-                            public void onFpsChanged(double fps, double renderTime) {
-                                Log.v(TAG, "onFpsChanged 2D : fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        binding.tvFps.setText("fps:" + (int) fps + ", renderTime:" + String.format("%.2f", renderTime));
-                                    }
-                                });
-                            }
-                        })
-                        .build();
+                mFURenderer.setInputTextureType(FUInputTextureEnum.FU_ADM_FLAG_COMMON_TEXTURE);
             }
             break;
             default:
         }
-        faceUnityView.setModuleManager(mFURenderer);
-
-        // 初始化SDK
-        initSDK();
-
-        // 设置 SDK 推流回调监听
-        initSDKCallback();
+        mFaceUnityDataFactory = new FaceUnityDataFactory(0);
+        faceUnityView.bindDataFactory(mFaceUnityDataFactory);
 
         LifeCycleSensorManager lifeCycleSensorManager = new LifeCycleSensorManager(this, getLifecycle());
         lifeCycleSensorManager.setOnAccelerometerChangedListener(new LifeCycleSensorManager.OnAccelerometerChangedListener() {
@@ -164,18 +220,14 @@ public class FUBeautyActivity extends AppCompatActivity {
                 if (mFURenderer != null) {
                     if (Math.abs(x) > 3 || Math.abs(y) > 3) {
                         if (Math.abs(x) > Math.abs(y)) {
-                            mFURenderer.onDeviceOrientationChanged(x > 0 ? 0 : 180);
+                            mFURenderer.setDeviceOrientation(x > 0 ? 0 : 180);
                         } else {
-                            mFURenderer.onDeviceOrientationChanged(y > 0 ? 90 : 270);
+                            mFURenderer.setDeviceOrientation(y > 0 ? 90 : 270);
                         }
                     }
                 }
             }
         });
-
-        String version = ZegoLiveRoom.version();
-        String version2 = ZegoLiveRoom.version2();
-        Log.e(TAG, "onCreate: version:" + version + ", version2:" + version2);
     }
 
     @Override

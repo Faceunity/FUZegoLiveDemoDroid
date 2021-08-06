@@ -59,7 +59,7 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
 
         // 创建及初始化 faceunity 相应的资源
         if (mFURenderer != null) {
-            mFURenderer.onSurfaceCreated();
+            mFURenderer.prepareRenderer();
         }
         initCsvUtil(mContext);
     }
@@ -73,7 +73,7 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         Log.d(TAG, "stopAndDeAllocate: ");
         // 销毁 faceunity 相关的资源
         if (mFURenderer != null) {
-            mFURenderer.onSurfaceDestroyed();
+            mFURenderer.release();
         }
         if (mCSVUtils != null) {
             mCSVUtils.close();
@@ -129,7 +129,7 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         if (needDropFrame) {
             mClient.onProcessCallback(zegoTextureId, width, height, timestamp_100n);
             if (mFURenderer != null) {
-                mFURenderer.onDrawFrameSingleInput(zegoTextureId, width, height);
+                mFURenderer.onDrawFrameSingleInputReturn(zegoTextureId, width, height);
             }
             needDropFrame = false;
         } else {  // 后续的就可以按照正常的方式进行处理
@@ -137,7 +137,7 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
             int textureId;
             if (mFURenderer != null) {
                 long start = System.nanoTime();
-                textureId = mFURenderer.onDrawFrameSingleInput(zegoTextureId, width, height);
+                textureId = mFURenderer.onDrawFrameSingleInputReturn(zegoTextureId, width, height);
                 long time = System.nanoTime() - start;
                 if (mCSVUtils != null) {
                     mCSVUtils.writeCsv(null, time);
@@ -161,7 +161,7 @@ public class VideoFilterGlTexture2dDemo extends ZegoVideoFilter {
         String filePath = Constant.filePath + dateStrDir + File.separator + "excel-" + dateStrFile + ".csv";
         Log.d(TAG, "initLog: CSV file path:" + filePath);
         StringBuilder headerInfo = new StringBuilder();
-        headerInfo.append("version：").append(FURenderer.getVersion()).append(CSVUtils.COMMA)
+        headerInfo.append("version：").append(FURenderer.getInstance().getVersion()).append(CSVUtils.COMMA)
                 .append("机型：").append(android.os.Build.MANUFACTURER).append(android.os.Build.MODEL)
                 .append("处理方式：单Texture").append(CSVUtils.COMMA);
         mCSVUtils.initHeader(filePath, headerInfo);

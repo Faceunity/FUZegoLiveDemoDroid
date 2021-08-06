@@ -53,7 +53,7 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
     private int mInputTextureId = 0;
     private Surface mOutputSurface = null;
     private boolean mIsEgl14 = false;
-    private int mSkipFrames = 5;
+    private int mSkipFrames = 2;
 
     private GlRectDrawer mDrawer = null;
     private float[] transformationMatrix = new float[]{
@@ -241,21 +241,20 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
         mDummyContext.detachCurrent();
 
         mEglContext.makeCurrent();
-
         // 调用 faceunity 进行美颜，美颜后返回纹理 ID
         int textureID = 0;
         if (mFuRender != null) {
             long start = System.nanoTime();
-            textureID = mFuRender.onDrawFrameSingleInput(mInputTextureId, mOutputWidth, mInputHeight);
+            textureID = mFuRender.onDrawFrameSingleInputReturn(mInputTextureId, mOutputWidth, mInputHeight);
             long time = System.nanoTime() - start;
             if (mCSVUtils != null) {
                 mCSVUtils.writeCsv(null, time);
             }
         }
-
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glDisable(GLES20.GL_BLEND);
         // 绘制美颜数据
         if (mSkipFrames-- < 0) {
             if (textureID > 0) {
@@ -269,12 +268,11 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
         } else {
             mEglContext.swapBuffers();
         }
-
         mEglContext.detachCurrent();
     }
 
     public void onCameraChange() {
-        mSkipFrames = 4;
+        mSkipFrames = 2;
     }
 
     // 设置 Surface
@@ -289,7 +287,7 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
 
             // 销毁 faceunity 相关的资源
             if (mFuRender != null) {
-                mFuRender.onSurfaceDestroyed();
+                mFuRender.release();
             }
 
             mEglContext.releaseSurface();
@@ -313,7 +311,7 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
 
         // 创建及初始化 faceunity 相应的资源
         if (mFuRender != null) {
-            mFuRender.onSurfaceCreated();
+            mFuRender.prepareRenderer();
         }
         initCsvUtil(mContext);
     }
@@ -341,7 +339,7 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
 
             // 销毁 faceunity 相关的资源
             if (mFuRender != null) {
-                mFuRender.onSurfaceDestroyed();
+                mFuRender.release();
             }
             if (mCSVUtils != null) {
                 mCSVUtils.close();
@@ -367,7 +365,7 @@ public class VideoFilterSurfaceTextureDemo extends ZegoVideoFilter implements Su
         String filePath = Constant.filePath + dateStrDir + File.separator + "excel-" + dateStrFile + ".csv";
         Log.d(TAG, "initLog: CSV file path:" + filePath);
         StringBuilder headerInfo = new StringBuilder();
-        headerInfo.append("version：").append(FURenderer.getVersion()).append(CSVUtils.COMMA)
+        headerInfo.append("version：").append(FURenderer.getInstance().getVersion()).append(CSVUtils.COMMA)
                 .append("机型：").append(android.os.Build.MANUFACTURER).append(android.os.Build.MODEL)
                 .append("处理方式：单Texture").append(CSVUtils.COMMA);
         mCSVUtils.initHeader(filePath, headerInfo);
