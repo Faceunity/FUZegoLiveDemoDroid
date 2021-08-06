@@ -8,7 +8,7 @@
 
 ### 一、添加 SDK
 
-将 faceunity 模块添加到工程中，下面是对库文件的说明。
+将 faceunity 模块添加到工程中，下面是对库文件的说明
 
 - assets/sticker 文件夹下 \*.bundle 是特效贴纸文件。
 - assets/makeup 文件夹下 \*.bundle 是美妆素材文件。
