@@ -1,0 +1,69 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 720
+        versionName "7.4.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    repositories {
+        flatDir {
+            dirs '../common/libs'   // aar目录
+        }
+    }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+    libraryVariants.all { variant ->
+        variant.mergeAssetsProvider.configure {
+            doLast {
+                delete(fileTree(dir: outputDir,
+                        includes: ['model/ai_bgseg_green.bundle',
+                                   'model/ai_face_processor_lite.bundle',
+                                   'model/ai_hairseg.bundle',
+                                   'model/ai_hand_processor.bundle',
+                                   'model/ai_human_processor_mb_fast.bundle',
+                                   'graphics/controller_cpp.bundle',
+                                   'graphics/fuzzytoonfilter.bundle',
+                                   'graphics/tongue.bundle',
+                                   'graphics/fxaa.bundle']))
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: '../main/libs')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0,'seconds'
+        resolutionStrategy.cacheDynamicVersionsFor 0,'seconds'
+    }
+
+    api 'com.faceunity:core:7.4.1.0'
+    implementation 'com.faceunity:model:7.4.1.0'
+
+    implementation project(path: ':common')
+}

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <im.zego.common.widgets.TitleLayout
+        <com.zego.common.widgets.TitleLayout
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="50dp" />
