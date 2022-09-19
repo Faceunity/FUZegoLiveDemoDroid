@@ -89,7 +89,7 @@ public class ZegoUtil {
      * 获取当前设置的环境
      */
     public static boolean getIsTestEnv() {
-        return PreferenceUtil.getInstance().getBooleanValue(KEY_TEST_ENVIRONMENT, true);
+        return false;
     }
 
 }

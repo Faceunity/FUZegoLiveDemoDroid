@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.faceunity.nama.authpack;
 import com.zego.common.util.AppLogger;
 import com.zego.common.widgets.CustomPopWindow;
 import com.zego.videofilter.R;

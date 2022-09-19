@@ -1,14 +1,18 @@
 package com.faceunity.nama.repo;
 
+import com.faceunity.FUConfig;
 import com.faceunity.core.controller.facebeauty.FaceBeautyParam;
 import com.faceunity.core.entity.FUBundleData;
+import com.faceunity.core.enumeration.FUFaceBeautyMultiModePropertyEnum;
+import com.faceunity.core.enumeration.FUFaceBeautyPropertyModeEnum;
 import com.faceunity.core.model.facebeauty.FaceBeauty;
 import com.faceunity.core.model.facebeauty.FaceBeautyBlurTypeEnum;
 import com.faceunity.core.model.facebeauty.FaceBeautyFilterEnum;
-import com.zego.videofilter.R;
 import com.faceunity.nama.entity.FaceBeautyBean;
 import com.faceunity.nama.entity.FaceBeautyFilterBean;
 import com.faceunity.nama.entity.ModelAttributeData;
+import com.faceunity.nama.utils.FuDeviceUtils;
+import com.zego.videofilter.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,18 +39,50 @@ public class FaceBeautySource {
         recommendFaceBeauty.setFilterIntensity(0.4);
         /*美肤*/
         recommendFaceBeauty.setBlurType(FaceBeautyBlurTypeEnum.FineSkin);
-        recommendFaceBeauty.setBlurIntensity(4.2);
+        recommendFaceBeauty.setSharpenIntensity(0.2);
         recommendFaceBeauty.setColorIntensity(0.3);
         recommendFaceBeauty.setRedIntensity(0.3);
-        recommendFaceBeauty.setSharpenIntensity(0.2);
+        recommendFaceBeauty.setBlurIntensity(4.2);
         /*美型*/
-        recommendFaceBeauty.setCheekVIntensity(0.5);
+        recommendFaceBeauty.setFaceShapeIntensity(1.0);
         recommendFaceBeauty.setEyeEnlargingIntensity(0.4);
-        recommendFaceBeauty.setChinIntensity(0.3);
-        recommendFaceBeauty.setForHeadIntensity(0.3);
+        recommendFaceBeauty.setCheekVIntensity(0.5);
         recommendFaceBeauty.setNoseIntensity(0.5);
+        recommendFaceBeauty.setForHeadIntensity(0.3);
         recommendFaceBeauty.setMouthIntensity(0.4);
+        recommendFaceBeauty.setChinIntensity(0.3);
+        //性能最优策略
+        if (FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID) {
+            setFaceBeautyPropertyMode(recommendFaceBeauty);
+        }
         return recommendFaceBeauty;
+    }
+
+    /**
+     * 高端机的时候，开启4个相对吃性能的模式
+     * 1.祛黑眼圈 MODE2
+     * 2.祛法令纹 MODE2
+     * 3.大眼 MODE3
+     * 4.嘴型 MODE3
+     */
+    private static void setFaceBeautyPropertyMode(FaceBeauty faceBeauty) {
+        /*
+         * 多模式属性
+         * 属性名称|支持模式|默认模式|最早支持版本
+         * 美白 colorIntensity|MODE1 MODE2|MODE2|MODE2 8.2.0;
+         * 祛黑眼圈 removePouchIntensity|MODE1 MODE2|MODE2|MODE2 8.2.0;
+         * 祛法令纹 removeLawPatternIntensity|MODE1 MODE1|MODE2|MODE2 8.2.0;
+         * 窄脸程度 cheekNarrowIntensity|MODE1 MODE2|MODE2|MODE2 8.0.0;
+         * 小脸程度 cheekSmallIntensity|MODE1 MODE2|MODE2|MODE2 8.0.0;
+         * 大眼程度 eyeEnlargingIntensity|MODE1 MODE2 MODE3|MODE3|MODE2 8.0.0;MODE3 8.2.0;
+         * 额头调整程度 forHeadIntensity|MODE1 MODE2|MODE2|MODE2 8.0.0;
+         * 瘦鼻程度 noseIntensity|MODE1 MODE2|MODE2|MODE2 8.0.0;
+         * 嘴巴调整程度 mouthIntensity|MODE1 MODE2 MODE3|MODE3|MODE2 8.0.0;MODE3 8.2.0;
+         */
+        faceBeauty.addPropertyMode(FUFaceBeautyMultiModePropertyEnum.REMOVE_POUCH_INTENSITY, FUFaceBeautyPropertyModeEnum.MODE2);
+        faceBeauty.addPropertyMode(FUFaceBeautyMultiModePropertyEnum.REMOVE_NASOLABIAL_FOLDS_INTENSITY, FUFaceBeautyPropertyModeEnum.MODE2);
+        faceBeauty.addPropertyMode(FUFaceBeautyMultiModePropertyEnum.EYE_ENLARGING_INTENSITY, FUFaceBeautyPropertyModeEnum.MODE3);
+        faceBeauty.addPropertyMode(FUFaceBeautyMultiModePropertyEnum.MOUTH_INTENSITY, FUFaceBeautyPropertyModeEnum.MODE3);
     }
 
 
@@ -130,6 +166,12 @@ public class FaceBeautySource {
                 new FaceBeautyBean(
                         FaceBeautyParam.CHEEK_NARROW_INTENSITY, R.string.beauty_box_cheek_narrow,
                         R.drawable.icon_beauty_shape_face_narrow_close_selector, R.drawable.icon_beauty_shape_face_narrow_open_selector
+                )
+        );
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.CHEEK_SHORT_INTENSITY, R.string.beauty_box_cheek_short,
+                        R.drawable.icon_beauty_shape_face_short_close_selector, R.drawable.icon_beauty_shape_face_short_open_selector
                 )
         );
         params.add(
@@ -222,6 +264,20 @@ public class FaceBeautySource {
                         R.drawable.icon_beauty_shape_smile_close_selector, R.drawable.icon_beauty_shape_smile_open_selector
                 )
         );
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.BROW_HEIGHT_INTENSITY, R.string.beauty_brow_height,
+                        R.drawable.icon_beauty_shape_brow_height_close_selector, R.drawable.icon_beauty_shape_brow_height_open_selector,
+                        R.string.brow_height_tips,FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
+                )
+        );
+        params.add(
+                new FaceBeautyBean(
+                        FaceBeautyParam.BROW_SPACE_INTENSITY, R.string.beauty_brow_space,
+                        R.drawable.icon_beauty_shape_brow_space_close_selector, R.drawable.icon_beauty_shape_brow_space_open_selector,
+                        R.string.brow_space_tips,FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID
+                )
+        );
         return params;
     }
 
@@ -244,9 +300,12 @@ public class FaceBeautySource {
         /*美型*/
         params.put(FaceBeautyParam.FACE_SHAPE_INTENSITY, new ModelAttributeData(1.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.CHEEK_THINNING_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.CHEEK_LONG_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.CHEEK_CIRCLE_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.CHEEK_V_INTENSITY, new ModelAttributeData(0.5, 0.0, 0.0, 1.0));
-        params.put(FaceBeautyParam.CHEEK_NARROW_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 0.5));
-        params.put(FaceBeautyParam.CHEEK_SMALL_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 0.5));
+        params.put(FaceBeautyParam.CHEEK_NARROW_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.CHEEK_SHORT_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.CHEEK_SMALL_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.INTENSITY_CHEEKBONES_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.INTENSITY_LOW_JAW_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
         params.put(FaceBeautyParam.EYE_ENLARGING_INTENSITY, new ModelAttributeData(0.4, 0.0, 0.0, 1.0));
@@ -261,6 +320,8 @@ public class FaceBeautySource {
         params.put(FaceBeautyParam.LONG_NOSE_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
         params.put(FaceBeautyParam.PHILTRUM_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
         params.put(FaceBeautyParam.SMILE_INTENSITY, new ModelAttributeData(0.0, 0.0, 0.0, 1.0));
+        params.put(FaceBeautyParam.BROW_HEIGHT_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
+        params.put(FaceBeautyParam.BROW_SPACE_INTENSITY, new ModelAttributeData(0.5, 0.5, 0.0, 1.0));
         return params;
     }
 
