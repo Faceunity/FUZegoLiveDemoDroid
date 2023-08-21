@@ -15,10 +15,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-
+import com.zego.videofilter.R;
 import com.faceunity.nama.seekbar.internal.compat.SeekBarCompat;
 import com.faceunity.nama.seekbar.internal.drawable.MarkerDrawable;
-import com.zego.videofilter.R;
 
 
 /**

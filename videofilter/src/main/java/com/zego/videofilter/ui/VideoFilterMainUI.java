@@ -18,7 +18,7 @@ public class VideoFilterMainUI extends AppCompatActivity implements View.OnClick
 
     private ActivityVideoFilterMainBinding binding;
 
-    private VideoFilterFactoryDemo.FilterType mFilterType = VideoFilterFactoryDemo.FilterType.FilterType_SyncTexture;
+    private VideoFilterFactoryDemo.FilterType mFilterType = VideoFilterFactoryDemo.FilterType.FilterType_SurfaceTexture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
