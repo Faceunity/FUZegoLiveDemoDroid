@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.widget.TextView;
 
-import com.faceunity.FUConfig;
+import com.faceunity.nama.FUConfig;
 import com.faceunity.nama.utils.FuDeviceUtils;
 import com.zego.audioplayer.ui.AudioPlayerMainUI;
 import com.zego.frequency_spectrum.ui.FrequencySpectrumAndSoundLevelMainActivity;
@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity {
             }
         }
 
-        FUConfig.DEVICE_LEVEL = FuDeviceUtils.judgeDeviceLevel(this);
+        FUConfig.DEVICE_LEVEL = FuDeviceUtils.judgeDeviceLevelGPU();
 
         setTitle("ZegoDemo");
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);

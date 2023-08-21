@@ -23,14 +23,13 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewParent;
 
-
+import com.zego.videofilter.R;
 import com.faceunity.nama.seekbar.internal.PopupIndicator;
 import com.faceunity.nama.seekbar.internal.compat.AnimatorCompat;
 import com.faceunity.nama.seekbar.internal.compat.SeekBarCompat;
 import com.faceunity.nama.seekbar.internal.drawable.MarkerDrawable;
 import com.faceunity.nama.seekbar.internal.drawable.ThumbDrawable;
 import com.faceunity.nama.seekbar.internal.drawable.TrackRectDrawable;
-import com.zego.videofilter.R;
 
 import java.util.Formatter;
 import java.util.Locale;
@@ -50,20 +49,21 @@ public class DiscreteSeekBar extends View {
          * @param fromUser if the change was made from the user or not (i.e. the developer calling {@link #setProgress(int)}
          */
         public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser);
+
         public void onStartTrackingTouch(DiscreteSeekBar seekBar);
+
         public void onStopTrackingTouch(DiscreteSeekBar seekBar);
     }
 
     public static class OnSimpleProgressChangeListener implements OnProgressChangeListener {
-        @Override
         public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
 
         }
-        @Override
+
         public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
 
         }
-        @Override
+
         public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
 
         }

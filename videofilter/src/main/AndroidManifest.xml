@@ -3,8 +3,8 @@
     package="com.zego.videofilter">
 
     <application>
-        <activity android:name=".ui.VideoFilterMainUI" />
-        <activity android:name=".ui.FUBeautyActivity" />
+        <activity android:name=".ui.VideoFilterMainUI" android:screenOrientation="portrait"/>
+        <activity android:name=".ui.FUBeautyActivity" android:screenOrientation="portrait"/>
 
     </application>
 

@@ -1,27 +1,26 @@
 package com.faceunity.nama;
 
 import android.content.Context;
-import android.hardware.Camera;
 import android.util.Log;
 
 import com.faceunity.core.callback.OperateCallback;
 import com.faceunity.core.entity.FURenderInputData;
 import com.faceunity.core.entity.FURenderOutputData;
-import com.faceunity.core.enumeration.CameraFacingEnum;
 import com.faceunity.core.enumeration.FUAIProcessorEnum;
 import com.faceunity.core.enumeration.FUAITypeEnum;
+import com.faceunity.core.faceunity.FUAIKit;
 import com.faceunity.core.faceunity.FURenderConfig;
 import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.faceunity.FURenderManager;
-import com.faceunity.core.utils.CameraUtils;
+import com.faceunity.core.model.facebeauty.FaceBeautyBlurTypeEnum;
 import com.faceunity.core.utils.FULogger;
 import com.faceunity.nama.listener.FURendererListener;
+import com.faceunity.nama.utils.FuDeviceUtils;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 /**
@@ -38,7 +37,6 @@ public class FURenderer extends IFURenderer {
             synchronized (FURenderer.class) {
                 if (INSTANCE == null) {
                     INSTANCE = new FURenderer();
-                    INSTANCE.mFURenderKit = FURenderKit.getInstance();
                 }
             }
         }
@@ -52,7 +50,8 @@ public class FURenderer extends IFURenderer {
 
 
     /* 特效FURenderKit*/
-    private FURenderKit mFURenderKit;
+    private FURenderKit mFURenderKit = FURenderKit.getInstance();
+    private FUAIKit mFUAIKit = FUAIKit.getInstance();
 
     /* AI道具*/
     private String BUNDLE_AI_FACE = "model" + File.separator + "ai_face_processor.bundle";
@@ -91,8 +90,8 @@ public class FURenderer extends IFURenderer {
             @Override
             public void onSuccess(int i, @NotNull String s) {
                 if (i == FURenderConfig.OPERATE_SUCCESS_AUTH) {
-                    mFURenderKit.getFUAIController().loadAIProcessor(BUNDLE_AI_FACE, FUAITypeEnum.FUAITYPE_FACEPROCESSOR);
-                    mFURenderKit.getFUAIController().loadAIProcessor(BUNDLE_AI_HUMAN, FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR);
+                    mFUAIKit.loadAIProcessor(BUNDLE_AI_FACE, FUAITypeEnum.FUAITYPE_FACEPROCESSOR);
+                    mFUAIKit.loadAIProcessor(BUNDLE_AI_HUMAN, FUAITypeEnum.FUAITYPE_HUMAN_PROCESSOR);
                 }
             }
 
@@ -291,6 +290,9 @@ public class FURenderer extends IFURenderer {
         }
         // AI检测
         trackStatus();
+
+        if (FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)//高性能设备
+            cheekFaceNum();
     }
 
     //region AI识别
@@ -356,6 +358,24 @@ public class FURenderer extends IFURenderer {
             mFURendererListener.onTrackStatusChanged(aIProcess, trackCount);
         }
     }
+
+    private void cheekFaceNum() {
+        //根据有无人脸 + 设备性能 判断开启的磨皮类型
+        float faceProcessorGetConfidenceScore = FUAIKit.getInstance().getFaceProcessorGetConfidenceScore(0);
+        if (faceProcessorGetConfidenceScore >= 0.95) {
+            //高端手机并且检测到人脸开启均匀磨皮，人脸点位质
+            if (FURenderKit.getInstance().getFaceBeauty() != null && FURenderKit.getInstance().getFaceBeauty().getBlurType() != FaceBeautyBlurTypeEnum.EquallySkin) {
+                FURenderKit.getInstance().getFaceBeauty().setBlurType(FaceBeautyBlurTypeEnum.EquallySkin);
+                FURenderKit.getInstance().getFaceBeauty().setEnableBlurUseMask(true);
+            }
+        } else {
+            if (FURenderKit.getInstance().getFaceBeauty() != null && FURenderKit.getInstance().getFaceBeauty().getBlurType() != FaceBeautyBlurTypeEnum.FineSkin) {
+                FURenderKit.getInstance().getFaceBeauty().setBlurType(FaceBeautyBlurTypeEnum.FineSkin);
+                FURenderKit.getInstance().getFaceBeauty().setEnableBlurUseMask(false);
+            }
+        }
+    }
+
     //endregion AI识别
 
     //------------------------------FPS 渲染时长回调相关定义------------------------------------
