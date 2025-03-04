@@ -57,8 +57,8 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
-    api 'com.faceunity:core:8.7.0'
-    implementation 'com.faceunity:model:8.7.0'
+    api 'com.faceunity:core:8.13.0'
+    implementation 'com.faceunity:model:8.13.0'
 
     implementation project(path: ':common')
 }
