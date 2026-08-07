@@ -291,7 +291,7 @@ public class FURenderer extends IFURenderer {
         // AI检测
         trackStatus();
 
-        if (FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_MID)//高性能设备
+        if (FUConfig.DEVICE_LEVEL > FuDeviceUtils.DEVICE_LEVEL_TWO)//高性能设备
             cheekFaceNum();
     }
 

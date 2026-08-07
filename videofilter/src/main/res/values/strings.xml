@@ -119,5 +119,18 @@
     <string name="beautify_leg_thin_slim">瘦腿</string>
 
     <string name="face_beauty_function_tips">%s功能仅支持在高端机上使用</string>
+    <string name="device_level_function_tip">该功能仅支持在高端机型上使用</string>
+    <string name="beauty_box_heavy_blur_fine_body">全身磨皮</string>
+    <string name="beauty_box_delspot">祛斑痘</string>
+    <string name="beauty_box_facial_plumping">面部丰盈</string>
+    <string name="beauty_box_intensity_eye_pupil">瞳孔大小</string>
+    <string name="beauty_box_clarity">清晰</string>
+
+    <string name="beautify_breast">丰胸</string>
+
+
+    <string name="beauty_skin_seg_type_overall">全局</string>
+    <string name="beauty_skin_seg_type_skin">仅皮肤</string>
+    <string name="beauty_skin_seg_type_tips">皮肤美白</string>
 
 </resources>

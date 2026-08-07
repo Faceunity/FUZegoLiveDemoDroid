@@ -25,6 +25,22 @@ public class FaceUnityDataFactory {
     private FURenderKit mFURenderKit = FURenderKit.getInstance();
     private FURenderer mFURenderer = FURenderer.getInstance();
 
+    private static FaceUnityDataFactory sInstance;
+    public static FaceUnityDataFactory getInstance() {
+        if (sInstance == null) {
+            synchronized (FaceUnityDataFactory.class) {
+                if (sInstance == null) {
+                    sInstance = new FaceUnityDataFactory(-1);
+                }
+            }
+        }
+        return sInstance;
+    }
+
+    public static void release() {
+        sInstance = null;
+    }
+
     /**
      * 道具加载标识
      */
@@ -57,7 +73,7 @@ public class FaceUnityDataFactory {
         hasFaceBeautyOrFilterLoaded = needBindFaceBeauty;
         //高端机开启小脸检测
         FUAIKit.getInstance().faceProcessorSetFaceLandmarkQuality(FUConfig.DEVICE_LEVEL);
-        if (FUConfig.DEVICE_LEVEL  > FuDeviceUtils.DEVICE_LEVEL_MID)
+        if (FUConfig.DEVICE_LEVEL  > FuDeviceUtils.DEVICE_LEVEL_TWO)
             FUAIKit.getInstance().fuFaceProcessorSetDetectSmallFace(true);
         //选中哪一项加载哪一项道具
         switch (currentFunctionIndex) {
