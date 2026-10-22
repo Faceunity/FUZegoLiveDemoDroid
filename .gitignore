@@ -9,3 +9,4 @@
 .externalNativeBuild
 /**/*/build
 .idea/
+/common/src/main/java/com/zego/common/GetAppIdConfig.java
